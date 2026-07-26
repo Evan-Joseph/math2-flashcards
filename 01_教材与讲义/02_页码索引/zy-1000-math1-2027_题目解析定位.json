@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "source_id": "zhangyu-1000-math1-2027",
+  "title": "张宇考研数学题源探析经典 1000 题·数学一：试题册与解析册定位（本地文件名标注 2027）",
+  "locator_granularity": "试题册章节级，单题在章节范围内的页级扫描；解析册章节级",
+  "verification_date": "2026-07-25",
+  "verification_method": "试题册有效书签、目录页渲染、章节首页与题号页定点渲染；解析册目录页与解析首页定点渲染",
+  "edition_evidence": {
+    "questions_copyright_pdf_page": 3,
+    "solutions_copyright_pdf_page": 2,
+    "copyright_edition": "2022.1（2026.1 重印）",
+    "isbn_from_copyright_page": "978-7-5763-0818-1",
+    "local_preface": "试题册前言明确写“2027 版”，并说明结合 2026 年考题更新",
+    "2027_service_status": "本地材料可按 2027 主线使用；出版社官方书目和对应 ISBN 尚待核对"
+  },
+  "books": [
+    {
+      "role": "questions",
+      "pdf_file": "【数学一】题源探析经典1000题数一试题册_张宇_2027.pdf",
+      "pdf_pages": 195,
+      "sha256": "933dd68f606e2212e64be800b72d48971bbdd99dcf9bf065286ec639a7580147",
+      "bookmark_count": 81,
+      "copyright_pdf_page": 3,
+      "copyright_edition": "2022.1（2026.1 重印）",
+      "isbn_from_copyright_page": "978-7-5763-0818-1",
+      "confidence": "high"
+    },
+    {
+      "role": "solutions",
+      "pdf_file": "【数学一】题源探析经典1000题数一解析册_张宇_2027.pdf",
+      "pdf_pages": 563,
+      "sha256": "9eff6a3c36226f748b3d87d009841e20500a0e81fa42143f56202fcab484971a",
+      "bookmark_count": 0,
+      "copyright_pdf_page": 2,
+      "copyright_edition": "2022.1（2026.1 重印）",
+      "isbn_from_copyright_page": "978-7-5763-0818-1",
+      "confidence": "high"
+    }
+  ],
+  "ranges": [
+    {"phase":"基础篇","subject":"高数","title":"零基础","question_pdf_start":9,"question_pdf_end":10,"solution_print_start":3,"solution_pdf_start":7,"confidence":"high"},
+    {"phase":"基础篇","subject":"高数","title":"第1章 函数极限与连续","question_pdf_start":11,"question_pdf_end":12,"solution_print_start":8,"solution_pdf_start":12,"confidence":"high"},
+    {"phase":"基础篇","subject":"高数","title":"第2章 数列极限","question_pdf_start":13,"question_pdf_end":13,"solution_print_start":14,"solution_pdf_start":18,"confidence":"high"},
+    {"phase":"基础篇","subject":"高数","title":"第3章 一元函数微分学的概念","question_pdf_start":14,"question_pdf_end":15,"solution_print_start":17,"solution_pdf_start":21,"confidence":"high"},
+    {"phase":"基础篇","subject":"高数","title":"第4章 一元函数微分学的计算","question_pdf_start":16,"question_pdf_end":16,"solution_print_start":22,"solution_pdf_start":26,"confidence":"high"},
+    {"phase":"基础篇","subject":"高数","title":"第5章 一元函数微分学的应用（一）","question_pdf_start":17,"question_pdf_end":20,"solution_print_start":27,"solution_pdf_start":31,"confidence":"high"},
+    {"phase":"基础篇","subject":"高数","title":"第6章 一元函数微分学的应用（二）","question_pdf_start":21,"question_pdf_end":22,"solution_print_start":35,"solution_pdf_start":39,"confidence":"high"},
+    {"phase":"基础篇","subject":"高数","title":"第7章 一元函数微分学的应用（三）","question_pdf_start":23,"question_pdf_end":23,"solution_print_start":42,"solution_pdf_start":46,"confidence":"high"},
+    {"phase":"基础篇","subject":"高数","title":"第8章 一元函数积分学的概念与性质","question_pdf_start":24,"question_pdf_end":26,"solution_print_start":43,"solution_pdf_start":47,"confidence":"high"},
+    {"phase":"基础篇","subject":"高数","title":"第9章 一元函数积分学的计算","question_pdf_start":27,"question_pdf_end":29,"solution_print_start":53,"solution_pdf_start":57,"confidence":"high"},
+    {"phase":"基础篇","subject":"高数","title":"第10章 一元函数积分学的应用（一）","question_pdf_start":30,"question_pdf_end":32,"solution_print_start":69,"solution_pdf_start":73,"confidence":"high"},
+    {"phase":"基础篇","subject":"高数","title":"第11章 一元函数积分学的应用（二）","question_pdf_start":33,"question_pdf_end":33,"solution_print_start":75,"solution_pdf_start":79,"confidence":"high"},
+    {"phase":"基础篇","subject":"高数","title":"第12章 一元函数积分学的应用（三）","question_pdf_start":34,"question_pdf_end":35,"solution_print_start":80,"solution_pdf_start":84,"confidence":"high"},
+    {"phase":"基础篇","subject":"高数","title":"第13章 多元函数微分学","question_pdf_start":36,"question_pdf_end":38,"solution_print_start":83,"solution_pdf_start":87,"confidence":"high"},
+    {"phase":"基础篇","subject":"高数","title":"第14章 二重积分","question_pdf_start":39,"question_pdf_end":41,"solution_print_start":91,"solution_pdf_start":95,"confidence":"high"},
+    {"phase":"基础篇","subject":"高数","title":"第15章 微分方程","question_pdf_start":42,"question_pdf_end":43,"solution_print_start":99,"solution_pdf_start":103,"confidence":"high"},
+    {"phase":"基础篇","subject":"高数","title":"第16章 无穷级数","question_pdf_start":44,"question_pdf_end":46,"solution_print_start":105,"solution_pdf_start":109,"confidence":"high"},
+    {"phase":"基础篇","subject":"高数","title":"第17章 多元函数积分学的预备知识","question_pdf_start":47,"question_pdf_end":48,"solution_print_start":112,"solution_pdf_start":116,"confidence":"high"},
+    {"phase":"基础篇","subject":"高数","title":"第18章 多元函数积分学","question_pdf_start":49,"question_pdf_end":50,"solution_print_start":116,"solution_pdf_start":120,"confidence":"high"},
+    {"phase":"基础篇","subject":"线代","title":"第1章 行列式","question_pdf_start":51,"question_pdf_end":52,"solution_print_start":122,"solution_pdf_start":126,"confidence":"high"},
+    {"phase":"基础篇","subject":"线代","title":"第2章 矩阵","question_pdf_start":53,"question_pdf_end":55,"solution_print_start":127,"solution_pdf_start":131,"confidence":"high"},
+    {"phase":"基础篇","subject":"线代","title":"第3章 向量组","question_pdf_start":56,"question_pdf_end":57,"solution_print_start":132,"solution_pdf_start":136,"confidence":"high"},
+    {"phase":"基础篇","subject":"线代","title":"第4章 线性方程组","question_pdf_start":58,"question_pdf_end":61,"solution_print_start":137,"solution_pdf_start":141,"confidence":"high"},
+    {"phase":"基础篇","subject":"线代","title":"第5章 特征值与特征向量","question_pdf_start":62,"question_pdf_end":64,"solution_print_start":144,"solution_pdf_start":148,"confidence":"high"},
+    {"phase":"基础篇","subject":"线代","title":"第6章 二次型","question_pdf_start":65,"question_pdf_end":68,"solution_print_start":156,"solution_pdf_start":160,"confidence":"high"},
+    {"phase":"基础篇","subject":"概率","title":"第1章 随机事件与概率","question_pdf_start":69,"question_pdf_end":69,"solution_print_start":173,"solution_pdf_start":177,"confidence":"high"},
+    {"phase":"基础篇","subject":"概率","title":"第2章 一维随机变量及其分布","question_pdf_start":70,"question_pdf_end":71,"solution_print_start":177,"solution_pdf_start":181,"confidence":"high"},
+    {"phase":"基础篇","subject":"概率","title":"第3章 多维随机变量及其分布","question_pdf_start":72,"question_pdf_end":74,"solution_print_start":180,"solution_pdf_start":184,"confidence":"high"},
+    {"phase":"基础篇","subject":"概率","title":"第4章 随机变量的数字特征","question_pdf_start":75,"question_pdf_end":77,"solution_print_start":188,"solution_pdf_start":192,"confidence":"high"},
+    {"phase":"基础篇","subject":"概率","title":"第5章 大数定律与中心极限定理","question_pdf_start":78,"question_pdf_end":78,"solution_print_start":197,"solution_pdf_start":201,"confidence":"high"},
+    {"phase":"基础篇","subject":"概率","title":"第6章 数理统计","question_pdf_start":79,"question_pdf_end":82,"solution_print_start":200,"solution_pdf_start":204,"confidence":"high"},
+    {"phase":"强化篇","subject":"高数","title":"第1章至第18章","question_pdf_start":84,"question_pdf_end":137,"solution_print_start":211,"solution_pdf_start":215,"confidence":"high","notes":"目录页已核验；强化篇逐章起页见试题册书签。"},
+    {"phase":"强化篇","subject":"线代","title":"第1章至第9章","question_pdf_start":138,"question_pdf_end":158,"solution_print_start":389,"solution_pdf_start":393,"confidence":"high","notes":"目录页已核验；逐章起页见试题册书签。"},
+    {"phase":"强化篇","subject":"概率","title":"第1章至第9章","question_pdf_start":159,"question_pdf_end":178,"solution_print_start":452,"solution_pdf_start":456,"confidence":"high","notes":"目录页已核验；逐章起页见试题册书签。"},
+    {"phase":"综合篇","subject":"测试卷","title":"测试卷一","question_pdf_start":180,"question_pdf_end":183,"solution_print_start":517,"solution_pdf_start":521,"confidence":"high"},
+    {"phase":"综合篇","subject":"测试卷","title":"测试卷二","question_pdf_start":184,"question_pdf_end":187,"solution_print_start":527,"solution_pdf_start":531,"confidence":"high"},
+    {"phase":"综合篇","subject":"测试卷","title":"测试卷三","question_pdf_start":188,"question_pdf_end":191,"solution_print_start":538,"solution_pdf_start":542,"confidence":"high"},
+    {"phase":"综合篇","subject":"测试卷","title":"测试卷四","question_pdf_start":192,"question_pdf_end":195,"solution_print_start":552,"solution_pdf_start":556,"confidence":"high"}
+  ],
+  "reinforced_chapter_starts": {
+    "高数": [
+      {"chapter":1,"question_pdf":84,"solution_pdf":215},{"chapter":2,"question_pdf":88,"solution_pdf":227},{"chapter":3,"question_pdf":90,"solution_pdf":231},{"chapter":4,"question_pdf":93,"solution_pdf":239},{"chapter":5,"question_pdf":95,"solution_pdf":243},{"chapter":6,"question_pdf":99,"solution_pdf":257},{"chapter":7,"question_pdf":102,"solution_pdf":265},{"chapter":8,"question_pdf":103,"solution_pdf":266},{"chapter":9,"question_pdf":106,"solution_pdf":274},{"chapter":10,"question_pdf":108,"solution_pdf":283},{"chapter":11,"question_pdf":111,"solution_pdf":294},{"chapter":12,"question_pdf":112,"solution_pdf":298},{"chapter":13,"question_pdf":114,"solution_pdf":300},{"chapter":14,"question_pdf":118,"solution_pdf":316},{"chapter":15,"question_pdf":122,"solution_pdf":337},{"chapter":16,"question_pdf":126,"solution_pdf":352},{"chapter":17,"question_pdf":131,"solution_pdf":371},{"chapter":18,"question_pdf":134,"solution_pdf":377}
+    ],
+    "线代": [
+      {"chapter":1,"question_pdf":138,"solution_pdf":393},{"chapter":2,"question_pdf":140,"solution_pdf":398},{"chapter":3,"question_pdf":141,"solution_pdf":399},{"chapter":4,"question_pdf":143,"solution_pdf":403},{"chapter":5,"question_pdf":145,"solution_pdf":406},{"chapter":6,"question_pdf":148,"solution_pdf":416},{"chapter":7,"question_pdf":150,"solution_pdf":421},{"chapter":8,"question_pdf":152,"solution_pdf":425},{"chapter":9,"question_pdf":155,"solution_pdf":438}
+    ],
+    "概率": [
+      {"chapter":1,"question_pdf":159,"solution_pdf":456},{"chapter":2,"question_pdf":160,"solution_pdf":459},{"chapter":3,"question_pdf":162,"solution_pdf":463},{"chapter":4,"question_pdf":163,"solution_pdf":467},{"chapter":5,"question_pdf":165,"solution_pdf":471},{"chapter":6,"question_pdf":167,"solution_pdf":480},{"chapter":7,"question_pdf":170,"solution_pdf":492},{"chapter":8,"question_pdf":171,"solution_pdf":494},{"chapter":9,"question_pdf":173,"solution_pdf":499}
+    ]
+  },
+  "single_question_lookup": {
+    "supported": true,
+    "method": "先按 phase/subject/chapter 找 question_pdf_start..end；该页段内题号连续，使用 PDF 阅读器页码跳转或对该窄页段 OCR。解析册按同一条目 solution_pdf_start 起找对应解析。",
+    "limitation": "本轮未把 1000 余题逐题写成静态页码表；跨页题和相邻章节边界需以题号和章节标题二次确认。"
+  }
+}
