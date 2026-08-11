@@ -28,7 +28,9 @@
 ## 证据与晚间复盘
 
 - 真实作答、错因、闭卷提取、订正和间隔复习如需结构化记录，仍由备考根目录的 `study-ledger` 独占；本科仓库不得另建平行账本。
-- `study-ledger` 的只读入口为 `/Users/joseph/.agents/tools/study-ledger/study-ledger`。晚间复盘还应按 `/Users/joseph/Desktop/【考研】11408考研备考/【工具】11408沉浸时钟/docs/API.md`，从本机安全配置读取凭据并只读调用 `GET /api/v1/daily-summary` 与 `GET /api/v1/sessions`；不得回显凭据。
+- `study-ledger` 的只读入口为 `/Users/joseph/.agents/tools/study-ledger/study-ledger`。晚间复盘还应先读 `/Users/joseph/Desktop/【考研】11408考研备考/【工具】11408沉浸时钟/docs/API.md`，只读调用公开且无需凭据的 `GET /api/v1/daily-summary` 与 `GET /api/v1/sessions`，日期和汇总统一使用 `Asia/Shanghai`。
+- `curl` 不自动继承 macOS 系统代理。时钟 API 直连超时时，先只读核验 `scutil --proxy` 或当前代理软件给出的 HTTPS 代理，再仅在当前 shell 临时设置 `HTTPS_PROXY`，先重试 `GET /api/v1/health`，成功后读取当日 `daily-summary` 与 `sessions`。不得修改系统代理，不得把机器特定代理地址或端口写入仓库。
+- 只有直连与当前 HTTPS 代理路径均失败时，才记录“接口不可读”，并保留时长、会话和备注为 `unknown`。网络超时、代理失败、HTTP 错误或响应无法解析均不能记成 0，也不能写成“无学习”。
 - 沉浸时钟的净时长、会话状态和备注只作执行事实。它们不能证明完成、正确率或掌握；撤回和跨日口径以 API 汇总字段为准。
 - 当天聊天可用于识别用户问过的问题、困惑、真实停点和明确陈述的作答事实。没有明确证据时写“无学习数据”，不得从解释过某题推断用户已经理解或掌握。
 - 每晚更新 `00_学习状态.md`，只保留最近事实、当前定位、未解决问题和下一步。不要复制长聊天全文，不保留已失效计划、内部 ID、API revision 或工作台路径。
