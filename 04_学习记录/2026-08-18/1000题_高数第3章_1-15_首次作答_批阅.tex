@@ -1,0 +1,159 @@
+\documentclass[11pt,a4paper]{ctexart}
+\usepackage[margin=1.8cm]{geometry}
+\usepackage{amsmath,amssymb,enumitem,xcolor,longtable}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\definecolor{accent}{HTML}{1F5A50}
+\newcommand{\verdict}[1]{\textcolor{accent}{\textbf{#1}}}
+\title{《1000题》高数第3章第1--15题\\首次作答批阅与订正}
+\author{}
+\date{2026年8月19日}
+\begin{document}
+\maketitle
+
+\section*{范围、来源与核验}
+用户扫描共5页；原题为试题册PDF第14--15页，官方解析为解析册PDF第21--25页。先用MinerU Precision OCR检查整卷覆盖，再逐题放大原扫描，并逐题回看原题与官方解析。OCR只作导航。该章属于当前暂按数学二的共同核心，2027正式大纲待官方确认。
+
+严格按结论与关键论证均成立统计：\textbf{6题正确（1、3、4、6、7、9），7题部分正确（2、5、8、10、12、13、15），2题错误（11、14）}，无识别不确定项。此统计只描述本次卷面。
+
+\section*{逐题批阅}
+\subsection*{1. \verdict{正确}}
+\textbf{原题：}已知$f(0)=0$且$f'(0)$存在，求$\displaystyle\lim_{x\to0}\frac{f(1-\cos x)}{\ln(1-x\sin x)}$。
+
+用户令$u=1-\cos x$并拆出导数定义，结论$-\frac12f'(0)$正确。官方路线为
+\[
+\frac{f(1-\cos x)-f(0)}{1-\cos x}\cdot\frac{1-\cos x}{\ln(1-x\sin x)}
+\to f'(0)\frac{\frac12x^2}{-x^2}=-\frac12f'(0).
+\]
+无需重做，注意保留分母主部的负号。
+
+\subsection*{2. \verdict{部分正确}}
+\textbf{原题：}$F(x)=g(x)\varphi(x)$，$\varphi$在$a$处连续但不可导，$g$与$F$在$a$处可导，判断必有的条件。
+
+用户选A正确，但“增量趋于0”不能推出$g(a)=0$。官方最小改法：反设$g(a)\ne0$。可导蕴含连续，故$a$附近$g(x)\ne0$，于是$\varphi(x)=F(x)/g(x)$在$a$可导，与题设矛盾。因此$g(a)=0$。订正时补齐反证。
+
+\subsection*{3. \verdict{正确}}
+\textbf{原题：}连续函数$f$满足$\displaystyle\lim_{x\to2}\frac{\ln(x-1)}{f(3-x)}=2$且$f(1)=0$，求$f'(1)$。
+
+用户选D，$f'(1)=-\frac12$正确。令$\Delta x=x-2$，由
+\[
+\frac{\ln(1+\Delta x)/\Delta x}{f(1-\Delta x)/\Delta x}\to2
+\]
+得$f(1-\Delta x)/\Delta x\to\frac12$；导数的增量为$-\Delta x$，故$f'(1)=-\frac12$。换元后应显式写出负增量。
+
+\subsection*{4. \verdict{正确}}
+\textbf{原题：}$f$在0处可导，$f(0)=f'(0)=\sqrt2$，求$\displaystyle\lim_{x\to0}\frac{f^2(x)-2}{x}$。
+
+用户用平方差得到
+\[
+\frac{f^2(x)-2}{x}=[f(x)+\sqrt2]\frac{f(x)-f(0)}x\to2\sqrt2\,f'(0)=4.
+\]
+路线和结论均正确。
+
+\subsection*{5. \verdict{部分正确}}
+\textbf{原题：}$f(x)=1/n^2$，其中$1/(n+1)^2<x\le1/n^2$，$n=1,2,\ldots$，且$f(0)=0$，求$f'_+(0)$。
+
+答案1正确，但用户写“固定$n$，$x\to0^+$”，这与题设不相容；$n$由$x$所在区间决定，$x\to0^+$时$n\to\infty$。由
+\[
+\frac1{(n+1)^2}<x\le\frac1{n^2},\quad f(x)=\frac1{n^2}
+\]
+得
+\[
+1\le\frac{f(x)}x<\left(\frac{n+1}{n}\right)^2\to1,
+\]
+所以$f'_+(0)=1$。订正不等式链并注明$n\to\infty$。
+
+\subsection*{6. \verdict{正确}}
+\textbf{原题：}可导函数$f(x)>0$，求$\displaystyle\lim_{n\to\infty}n\ln\frac{f(1/n)}{f(0)}$。
+
+用户路线与官方一致：
+\[
+n\ln\frac{f(1/n)}{f(0)}=\frac{\ln f(1/n)-\ln f(0)}{1/n}\to\frac{f'(0)}{f(0)}.
+\]
+
+\subsection*{7. \verdict{正确}}
+\textbf{原题：}$f$可导而$|f|$在$x=0$处不可导，判断$f(0)$与$f'(0)$。
+
+用户选B正确。若$f(0)\ne0$，则$|f|$在0附近等于$\pm f$，必可导，故$f(0)=0$。此时$|f|$的右、左导数分别为$|f'(0)|$与$-|f'(0)|$，要不可导必须$f'(0)\ne0$。
+
+\subsection*{8. \verdict{部分正确}}
+\textbf{原题：}$f$连续且$\displaystyle\lim_{x\to1}\frac{f(x)-1}{\ln x}=2$，求曲线$y=f(x)$在$x=1$处的切线。
+
+切线$y=2x-1$正确。卷面最早缺失是把两个商直接写成相等。应写
+\[
+f'(1)=\lim\frac{f(x)-1}{x-1}
+=\lim\frac{f(x)-1}{\ln x}\frac{\ln x}{x-1}=2.
+\]
+原极限有限且$\ln x\to0$，结合连续性先得$f(1)=1$。
+
+\subsection*{9. \verdict{正确}}
+\textbf{原题：}$f$在$x=1$处可导，$\Delta f(1)$为自变量增量$\Delta x$时的函数值增量，求$\displaystyle\lim_{\Delta x\to0}\frac{\Delta f(1)-df(1)}{\Delta x}$。
+
+由$\Delta f(1)=f'(1)\Delta x+o(\Delta x)$及$df(1)=f'(1)\Delta x$，相减后除以$\Delta x$趋0，选D。用户路线正确。
+
+\subsection*{10. \verdict{部分正确}}
+\textbf{原题：}$f(x)=x^3\sin(1/x)$（$x>0$），$f(x)=x^2$（$x\le0$），判断$f$在0处的连续性、可导性及导函数连续性。
+
+用户选D正确，也算出$f'(0)=0$，但没有证明导函数连续。需补：
+\[
+f'(x)=3x^2\sin\frac1x-x\cos\frac1x\to0\quad(x\to0^+),
+\qquad f'(x)=2x\to0\quad(x\to0^-).
+\]
+两侧均趋$f'(0)=0$，所以$f'$在0连续。可导本身不保证导函数连续。
+
+\subsection*{11. \verdict{错误}}
+\textbf{原题：}$\varphi$有一阶连续导数，$f(x)=\varphi(x)[1+|\ln(1+x)|]$，判断$\varphi(0)=0$是$f$在0处可导的什么条件。
+
+用户认为$\varphi(0)=0$充分但不必要，错在只看$\ln1=0$和函数值，没有比较左右导数。官方路线为
+\[
+f'_+(0)=\varphi'(0)+\varphi(0),\qquad
+f'_-(0)=\varphi'(0)-\varphi(0).
+\]
+两者相等当且仅当$\varphi(0)=0$，故为\textbf{充分必要条件，选A}。本题须闭卷重做。
+
+\subsection*{12. \verdict{部分正确}}
+\textbf{原题：}$f$在$x_0$处可导，$x_n=\sin(1/n)+1/n^2$，求$\displaystyle\lim_{n\to\infty}\frac{f(x_0+1/n)-f(x_0-x_n)}{\sin(1/n)}$。
+
+结论$2f'(x_0)$正确，但用户把局部线性化写成无余项的精确等式。官方路线把分子加减$f(x_0)$：
+\[
+\frac{f(x_0+1/n)-f(x_0)}{1/n}\frac{1/n}{\sin(1/n)}
++\frac{f(x_0-x_n)-f(x_0)}{-x_n}\frac{x_n}{\sin(1/n)}\to2f'(x_0).
+\]
+这里$x_n=\sin(1/n)+1/n^2\sim1/n$。订正时用导数定义；若用展开，必须写$o(h)$。
+
+\subsection*{13. \verdict{部分正确}}
+\textbf{原题：}$f$为在0处可导的奇函数，求$\displaystyle\lim_{x\to0}\frac{f(tx)-5f(x)}x$。
+
+结论$(t-5)f'(0)$正确。用户把$f(tx)=txf'(0)$写成精确等式，通常不成立。由奇函数得$f(0)=0$，官方写法为
+\[
+\frac{f(tx)-5f(x)}x
+=t\frac{f(tx)-f(0)}{tx}-5\frac{f(x)-f(0)}x
+\to(t-5)f'(0).
+\]
+$t=0$时结论同样成立。
+
+\subsection*{14. \verdict{错误}}
+\textbf{原题：}$f(x)=\max\{2x,x^2\}$，$x\in(0,4)$，且$f'(a)$不存在，求$a$。
+
+用户正确找到切换点2并算出左右导数2、4，却把答案写成$a>2$。两段在各自开区间内均光滑，不可导只发生在切换点。因此\textbf{$a=2$}。订正流程：先解$2x=x^2$找区间内切换点，再只检查该点左右导数。
+
+\subsection*{15. \verdict{部分正确}}
+\textbf{原题：}$\displaystyle f(x)=\lim_{n\to\infty}\frac{x^2e^{n(x-1)}+ax+b}{5+e^{n(x-1)}}$，求$f(x)$并讨论连续性、可导性与$a,b$的关系。
+
+用户正确得到
+\[
+f(x)=\begin{cases}
+(ax+b)/5,&x<1,\\
+(1+a+b)/6,&x=1,\\
+x^2,&x>1,
+\end{cases}
+\]
+且连续条件$a+b=5$正确。可导还需在连续基础上满足
+\[
+f'_-(1)=\frac a5=f'_+(1)=2.
+\]
+故可导当且仅当$a=10,b=-5$。用户漏了导数匹配条件。
+
+\section*{订正清单}
+完整重做第11、14题；补齐第2、5、8、10、12、13、15题的关键论证。第1、3、4、6、7、9题无需增加替代路线。当前没有识别不确定项；是否已订正及间隔后能否独立作答仍待后续证据。
+\end{document}
