@@ -1,159 +1,129 @@
 \documentclass[11pt,a4paper]{ctexart}
-\usepackage[margin=1.8cm]{geometry}
-\usepackage{amsmath,amssymb,enumitem,xcolor,longtable}
+\usepackage[margin=1.7cm]{geometry}
+\usepackage{amsmath,amssymb,graphicx,xcolor}
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{4pt}
-\definecolor{accent}{HTML}{1F5A50}
-\newcommand{\verdict}[1]{\textcolor{accent}{\textbf{#1}}}
-\title{《1000题》高数第3章第1--15题\\首次作答批阅与订正}
+\setlength{\parskip}{5pt}
+\definecolor{change}{HTML}{B42318}
+\newcommand{\answerimg}[1]{\begin{center}\includegraphics[width=\textwidth,height=.48\textheight,keepaspectratio]{derived/1000题_高数第3章_1-15_原解答裁切/q#1.png}\end{center}}
+\newcommand{\problem}[1]{\textcolor{change}{\textbf{【问题标注】}#1}\par}
+\newcommand{\same}{答案正确，保持原解答，不作修改。}
+\newcommand{\three}[4]{\section*{第#1题}\textbf{原题}\par #2\par\textbf{原解答}\answerimg{#1}#4\textbf{修正后解答}\par #3\par}
+\title{《1000题》高数第3章第1--15题\\首次作答批阅}
 \author{}
-\date{2026年8月19日}
+\date{2026年8月20日}
 \begin{document}
 \maketitle
 
-\section*{范围、来源与核验}
-用户扫描共5页；原题为试题册PDF第14--15页，官方解析为解析册PDF第21--25页。先用MinerU Precision OCR检查整卷覆盖，再逐题放大原扫描，并逐题回看原题与官方解析。OCR只作导航。该章属于当前暂按数学二的共同核心，2027正式大纲待官方确认。
-
-严格按结论与关键论证均成立统计：\textbf{6题正确（1、3、4、6、7、9），7题部分正确（2、5、8、10、12、13、15），2题错误（11、14）}，无识别不确定项。此统计只描述本次卷面。
-
-\section*{逐题批阅}
-\subsection*{1. \verdict{正确}}
-\textbf{原题：}已知$f(0)=0$且$f'(0)$存在，求$\displaystyle\lim_{x\to0}\frac{f(1-\cos x)}{\ln(1-x\sin x)}$。
-
-用户令$u=1-\cos x$并拆出导数定义，结论$-\frac12f'(0)$正确。官方路线为
+\three{1}{设$f(0)=0$，且$f'(0)$存在，求
 \[
-\frac{f(1-\cos x)-f(0)}{1-\cos x}\cdot\frac{1-\cos x}{\ln(1-x\sin x)}
-\to f'(0)\frac{\frac12x^2}{-x^2}=-\frac12f'(0).
-\]
-无需重做，注意保留分母主部的负号。
+\lim_{x\to0}\frac{f(1-\cos x)}{\ln(1-x\sin x)}.
+\]}{\same}{}
 
-\subsection*{2. \verdict{部分正确}}
-\textbf{原题：}$F(x)=g(x)\varphi(x)$，$\varphi$在$a$处连续但不可导，$g$与$F$在$a$处可导，判断必有的条件。
+\three{2}{设$F(x)=g(x)\varphi(x)$，$\varphi(x)$在$x=a$处连续但不可导，$g(x)$在$x=a$处可导，$F(x)$在$x=a$处可导，则一定有（~~~）。\quad(A) $g(a)=0$\quad(B) $g(a)\ne0$\quad(C) $g'(a)=0$\quad(D) $g(a)$可以为任意实数。}{\same}{}
 
-用户选A正确，但“增量趋于0”不能推出$g(a)=0$。官方最小改法：反设$g(a)\ne0$。可导蕴含连续，故$a$附近$g(x)\ne0$，于是$\varphi(x)=F(x)/g(x)$在$a$可导，与题设矛盾。因此$g(a)=0$。订正时补齐反证。
-
-\subsection*{3. \verdict{正确}}
-\textbf{原题：}连续函数$f$满足$\displaystyle\lim_{x\to2}\frac{\ln(x-1)}{f(3-x)}=2$且$f(1)=0$，求$f'(1)$。
-
-用户选D，$f'(1)=-\frac12$正确。令$\Delta x=x-2$，由
+\three{3}{设连续函数$f(x)$满足
 \[
-\frac{\ln(1+\Delta x)/\Delta x}{f(1-\Delta x)/\Delta x}\to2
+\lim_{x\to2}\frac{\ln(x-1)}{f(3-x)}=2,\qquad f(1)=0,
 \]
-得$f(1-\Delta x)/\Delta x\to\frac12$；导数的增量为$-\Delta x$，故$f'(1)=-\frac12$。换元后应显式写出负增量。
+求$f'(1)$。}{\same}{}
 
-\subsection*{4. \verdict{正确}}
-\textbf{原题：}$f$在0处可导，$f(0)=f'(0)=\sqrt2$，求$\displaystyle\lim_{x\to0}\frac{f^2(x)-2}{x}$。
-
-用户用平方差得到
+\three{4}{设$f(x)$在$x=0$处可导，$f(0)=f'(0)=\sqrt2$，求
 \[
-\frac{f^2(x)-2}{x}=[f(x)+\sqrt2]\frac{f(x)-f(0)}x\to2\sqrt2\,f'(0)=4.
-\]
-路线和结论均正确。
+\lim_{x\to0}\frac{f^2(x)-2}{x}.
+\]}{\same}{}
 
-\subsection*{5. \verdict{部分正确}}
-\textbf{原题：}$f(x)=1/n^2$，其中$1/(n+1)^2<x\le1/n^2$，$n=1,2,\ldots$，且$f(0)=0$，求$f'_+(0)$。
-
-答案1正确，但用户写“固定$n$，$x\to0^+$”，这与题设不相容；$n$由$x$所在区间决定，$x\to0^+$时$n\to\infty$。由
+\three{5}{设$f(x)=1/n^2$，其中
 \[
-\frac1{(n+1)^2}<x\le\frac1{n^2},\quad f(x)=\frac1{n^2}
+\frac1{(n+1)^2}<x\le\frac1{n^2},\quad n=1,2,\ldots,\qquad f(0)=0,
 \]
-得
+求$f'_+(0)$。}{\same}{}
+
+\three{6}{设可导函数$f(x)>0$，求
 \[
-1\le\frac{f(x)}x<\left(\frac{n+1}{n}\right)^2\to1,
-\]
-所以$f'_+(0)=1$。订正不等式链并注明$n\to\infty$。
+\lim_{n\to\infty}n\ln\frac{f(1/n)}{f(0)}.
+\]}{\same}{}
 
-\subsection*{6. \verdict{正确}}
-\textbf{原题：}可导函数$f(x)>0$，求$\displaystyle\lim_{n\to\infty}n\ln\frac{f(1/n)}{f(0)}$。
+\three{7}{设函数$f(x)$可导，$|f(x)|$在$x=0$处不可导，则（~~~）。\quad(A) $f(0)=0,f'(0)=0$\quad(B) $f(0)=0,f'(0)\ne0$\quad(C) $f(0)\ne0,f'(0)=0$\quad(D) $f(0)\ne0,f'(0)\ne0$。}{\same}{}
 
-用户路线与官方一致：
+\three{8}{设函数$f(x)$连续，
 \[
-n\ln\frac{f(1/n)}{f(0)}=\frac{\ln f(1/n)-\ln f(0)}{1/n}\to\frac{f'(0)}{f(0)}.
+\lim_{x\to1}\frac{f(x)-1}{\ln x}=2,
 \]
+求曲线$y=f(x)$在$x=1$处的切线方程。}{\same}{}
 
-\subsection*{7. \verdict{正确}}
-\textbf{原题：}$f$可导而$|f|$在$x=0$处不可导，判断$f(0)$与$f'(0)$。
-
-用户选B正确。若$f(0)\ne0$，则$|f|$在0附近等于$\pm f$，必可导，故$f(0)=0$。此时$|f|$的右、左导数分别为$|f'(0)|$与$-|f'(0)|$，要不可导必须$f'(0)\ne0$。
-
-\subsection*{8. \verdict{部分正确}}
-\textbf{原题：}$f$连续且$\displaystyle\lim_{x\to1}\frac{f(x)-1}{\ln x}=2$，求曲线$y=f(x)$在$x=1$处的切线。
-
-切线$y=2x-1$正确。卷面最早缺失是把两个商直接写成相等。应写
+\three{9}{设函数$f(x)$在$x=1$处可导，$\Delta f(1)$是增量为$\Delta x$时的函数值增量，求
 \[
-f'(1)=\lim\frac{f(x)-1}{x-1}
-=\lim\frac{f(x)-1}{\ln x}\frac{\ln x}{x-1}=2.
-\]
-原极限有限且$\ln x\to0$，结合连续性先得$f(1)=1$。
+\lim_{\Delta x\to0}\frac{\Delta f(1)-df(1)}{\Delta x}.
+\]（~~~）。\quad(A) $f'(1)$\quad(B) $1$\quad(C) $\infty$\quad(D) $0$}{\same}{}
 
-\subsection*{9. \verdict{正确}}
-\textbf{原题：}$f$在$x=1$处可导，$\Delta f(1)$为自变量增量$\Delta x$时的函数值增量，求$\displaystyle\lim_{\Delta x\to0}\frac{\Delta f(1)-df(1)}{\Delta x}$。
-
-由$\Delta f(1)=f'(1)\Delta x+o(\Delta x)$及$df(1)=f'(1)\Delta x$，相减后除以$\Delta x$趋0，选D。用户路线正确。
-
-\subsection*{10. \verdict{部分正确}}
-\textbf{原题：}$f(x)=x^3\sin(1/x)$（$x>0$），$f(x)=x^2$（$x\le0$），判断$f$在0处的连续性、可导性及导函数连续性。
-
-用户选D正确，也算出$f'(0)=0$，但没有证明导函数连续。需补：
+\three{10}{设
 \[
-f'(x)=3x^2\sin\frac1x-x\cos\frac1x\to0\quad(x\to0^+),
-\qquad f'(x)=2x\to0\quad(x\to0^-).
+f(x)=\begin{cases}
+x^3\sin\dfrac1x,&x>0,\\
+x^2,&x\le0,
+\end{cases}
 \]
-两侧均趋$f'(0)=0$，所以$f'$在0连续。可导本身不保证导函数连续。
+判断$f$在$0$处的连续性、可导性及导函数连续性。}{\same}{}
 
-\subsection*{11. \verdict{错误}}
-\textbf{原题：}$\varphi$有一阶连续导数，$f(x)=\varphi(x)[1+|\ln(1+x)|]$，判断$\varphi(0)=0$是$f$在0处可导的什么条件。
+\three{11}{设$\varphi(x)$具有一阶连续导数，
+\[
+f(x)=\varphi(x)\bigl[1+|\ln(1+x)|\bigr],
+\]
+判断$\varphi(0)=0$是$f(x)$在$x=0$处可导的什么条件。}{
+保留原解答前面对题设和充分性的判断。
 
-用户认为$\varphi(0)=0$充分但不必要，错在只看$\ln1=0$和函数值，没有比较左右导数。官方路线为
+\textcolor{change}{\textbf{【修改处】将原解答最后的“充分但不必要”改为“充分必要条件，选A”。}}
+
+当$x>0$且充分接近$0$时，$|\ln(1+x)|=\ln(1+x)$；当$x<0$且充分接近$0$时，$|\ln(1+x)|=-\ln(1+x)$。因此
 \[
 f'_+(0)=\varphi'(0)+\varphi(0),\qquad
 f'_-(0)=\varphi'(0)-\varphi(0).
 \]
-两者相等当且仅当$\varphi(0)=0$，故为\textbf{充分必要条件，选A}。本题须闭卷重做。
+左右导数相等当且仅当$\varphi(0)=0$。原解答只由$\ln1=0$判断函数值，函数值不能代替左右导数。}{\problem{最后一行把条件判为“充分但不必要”。前面的错误从“$\ln1=0$，对$\varphi(0)$任意常数即可”开始：这里代入的只是函数值，没有比较左右导数。}}
 
-\subsection*{12. \verdict{部分正确}}
-\textbf{原题：}$f$在$x_0$处可导，$x_n=\sin(1/n)+1/n^2$，求$\displaystyle\lim_{n\to\infty}\frac{f(x_0+1/n)-f(x_0-x_n)}{\sin(1/n)}$。
-
-结论$2f'(x_0)$正确，但用户把局部线性化写成无余项的精确等式。官方路线把分子加减$f(x_0)$：
+\three{12}{设$f$在$x_0$处可导，
 \[
-\frac{f(x_0+1/n)-f(x_0)}{1/n}\frac{1/n}{\sin(1/n)}
-+\frac{f(x_0-x_n)-f(x_0)}{-x_n}\frac{x_n}{\sin(1/n)}\to2f'(x_0).
+x_n=\sin\frac1n+\frac1{n^2},
 \]
-这里$x_n=\sin(1/n)+1/n^2\sim1/n$。订正时用导数定义；若用展开，必须写$o(h)$。
-
-\subsection*{13. \verdict{部分正确}}
-\textbf{原题：}$f$为在0处可导的奇函数，求$\displaystyle\lim_{x\to0}\frac{f(tx)-5f(x)}x$。
-
-结论$(t-5)f'(0)$正确。用户把$f(tx)=txf'(0)$写成精确等式，通常不成立。由奇函数得$f(0)=0$，官方写法为
+求
 \[
-\frac{f(tx)-5f(x)}x
-=t\frac{f(tx)-f(0)}{tx}-5\frac{f(x)-f(0)}x
-\to(t-5)f'(0).
-\]
-$t=0$时结论同样成立。
+\lim_{n\to\infty}
+\frac{f(x_0+1/n)-f(x_0-x_n)}{\sin(1/n)}.
+\]}{\same}{}
 
-\subsection*{14. \verdict{错误}}
-\textbf{原题：}$f(x)=\max\{2x,x^2\}$，$x\in(0,4)$，且$f'(a)$不存在，求$a$。
-
-用户正确找到切换点2并算出左右导数2、4，却把答案写成$a>2$。两段在各自开区间内均光滑，不可导只发生在切换点。因此\textbf{$a=2$}。订正流程：先解$2x=x^2$找区间内切换点，再只检查该点左右导数。
-
-\subsection*{15. \verdict{部分正确}}
-\textbf{原题：}$\displaystyle f(x)=\lim_{n\to\infty}\frac{x^2e^{n(x-1)}+ax+b}{5+e^{n(x-1)}}$，求$f(x)$并讨论连续性、可导性与$a,b$的关系。
-
-用户正确得到
+\three{13}{设$f$为在$x=0$处可导的奇函数，求
 \[
-f(x)=\begin{cases}
-(ax+b)/5,&x<1,\\
-(1+a+b)/6,&x=1,\\
-x^2,&x>1,
-\end{cases}
-\]
-且连续条件$a+b=5$正确。可导还需在连续基础上满足
-\[
-f'_-(1)=\frac a5=f'_+(1)=2.
-\]
-故可导当且仅当$a=10,b=-5$。用户漏了导数匹配条件。
+\lim_{x\to0}\frac{f(tx)-5f(x)}x.
+\]}{\same}{}
 
-\section*{订正清单}
-完整重做第11、14题；补齐第2、5、8、10、12、13、15题的关键论证。第1、3、4、6、7、9题无需增加替代路线。当前没有识别不确定项；是否已订正及间隔后能否独立作答仍待后续证据。
+\three{14}{设$f(x)=\max\{2x,x^2\}$，$x\in(0,4)$，且$f'(a)$不存在，$a\in(0,4)$，求$a$。}{
+保留原解答的分段及在$2$处左右导数$2$、$4$的计算。
+
+\textcolor{change}{\textbf{【修改处】仅将最后一行“$a>2$”改为“$\boxed{a=2}$”。}}
+
+两段在各自开区间内均可导，只有切换点$2$的左右导数不相等。}{\problem{最后一行由左右导数不相等写成了“$a>2$”；前面的分段和$a=2$时的左右导数计算均保留。}}
+
+\three{15}{设
+\[
+f(x)=\lim_{n\to\infty}
+\frac{x^2e^{n(x-1)}+ax+b}{5+e^{n(x-1)}},
+\]
+求$f(x)$并讨论连续性、可导性与$a,b$的关系。}{
+保留原解答得到的分段函数及连续条件$a+b=5$。
+
+\textcolor{change}{\textbf{【修改处】在原解答最后补上左右导数条件：}}
+\[
+f'_-(1)=\frac a5,\qquad f'_+(1)=2.
+\]
+所以可导还需
+\[
+\frac a5=2\Rightarrow a=10,\qquad a+b=5\Rightarrow b=-5.
+\]
+故
+\[
+\boxed{f\text{连续}\iff a+b=5},\qquad
+\boxed{f\text{可导}\iff a=10,\ b=-5}.
+\]
+原解答把连续条件直接当成可导条件，漏掉了左右导数相等。}{\problem{最后一行把连续条件$a+b=5$直接作为可导条件，缺少$x=1$处左右导数相等的判断。}}
+
 \end{document}
