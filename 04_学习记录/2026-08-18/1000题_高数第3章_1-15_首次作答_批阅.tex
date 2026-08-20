@@ -1,129 +1,454 @@
 \documentclass[11pt,a4paper]{ctexart}
 \usepackage[margin=1.7cm]{geometry}
-\usepackage{amsmath,amssymb,graphicx,xcolor}
+\usepackage{amsmath,amssymb,xcolor,ulem}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{5pt}
 \definecolor{change}{HTML}{B42318}
-\newcommand{\answerimg}[1]{\begin{center}\includegraphics[width=\textwidth,height=.48\textheight,keepaspectratio]{derived/1000题_高数第3章_1-15_原解答裁切/q#1.png}\end{center}}
-\newcommand{\problem}[1]{\textcolor{change}{\textbf{【问题标注】}#1}\par}
+\newcommand{\markproblem}[1]{\textcolor{change}{\textbf{【问题】#1}}}
+\newcommand{\markchange}[1]{\textcolor{change}{\textbf{【修改处】#1}}}
 \newcommand{\same}{答案正确，保持原解答，不作修改。}
-\newcommand{\three}[4]{\section*{第#1题}\textbf{原题}\par #2\par\textbf{原解答}\answerimg{#1}#4\textbf{修正后解答}\par #3\par}
-\title{《1000题》高数第3章第1--15题\\首次作答批阅}
-\author{}
-\date{2026年8月20日}
-\begin{document}
-\maketitle
+\newcommand{\q}[4]{\section*{第#1题}\textbf{原题}\par#2\par\textbf{原解答}\par#3\par\textbf{修正后解答}\par#4}
+\title{《1000题》高数第3章第1--15题首次作答批阅}
+\author{}\date{2026年8月20日}
+\begin{document}\maketitle
 
-\three{1}{设$f(0)=0$，且$f'(0)$存在，求
+\q{1}{设$f(x)$满足$f(0)=0$，且$f'(0)$存在，则
 \[
-\lim_{x\to0}\frac{f(1-\cos x)}{\ln(1-x\sin x)}.
-\]}{\same}{}
+\lim_{x\to0}\frac{f(1-\cos x)}{\ln(1-x\sin x)}=\underline{\qquad}.
+\]}{
+$f(0)=0\qquad f'(0)$存在，求$\displaystyle\lim_{x\to0}\frac{f(1-\cos x)}{\ln(1-x\sin x)}$
 
-\three{2}{设$F(x)=g(x)\varphi(x)$，$\varphi(x)$在$x=a$处连续但不可导，$g(x)$在$x=a$处可导，$F(x)$在$x=a$处可导，则一定有（~~~）。\quad(A) $g(a)=0$\quad(B) $g(a)\ne0$\quad(C) $g'(a)=0$\quad(D) $g(a)$可以为任意实数。}{\same}{}
+令$u=1-\cos x$
 
-\three{3}{设连续函数$f(x)$满足
+\[
+\Rightarrow\lim_{u\to0}\frac{f(u)-f(0)}{u-0}
+=\frac{f(1-\cos x)}{1-\cos x}=f'(0)
+\]
+\[
+\lim_{x\to0}\frac{f(1-\cos x)}{\ln(1-x\sin x)}
+=\lim_{x\to0}\frac{f(1-\cos x)}{1-\cos x}\cdot
+\frac{1-\cos x}{\ln(1-x\sin x)}
+=-\frac12\lim_{x\to0}\frac{f(1-\cos x)}{1-\cos x}
+\]
+\[
+\Rightarrow\lim=-\frac12f'(0)
+\]}{\same}
+
+\q{2}{设$F(x)=g(x)\varphi(x)$，$\varphi(x)$在$x=a$处连续但不可导，$g(x)$在$x=a$处可导，$F(x)$在$x=a$处可导，则一定有（~~~）。
+
+(A) $g(a)=0$\quad(B) $g(a)\ne0$\quad(C) $g'(a)=0$\quad(D) $g(a)$可以为任意实数}{
+$F(x)=g(x)\varphi(x)\qquad \varphi(x)$在$x=a$处连续而不可导
+
+$g(x)$在$x=a$处连续可导\qquad 求$F(x)$在$x=a$处可导
+
+\[
+\Rightarrow\lim_{x\to a}\frac{F(x)-F(a)}{x-a}
+=\frac{g(x)\varphi(x)-g(a)\varphi(a)}{x-a}
+\overset{\text{存在}}{=}A
+\]
+\[
+\Rightarrow x\to a\text{时， }g(x)\varphi(x)-g(a)\varphi(a)\to0
+\]
+\[
+g'(a)=\lim_{x\to a}\frac{g(x)-g(a)}{x-a}\overset{\text{存在}}{=}B
+\]
+\[
+\Rightarrow x\to a\text{时， }g(x)-g(a)\to0
+\]
+\[
+\sout{\text{设 }\varphi(a)=c}\quad
+g(a)\varphi(x)-g(a)\varphi(a)=g(a)(\varphi(x)-\varphi(a))\to0
+\]
+\[
+\sout{\Rightarrow x\to a\text{时， }g(x)\varphi(a)-g(a)\varphi(a)
+=\varphi(a)(g(x)-g(a))\to0}
+\]
+然而$\varphi(x)$在$x=a$不可导
+\[
+\Rightarrow\lim_{x\to a}\frac{\varphi(x)-\varphi(a)}{x-a}
+\overset{\text{不存在}}{=}C
+\]
+\[
+\Rightarrow\lim_{x\to a}\text{时， }\varphi(x)-\varphi(a)\overset{x}{\to}0
+\]
+\[
+\Rightarrow g(a)\text{必为}0
+\]
+\[
+\Rightarrow A
+\]}{\same}
+
+\q{3}{设连续函数$f(x)$满足
 \[
 \lim_{x\to2}\frac{\ln(x-1)}{f(3-x)}=2,\qquad f(1)=0,
 \]
-求$f'(1)$。}{\same}{}
+则$f'(1)$的值为（~~~）。
 
-\three{4}{设$f(x)$在$x=0$处可导，$f(0)=f'(0)=\sqrt2$，求
+(A) $2$\quad(B) $-2$\quad(C) $\frac12$\quad(D) $-\frac12$}{
 \[
-\lim_{x\to0}\frac{f^2(x)-2}{x}.
-\]}{\same}{}
-
-\three{5}{设$f(x)=1/n^2$，其中
-\[
-\frac1{(n+1)^2}<x\le\frac1{n^2},\quad n=1,2,\ldots,\qquad f(0)=0,
+\lim_{x\to2}\frac{\ln(x-1)}{f(3-x)}=2\qquad f(1)=0\qquad \text{求 }f'(1)
 \]
-求$f'_+(0)$。}{\same}{}
-
-\three{6}{设可导函数$f(x)>0$，求
 \[
-\lim_{n\to\infty}n\ln\frac{f(1/n)}{f(0)}.
-\]}{\same}{}
+f'(1)=\lim_{x\to1}\frac{f(x)-f(1)}{x-1}
+=\frac{f(x)}{x-1}\lim_{x\to1}
+\]
+令$u=3-x\to1$，则$x\to2$
+\[
+\lim_{x\to2}\frac{\ln(x-1)}{2-x}\cdot\frac{2-x}{f(3-x)}
+=\lim_{x\to2}\frac{\ln(x-1)}{2-x}\cdot f'(1)^{-1}
+=\lim_{x\to2}-\frac1{f'(1)}=2
+\]
+\[
+\Rightarrow f'(1)=-\frac12\Rightarrow D
+\]}{\same}
 
-\three{7}{设函数$f(x)$可导，$|f(x)|$在$x=0$处不可导，则（~~~）。\quad(A) $f(0)=0,f'(0)=0$\quad(B) $f(0)=0,f'(0)\ne0$\quad(C) $f(0)\ne0,f'(0)=0$\quad(D) $f(0)\ne0,f'(0)\ne0$。}{\same}{}
+\q{4}{设$f(x)$在$x=0$处可导，$f(0)=f'(0)=\sqrt2$，则
+\[
+\lim_{x\to0}\frac{f^2(x)-2}{x}=\underline{\qquad}.
+\]}{
+$f(x)$在$x=0$处可导\qquad $f(0)=f'(0)=\sqrt2$\qquad 求$\displaystyle\lim_{x\to0}\frac{f^2(x)-2}{x}$
 
-\three{8}{设函数$f(x)$连续，
+\[
+f'(0)=\lim_{x\to0}\frac{f(x)-f(0)}{x-0}
+=\lim_{x\to0}\frac{f^2(x)-f^2(0)}{x(f(x)+f(0))}
+=\lim_{x\to0}\frac{f^2(x)-2}{x(f(x)+\sqrt2)}=\sqrt2
+\]
+\[
+\Rightarrow\lim_{x\to0}\frac{f^2(x)-2}{x}
+=\lim_{x\to0}\frac{f^2(x)-2}{x(f(x)+\sqrt2)}
+\cdot\frac{f(x)+\sqrt2}{1}
+=\lim_{x\to0}\sqrt2(\sqrt2+f(x))=4
+\]}{\same}
+
+\q{5}{设$f(x)=\frac1{n^2}$，$\frac1{(n+1)^2}<x\le\frac1{n^2}$，$n=1,2,\ldots$，$f(0)=0$，则$f'_+(0)=\underline{\qquad}$。}{
+\[
+f(x)=\frac1{n^2}\qquad \frac1{(n+1)^2}<x\le\frac1{n^2}
+\qquad n=1,2,\cdots\qquad f(0)=0\qquad \text{求 }f'_+(0)
+\]
+\[
+f'_+(0)=\lim_{x\to0^+}\frac{f(x)-f(0)}{x-0}
+=\lim_{x\to0^+}\frac{\frac1{n^2}}x
+=\lim_{x\to0^+}\frac1{xn^2}
+\]
+\[
+\frac1{x(n+1)^2}<1\le\frac1{xn^2}
+\]
+固定$n$，当$x\to0^+$时，$\frac1{xn^2}$递减
+\[
+\Rightarrow\text{递减有下界， }\lim_{x\to0^+}\frac1{xn^2}=f'_+(0)=1
+\]}{\same}
+
+\q{6}{设可导函数$f(x)>0$，则
+\[
+\lim_{n\to\infty}n\ln\frac{f(1/n)}{f(0)}=\underline{\qquad}.
+\]}{
+可导函数\ \sout{$f(x)$}\ $f(x)>0$\qquad 求$\displaystyle\lim_{n\to\infty}n\ln\frac{f(\frac1n)}{f(0)}$
+\[
+\lim_{n\to\infty}n\ln\frac{f(\frac1n)}{f(0)}
+=\lim_{n\to\infty}\frac{\ln\frac{f(\frac1n)}{f(0)}}{\frac1n}
+\]
+\[
+=\lim_{n\to\infty}\frac{\ln\left(1+\frac{f(\frac1n)}{f(0)}-1\right)}{\frac1n}
+=\lim_{n\to\infty}\frac{f(\frac1n)-f(0)}{\frac1n\cdot f(0)}
+\]
+\[
+f'(0)=\lim_{x\to0}\frac{f(x)-f(0)}{x-0}
+=\lim_{n\to\infty}\frac{f(\frac1n)-f(0)}{\frac1n}
+\]
+\[
+\Rightarrow\lim_{n\to\infty}
+\frac{f(\frac1n)-f(0)}{\frac1n}\cdot
+\frac{\frac1n}{\frac1n\cdot f(0)}
+=\lim_{n\to\infty}f'(0)\cdot\frac1{f(0)}
+=\frac{f'(0)}{f(0)}
+\]}{\same}
+
+\q{7}{设函数$f(x)$可导，$|f(x)|$在$x=0$处不可导，则（~~~）。
+
+(A) $f(0)=0,f'(0)=0$\quad(B) $f(0)=0,f'(0)\ne0$
+
+(C) $f(0)\ne0,f'(0)=0$\quad(D) $f(0)\ne0,f'(0)\ne0$}{
+$f(x)$可导\qquad $|f(x)|$在$x=0$不可导
+\[
+\Rightarrow\text{在 }x=0\text{处，}|f(x)|\text{遇尖点}
+\]
+\[
+\Rightarrow f(0)=0\text{且 }f'(0)\ne0
+\]
+\[
+\Rightarrow B
+\]}{\same}
+
+\q{8}{设函数$f(x)$连续，
 \[
 \lim_{x\to1}\frac{f(x)-1}{\ln x}=2,
 \]
-求曲线$y=f(x)$在$x=1$处的切线方程。}{\same}{}
-
-\three{9}{设函数$f(x)$在$x=1$处可导，$\Delta f(1)$是增量为$\Delta x$时的函数值增量，求
+则曲线$y=f(x)$在$x=1$处的切线方程为$\underline{\qquad}$。}{
+$f(x)$连续\qquad $\displaystyle\lim_{x\to1}\frac{f(x)-1}{\ln x}=2$\qquad 求$y=f(x)$在$x=1$处切线方程
 \[
-\lim_{\Delta x\to0}\frac{\Delta f(1)-df(1)}{\Delta x}.
-\]（~~~）。\quad(A) $f'(1)$\quad(B) $1$\quad(C) $\infty$\quad(D) $0$}{\same}{}
+\lim_{x\to1}\frac{f(x)-1}{\ln x}
+=\lim_{x\to1}\frac{f(x)-1}{\ln(1+x-1)}
+=\lim_{x\to1}\frac{f(x)-1}{x-1}
+=\lim_{x\to1}\frac{f(x)-1}{x-1}=2
+\]
+\[
+\Rightarrow f(1)=2x-1=1
+\]
+\[
+\Rightarrow f'(1)=\lim_{x\to1}\frac{f(x)-f(1)}{x-1}
+=\frac{f(x)-1}{\ln x}=2
+\]
+\[
+\Rightarrow\text{切线方程 }\sout{y=2x}\quad
+y-1=f'(1)(x-1)=2(x-1)\Rightarrow y=2x-1
+\]}{\same}
 
-\three{10}{设
+\q{9}{设函数$f(x)$在$x=1$处可导，且$\Delta f(1)$是$f(x)$在增量为$\Delta x$时的函数值增量，则
+\[
+\lim_{\Delta x\to0}\frac{\Delta f(1)-df(1)}{\Delta x}
+\]
+等于（~~~）。
+
+(A) $f'(1)$\quad(B) $1$\quad(C) $\infty$\quad(D) $0$}{
+$f(x)$在$x=1$处可导\qquad $\Delta f(1)$是$f(x)$在增量$\Delta x$时增量
+\[
+\text{求 }\lim_{\Delta x\to0}\frac{\Delta f(1)-df(1)}{\Delta x}
+\]
+\[
+\lim_{\Delta x\to0}\frac{\Delta f(1)-df(1)}{\Delta x}
+=\lim_{\Delta x\to0}
+\frac{f'(1)\Delta x+o(\Delta x)-f'(1)d x}{\Delta x}=0
+\]}{\same}
+
+\q{10}{设
 \[
 f(x)=\begin{cases}
-x^3\sin\dfrac1x,&x>0,\\
+x^3\sin\frac1x,&x>0,\\
 x^2,&x\le0,
 \end{cases}
 \]
-判断$f$在$0$处的连续性、可导性及导函数连续性。}{\same}{}
+则$f(x)$在$x=0$处（~~~）。
 
-\three{11}{设$\varphi(x)$具有一阶连续导数，
+(A) 不连续\quad(B) 连续，但不可导\quad(C) 可导，但导函数不连续\quad(D) 可导，且导函数连续}{
 \[
-f(x)=\varphi(x)\bigl[1+|\ln(1+x)|\bigr],
+f(x)=\begin{cases}x^3\sin\frac1x,&x>0,\\x^2,&x\le0,\end{cases}
+\qquad\text{求 }f(x)\text{在 }x=0\text{处}
 \]
-判断$\varphi(0)=0$是$f(x)$在$x=0$处可导的什么条件。}{
-保留原解答前面对题设和充分性的判断。
+\[
+\lim_{x\to0^-}f(x)=0\qquad \lim_{x\to0^+}f(x)=0\qquad f(0)=0
+\]
+\[
+\Rightarrow f(x)\text{在 }x=0\text{处连续}
+\]
+\[
+\lim_{x\to0^-}f'(x)=\frac{f(x)-f(0)}{x-0}=\frac{x^2}{x}=0
+\]
+\[
+\lim_{x\to0^+}f(x)=\frac{x^3\sin\frac1x}{x}=x=0
+\]
+\[
+\Rightarrow f(x)\text{在 }x=0\text{处可导，导函数 }g(x)\text{连续}
+\]}{\same}
 
-\textcolor{change}{\textbf{【修改处】将原解答最后的“充分但不必要”改为“充分必要条件，选A”。}}
+\q{11}{设$\varphi(x)$具有一阶连续导数，
+\[
+f(x)=\varphi(x)[1+|\ln(1+x)|],
+\]
+则$\varphi(0)=0$是$f(x)$在$x=0$处可导的（~~~）。
 
-当$x>0$且充分接近$0$时，$|\ln(1+x)|=\ln(1+x)$；当$x<0$且充分接近$0$时，$|\ln(1+x)|=-\ln(1+x)$。因此
+(A) 充分必要条件\quad(B) 充分非必要条件\quad(C) 必要非充分条件\quad(D) 既非充分又非必要条件}{
+$\varphi$具一阶连续导数\qquad
+$f(x)=\varphi(x)[1+|\ln(1+x)|]$\qquad
+求$f(x)$在$x=0$可导$\Leftrightarrow?\Rightarrow\varphi(0)=0$
+
+由\ \sout{$\varphi(0)=0$}\ $f(x)$在$x=0$可导：
+\[
+f'_-(0)=f'_+(0)\Rightarrow\varphi(x)\ln(1+x)=0,\ x\to0
+\Rightarrow\varphi(0)\ln1=0
+\]
+\markproblem{$\ln1$本身等于$0$，对$\varphi(0)$任意常数即可$\Rightarrow$不必要条件}
+
+由$\varphi(0)=0$：
+\[
+\Rightarrow f(0)=0
+\]
+\[
+\Rightarrow f'_-(0)=\lim_{x\to0^-}\frac{\varphi(x)[1-\ln(1+x)]}{x}
+=\lim_{x\to0^-}\frac{\varphi(x)-x\varphi(x)}x
+=\lim_{x\to0^-}\frac{\varphi(x)}x-\varphi(0)
+=\lim_{x\to0^-}\frac{\varphi(x)}x
+\]
+\[
+f'_+(0)=\lim_{x\to0^+}\frac{\varphi(x)+x\varphi(x)}x
+=\lim_{x\to0^+}\frac{\varphi(x)}x=f'_-(0)
+\]
+\[
+\Rightarrow\text{充分条件}
+\]}{
+保留原解答中“$\varphi(0)=0$时可导”的部分。
+
+\markchange{将“不必要条件”改为“必要条件”，最终选A。}
 \[
 f'_+(0)=\varphi'(0)+\varphi(0),\qquad
 f'_-(0)=\varphi'(0)-\varphi(0).
 \]
-左右导数相等当且仅当$\varphi(0)=0$。原解答只由$\ln1=0$判断函数值，函数值不能代替左右导数。}{\problem{最后一行把条件判为“充分但不必要”。前面的错误从“$\ln1=0$，对$\varphi(0)$任意常数即可”开始：这里代入的只是函数值，没有比较左右导数。}}
-
-\three{12}{设$f$在$x_0$处可导，
 \[
-x_n=\sin\frac1n+\frac1{n^2},
+f'_+(0)=f'_-(0)\Longleftrightarrow\varphi(0)=0.
 \]
-求
+原解答在标注处只代入了函数值；判断可导必须比较左右导数。}
+
+\q{12}{设$f(x)$在$x_0$处可导，$x_n=\sin\frac1n+\frac1{n^2}$，则
 \[
-\lim_{n\to\infty}
-\frac{f(x_0+1/n)-f(x_0-x_n)}{\sin(1/n)}.
-\]}{\same}{}
+\lim_{n\to\infty}\frac{f(x_0+\frac1n)-f(x_0-x_n)}{\sin\frac1n}
+=\underline{\qquad}.
+\]}{
+$f(x)$在$x_0$处可导\qquad $x_n=\sin\frac1n+\frac1{n^2}$\qquad
+求$\displaystyle\lim_{n\to\infty}\frac{f(x_0+\frac1n)-f(x_0-x_n)}{\sin\frac1n}$
 
-\three{13}{设$f$为在$x=0$处可导的奇函数，求
+\sout{令$t=\frac1n$}
+
+\sout{$\displaystyle\lim_{t\to0}\frac{f(x_0+t)-f(x_0-x_n)}{\sin t}$}
+
+\sout{$\displaystyle\lim_{n\to\infty}\frac{f(x_0+\frac1n)-f(x_0-x_n)}{\sin\frac1n}$}
+
+\sout{（中间洛必达计算）}
+
+当$n\to\infty$时，有$\frac1n\to0$，亦有$x_n\to0$
 \[
-\lim_{x\to0}\frac{f(tx)-5f(x)}x.
-\]}{\same}{}
-
-\three{14}{设$f(x)=\max\{2x,x^2\}$，$x\in(0,4)$，且$f'(a)$不存在，$a\in(0,4)$，求$a$。}{
-保留原解答的分段及在$2$处左右导数$2$、$4$的计算。
-
-\textcolor{change}{\textbf{【修改处】仅将最后一行“$a>2$”改为“$\boxed{a=2}$”。}}
-
-两段在各自开区间内均可导，只有切换点$2$的左右导数不相等。}{\problem{最后一行由左右导数不相等写成了“$a>2$”；前面的分段和$a=2$时的左右导数计算均保留。}}
-
-\three{15}{设
-\[
-f(x)=\lim_{n\to\infty}
-\frac{x^2e^{n(x-1)}+ax+b}{5+e^{n(x-1)}},
+\Rightarrow f'(x_0)=\lim_{n\to\infty}\frac{f(x_0+\frac1n)-f(x_0)}{\frac1n}
+=\lim_{n\to\infty}\frac{f(x_0-x_n)-f(x_0)}{-x_n}
 \]
-求$f(x)$并讨论连续性、可导性与$a,b$的关系。}{
-保留原解答得到的分段函数及连续条件$a+b=5$。
+\[
+\Rightarrow\lim_{n\to\infty}f(x_0+\tfrac1n)=f'(x_0)\cdot\tfrac1n+f(x_0)
+\]
+\[
+\lim_{n\to\infty}f(x_0-x_n)=f(x_0)-f'(x_0)\cdot x_n
+\]
+\[
+\Rightarrow\lim_{n\to\infty}
+\frac{f(x_0+\frac1n)-f(x_0-x_n)}{\sin\frac1n}
+=\lim_{n\to\infty}\frac{f'(x_0)\cdot\frac1n+f'(x_0)\cdot x_n}{\frac1n}
+\]
+\[
+=\lim_{n\to\infty}f'(x_0)\left(1+\frac{x_n}{\frac1n}\right)
+=\lim_{n\to\infty}f'(x_0)\left(1+1+\frac1n\right)
+=2f'(x_0)
+\]}{\same}
 
-\textcolor{change}{\textbf{【修改处】在原解答最后补上左右导数条件：}}
+\q{13}{设$f(x)$为在$x=0$处可导的奇函数，则
+\[
+\lim_{x\to0}\frac{f(tx)-5f(x)}x=\underline{\qquad}.
+\]}{
+$f(x)$奇函数在$x=0$处可导\qquad 求$\displaystyle\lim_{x\to0}\frac{f(tx)-5f(x)}x$
+\[
+\Rightarrow f(0)=0
+\]
+\[
+f'(0)=\lim_{tx\to0}\frac{f(tx)-f(0)}{tx-0}
+=\lim_{x\to0}\frac{f(tx)}{tx}
+\Rightarrow f(tx)=tx\cdot f'(0),\ x\to0\text{时}
+\]
+\[
+5f'(0)=\lim_{x\to0}\frac{5f(x)-5f(0)}{x-0}
+=\lim_{x\to0}\frac{5f(x)}x
+\Rightarrow5f(x)=5x f'(0),\ x\to0\text{时}
+\]
+\[
+\Rightarrow\lim_{x\to0}\frac{f(tx)-5f(x)}x
+=\lim_{x\to0}\frac{txf'(0)-5xf'(0)}x
+=f'(0)(t-5)
+\]}{\same}
+
+\q{14}{设$f(x)=\max\{2x,x^2\}$，$x\in(0,4)$，且$f'(a)$不存在，$a\in(0,4)$，则$a=\underline{\qquad}$。}{
+$f(x)=\max\{2x,x^2\},\ x\in(0,4)\qquad f'(a)$不存在，$a\in(0,4)$\qquad 求$a$
+\[
+f(x)=\begin{cases}2x,&0<x\le2,\\x^2,&2<x<4.\end{cases}
+\]
+\sout{$f'(a)=\lim$}
+\[
+f'(a)\text{不存在}\Rightarrow f'_-(a)\ne f'_+(a)
+\]
+当$a=2$时，
+\[
+f'_-(a)=\lim_{x\to2^-}\frac{2x-4}{x-2}=2
+\]
+\[
+f'_+(a)=\lim_{x\to2^+}\frac{x^2-4}{x-2}=x+2=4
+\]
+\[
+\markproblem{$\Rightarrow a>2$}
+\]}{
+保留原解答的分段和$a=2$处左右导数的计算。
+
+\[
+\markchange{$a>2$ 改为 $\boxed{a=2}$}
+\]
+两段函数在各自开区间内均可导，只有切换点$2$的左右导数不相等。}
+
+\q{15}{设
+\[
+f(x)=\lim_{n\to\infty}\frac{x^2e^{n(x-1)}+ax+b}{5+e^{n(x-1)}},
+\]
+求$f(x)$并讨论$f(x)$的连续性及可导性与$a,b$的关系。}{
+\[
+f(x)=\lim_{n\to\infty}\frac{x^2e^{n(x-1)}+ax+b}{5+e^{n(x-1)}}
+\qquad\text{求 }f(x)\qquad
+\text{讨论 }f(x)\begin{cases}\text{连续性}\\\text{可导性}\end{cases}\text{与 }a,b\text{的关系}
+\]
+当$x>1$时，
+\[
+\lim_{n\to\infty}\frac{x^2e^{n(x-1)}+ax+b}{5+e^{n(x-1)}}
+=\lim_{n\to\infty}\frac{x^2e^{n(x-1)}\cdot n}{e^{n(x-1)}\cdot n}=x^2
+\]
+当$x=1$时，
+\[
+\lim_{n\to\infty}=\frac{x^2+ax+b}{5+1}=\frac{1+a+b}{6}
+\]
+当$0<x<1$时，
+\[
+\lim_{n\to\infty}\frac{x^2e^{n(x-1)}+ax+b}{5+e^{n(x-1)}}
+=\lim_{n\to\infty}\frac{ax+b}{5}=\frac{ax+b}{5}
+\]
+当$x=0$时，
+\[
+\lim_{n\to\infty}=\frac{b}{5+e^{-n}}=\frac b5
+\]
+当$x<0$时，
+\[
+\lim_{n\to\infty}=\frac{ax+b}{5}
+\]
+\[
+\Rightarrow f(x)=
+\begin{cases}
+\dfrac{ax+b}{5},&x<1,\\[3pt]
+\dfrac{1+a+b}{6},&x=1,\\[3pt]
+x^2,&x>1.
+\end{cases}
+\]
+若$f(x)$连续，则
+\[
+\lim_{x\to1^-}f(x)=\lim_{x\to1^+}f(x)=f(1)
+\Rightarrow a+b=5\text{时，}f(x)\text{连续}
+\]
+若$f(x)$可导，则
+\[
+f'_-(1)=f'_+(1)\Rightarrow
+\markproblem{a+b=5\text{时，}f(x)\text{可导}}
+\]
+}{
+保留原解答求出的分段函数和连续条件$a+b=5$。
+
+\markchange{将最后一行改为：}
 \[
 f'_-(1)=\frac a5,\qquad f'_+(1)=2.
 \]
-所以可导还需
 \[
 \frac a5=2\Rightarrow a=10,\qquad a+b=5\Rightarrow b=-5.
 \]
-故
 \[
-\boxed{f\text{连续}\iff a+b=5},\qquad
-\boxed{f\text{可导}\iff a=10,\ b=-5}.
+\boxed{f\text{连续}\Longleftrightarrow a+b=5},\qquad
+\boxed{f\text{可导}\Longleftrightarrow a=10,\ b=-5}.
 \]
-原解答把连续条件直接当成可导条件，漏掉了左右导数相等。}{\problem{最后一行把连续条件$a+b=5$直接作为可导条件，缺少$x=1$处左右导数相等的判断。}}
+原解答在标注处把连续条件直接当成可导条件，漏掉了左右导数相等的计算。}
 
 \end{document}
