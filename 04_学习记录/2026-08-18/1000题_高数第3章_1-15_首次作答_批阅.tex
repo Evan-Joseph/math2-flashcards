@@ -16,13 +16,9 @@
 \definecolor{fixgreen}{HTML}{137333}
 \newcommand{\markproblem}[1]{\textcolor{problemred}{\textbf{【问题】#1}}}
 \newcommand{\markchange}[1]{\textcolor{fixgreen}{\textbf{【修正】#1}}}
-\newcommand{\same}{答案正确，保持原解答，不作修改。}
-\newcommand{\q}[4]{\section*{第#1题}\textbf{原题}\par#2\par\textbf{解答}\par#3\par\textbf{解析}\par#4}
-\title{《1000题》高数第3章第1--15题首次作答批阅}
-\author{}\date{2026年8月20日}
-\begin{document}\maketitle
-\textcolor{ink}{\small 材料：张宇《题源探析经典1000题》数学一试题册（2022.1，2026.1重印），试题册 PDF 14--15；对应解析册 PDF 21--25。当前按数学二共同范围核验。\\
-核验链：MinerU Precision OCR 整卷覆盖；每题原扫描放大确认；逐题回看原题与官方解析原页。原扫描与 MinerU 派生物仅作本地证据，不嵌入本 PDF。}
+\newcommand{\same}{}
+\newcommand{\q}[4]{\section*{第#1题}\textbf{原题}\par#2\par\textbf{我的解答}\par#3\if\relax\detokenize{#4}\relax\else\par\textbf{正确解答}\par#4\fi}
+\begin{document}
 
 \q{1}{设$f(x)$满足$f(0)=0$，且$f'(0)$存在，则
 \[
