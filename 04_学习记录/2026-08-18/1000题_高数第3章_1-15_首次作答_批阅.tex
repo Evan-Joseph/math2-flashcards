@@ -3,11 +3,12 @@
 \usepackage{amsmath,amssymb,xcolor,ulem}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{5pt}
-\definecolor{change}{HTML}{B42318}
-\newcommand{\markproblem}[1]{\textcolor{change}{\textbf{【问题】#1}}}
-\newcommand{\markchange}[1]{\textcolor{change}{\textbf{【修改处】#1}}}
+\definecolor{problemred}{HTML}{B42318}
+\definecolor{fixgreen}{HTML}{137333}
+\newcommand{\markproblem}[1]{\textcolor{problemred}{\textbf{【问题】#1}}}
+\newcommand{\markchange}[1]{\textcolor{fixgreen}{\textbf{【修正】#1}}}
 \newcommand{\same}{答案正确，保持原解答，不作修改。}
-\newcommand{\q}[4]{\section*{第#1题}\textbf{原题}\par#2\par\textbf{原解答}\par#3\par\textbf{修正后解答}\par#4}
+\newcommand{\q}[4]{\section*{第#1题}\textbf{原题}\par#2\par\textbf{解答}\par#3\par\textbf{解析}\par#4}
 \title{《1000题》高数第3章第1--15题首次作答批阅}
 \author{}\date{2026年8月20日}
 \begin{document}\maketitle
