@@ -1,8 +1,17 @@
-\documentclass[11pt,a4paper]{ctexart}
-\usepackage[margin=1.7cm]{geometry}
-\usepackage{amsmath,amssymb,xcolor,ulem}
+\documentclass[11pt,a4paper,fontset=fandol]{ctexart}
+\usepackage[a4paper,left=20mm,right=20mm,top=20mm,bottom=18mm,headheight=15pt]{geometry}
+\usepackage{amsmath,amssymb,xcolor,ulem,fancyhdr,lastpage}
+\definecolor{ink}{HTML}{172033}
+\definecolor{accent}{HTML}{2C4A7C}
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{5pt}
+\setlength{\parskip}{0.45em}
+\linespread{1.14}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small 11408 / 22408 批阅记录}
+\fancyhead[R]{\small 数学二}
+\fancyfoot[C]{\small 第 \thepage\ 页，共 \pageref{LastPage} 页}
+\renewcommand{\headrulewidth}{0.6pt}
 \definecolor{problemred}{HTML}{B42318}
 \definecolor{fixgreen}{HTML}{137333}
 \newcommand{\markproblem}[1]{\textcolor{problemred}{\textbf{【问题】#1}}}
@@ -12,6 +21,8 @@
 \title{《1000题》高数第3章第1--15题首次作答批阅}
 \author{}\date{2026年8月20日}
 \begin{document}\maketitle
+\textcolor{ink}{\small 材料：张宇《题源探析经典1000题》数学一试题册（2022.1，2026.1重印），试题册 PDF 14--15；对应解析册 PDF 21--25。当前按数学二共同范围核验。\\
+核验链：MinerU Precision OCR 整卷覆盖；每题原扫描放大确认；逐题回看原题与官方解析原页。原扫描与 MinerU 派生物仅作本地证据，不嵌入本 PDF。}
 
 \q{1}{设$f(x)$满足$f(0)=0$，且$f'(0)$存在，则
 \[
