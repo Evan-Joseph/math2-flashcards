@@ -42,7 +42,19 @@ $=\lim_{x\to0}\dfrac{a\cos(ax)-b}{2x}$。\quad\problem{到这里使用了一次�
 $\Rightarrow x\to0$时，$\cos(ax)\cdot a-b\to0$\\
 $\Rightarrow a-b\to0，a=b$
 \pt{正确解答}
-\fix{保留 $a=b$；补足极限：}$当 $b=a$ 时，$\displaystyle f'(0)=\lim_{x\to0}\frac{\sin(ax)-ax}{x^2}=0$。所以 $\boxed{a=b}$，$a$ 任意。
+\fix{保留 $a=b$；补足极限：}当 $b=a$ 时，
+\[
+f'(0)=\lim_{x\to0}\frac{\sin(ax)-ax}{x^2}
+=\lim_{x\to0}\frac{a\cos(ax)-a}{2x}
+=\frac a2\lim_{x\to0}\frac{\cos(ax)-1}{x}.
+\]
+又因为
+\[
+\frac{1-\cos(ax)}x
+=2\frac{\sin^2(ax/2)}x
+=\frac{a^2x}{2}\left(\frac{\sin(ax/2)}{ax/2}\right)^2\to0,
+\]
+所以 $f'(0)=0$。因此全部条件为 $\boxed{a=b}$，其中 $a$ 任意。
 
 \section*{第4题}\pt{原题}曲线 $y=f(x)$ 在点 $(1,2)$ 处有切线。若 $\displaystyle\lim_{h\to0}\frac{f(1+2h)-f(1)}h=6$，求该切线方程。
 \pt{我的解答}
