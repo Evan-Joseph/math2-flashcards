@@ -2,18 +2,18 @@
 % 本卷为范围内改编题，无对应官方解析原页；仅作原扫描逐字核验与数学批注。
 \documentclass[11pt,a4paper,fontset=fandol]{ctexart}
 \usepackage[a4paper,left=20mm,right=20mm,top=20mm,bottom=18mm,headheight=15pt]{geometry}
-\usepackage{amsmath,amssymb,fancyhdr,lastpage,xcolor}
+\usepackage{amsmath,amssymb,fancyhdr,lastpage,xcolor,cancel}
 \definecolor{accent}{HTML}{2C4A7C}\definecolor{problemred}{HTML}{B42318}\definecolor{fixgreen}{HTML}{137333}
 \setlength{\parindent}{0pt}\setlength{\parskip}{0.45em}\linespread{1.12}
 \pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small 数学二}\fancyhead[R]{\small 第3讲收尾检测}\fancyfoot[C]{\small 第 \thepage\ 页，共 \pageref{LastPage} 页}\renewcommand{\headrulewidth}{0.6pt}
 \newcommand{\pt}[1]{\par\vspace{.3em}{\large\bfseries\color{accent}#1}\par\vspace{.1em}}
-\newcommand{\problem}[1]{\textcolor{problemred}{\textbf{【问题】#1}}}
-\newcommand{\fix}[1]{\textcolor{fixgreen}{\textbf{【修正】#1}}}
+\newcommand{\problem}[1]{\textcolor{problemred}{\textbf{问题：}#1}}
+\newcommand{\fix}[1]{\textcolor{fixgreen}{\textbf{修正：}#1}}
 \begin{document}
 \section*{第1题}\pt{原题}设函数 $f$ 在 $0$ 处可导，且 $f(0)=0$。求 $\displaystyle\lim_{x\to0}\frac{f(\sin x)}x$。
 \pt{我的解答}
 $f$在$0$处可导，$f(0)=0$，求$\displaystyle\lim_{x\to0}\frac{f(\sin x)}x$\\
-$\displaystyle\lim_{x\to0}\frac{f(\sin x)}x=\lim_{x\to0}\frac{f'(\sin x)\cdot\cos x}{x}$。\quad\problem{你确实写了这一整行；问题在于把原函数值比值直接换成了导数表达式。洛必达若要使用，必须先确认分子在邻域内可导，并且求导后分母为 $1$。}\\
+$\displaystyle\lim_{x\to0}\frac{f(\sin x)}x=\lim_{x\to0}\frac{f'(\sin x)\cdot\cos x}{\cancel{x}}$。\quad\problem{这里的分母 $x$ 已被你划掉；按有效书写，应读作洛必达后分母求导为 $1$，不能再把它转录成保留 $x$ 的式子。}\\
 $=f'(\cos x)$
 \pt{正确解答}
 \fix{按当前题设的导数定义：}$\displaystyle\frac{f(\sin x)}x=\frac{f(\sin x)-f(0)}{\sin x-0}\cdot\frac{\sin x}{x}\to f'(0)\cdot1=f'(0)$。
