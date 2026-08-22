@@ -1,0 +1,57 @@
+% !TEX program = xelatex
+% 本卷为本科范围内改编检测题；无对应官方解析原页，结论按定义和代数复核。
+\documentclass[11pt,a4paper,fontset=fandol]{ctexart}
+\usepackage[a4paper,left=20mm,right=20mm,top=20mm,bottom=18mm,headheight=15pt]{geometry}
+\usepackage{amsmath,amssymb,fancyhdr,lastpage,xcolor}
+\definecolor{accent}{HTML}{2C4A7C}\definecolor{problemred}{HTML}{B42318}\definecolor{fixgreen}{HTML}{137333}
+\setlength{\parindent}{0pt}\setlength{\parskip}{0.45em}\linespread{1.12}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small 数学二}\fancyhead[R]{\small 第3讲收尾检测}\fancyfoot[C]{\small 第 \thepage\ 页，共 \pageref{LastPage} 页}\renewcommand{\headrulewidth}{0.6pt}
+\newcommand{\pt}[1]{\par\vspace{.3em}{\large\bfseries\color{accent}#1}\par\vspace{.1em}}
+\newcommand{\problem}[1]{\textcolor{problemred}{\textbf{【问题】#1}}}
+\newcommand{\fix}[1]{\textcolor{fixgreen}{\textbf{【修正】#1}}}
+\begin{document}
+\section*{第1题}\pt{原题}设函数 $f$ 在 $0$ 处可导，且 $f(0)=0$。求 $\displaystyle\lim_{x\to0}\frac{f(\sin x)}x$。
+\pt{我的解答}
+$f$在$0$处可导，$f(0)=0$，求$\displaystyle\lim_{x\to0}\frac{f(\sin x)}x$\\
+$=\displaystyle\lim_{x\to0}\frac{f'(\sin x)\cdot\cos x}{x}$。\quad\problem{这里把函数值的极限直接改写成了导数，且多出了 $f'(\sin x)$；导数定义不能这样使用。}\\
+$=f'(\cos x)$
+\pt{正确解答}
+\fix{按导数定义拆成两个比值：}$\displaystyle\frac{f(\sin x)}x=\frac{f(\sin x)-f(0)}{\sin x-0}\cdot\frac{\sin x}{x}$。当 $x\to0$ 时，第一因子趋于 $f'(0)$，第二因子趋于 $1$，故极限为 $f'(0)$。
+
+\section*{第2题}\pt{原题}设 $\displaystyle f(x)=\begin{cases}ax^2+bx+1,&x\le1,\\\ln x+c(x-1),&x>1,\end{cases}$ 若 $f$ 在 $x=1$ 处可导，求 $a,b,c$ 之间应满足的全部条件。
+\pt{我的解答}
+$f(x)=\begin{cases}ax^2+bx+1,&x\le1\\\ln x+c(x-1),&x>1\end{cases}$，$f$在$x=1$处可导。\\
+$f(1)=a+b+1$\\
+$f_-(1)=\displaystyle\lim_{x\to1^-}f(x)=a+b+1$\\
+$f_+(1)=\displaystyle\lim_{x\to1^+}f(x)=0$\\
+$\Rightarrow a+b=-1$\\
+$f'_-(1)=\displaystyle\lim_{x\to1^-}\frac{f(x)-f(1)}{x-1}=\lim_{x\to1^-}\frac{ax^2+bx+1}{x-1}=\lim_{x\to1^-}(2ax+b)=2a+b$。\quad\problem{从这里开始分子漏写了 $-f(1)$，因此不能直接约成 $2ax+b$；左侧导数应以 $f(x)-f(1)$ 为分子。}\\
+$f'_+(1)=\displaystyle\lim_{x\to1^+}\frac{\ln x+c(x-1)}{x-1}=\lim_{x\to1^+}(\frac1x+c)=c+1$\\
+$\Rightarrow2a+b=c+1$
+\pt{正确解答}
+\fix{保留你得到的两条条件：}$a+b=-1$ 且 $2a+b=c+1$。等价地，$b=-a-1$、$c=a-2$。其中第一条来自连续性，第二条来自左右导数相等；两者缺一不可。
+
+\section*{第3题}\pt{原题}设 $\displaystyle f(x)=\begin{cases}\frac{\sin(ax)}x,&x\ne0,\\b,&x=0,\end{cases}$ 其中 $a,b$ 为常数。求使 $f$ 在 $x=0$ 处可导的 $a,b$。
+\pt{我的解答}
+$f(x)=\begin{cases}\dfrac{\sin(ax)}x,&x\ne0\\b,&x=0\end{cases}$，求$f$在$x=0$处可导。\\
+$f(0)=b$，$\displaystyle\lim_{x\to0}f(x)=\lim_{x\to0}\frac{\sin(ax)}x=a$\\
+$\Rightarrow a=b$\\
+$\therefore f'(0)=\displaystyle\lim_{x\to0}\frac{f(x)-f(0)}x=\lim_{x\to0}\frac{\frac{\sin(ax)}x-b}{x}=\lim_{x\to0}\frac{\sin(ax)-bx}{x^2}$\\
+$=\displaystyle\lim_{x\to0}\frac{a\cos(ax)-b}{2x}$。\quad\problem{代入 $a=b$ 后这是 $0/0$ 型，不能直接据分子趋于 $0$ 就得到原极限存在或得到数值；还需要继续等价展开或再作一次洛必达。}\\
+$\Rightarrow x\to0$时，$a\cos(ax)-b\to0$，$a-b\to0$，$a=b$
+\pt{正确解答}
+\fix{条件 $a=b$ 正确；补足极限。} 当 $b=a$ 时，
+\[
+f'(0)=\lim_{x\to0}\frac{\sin(ax)-ax}{x^2}
+=\lim_{x\to0}\frac{-a^3x^3/6+o(x^3)}{x^2}=0.
+\]
+因此全部条件为 $a=b$，且 $a$ 可取任意实数。
+
+\section*{第4题}\pt{原题}曲线 $y=f(x)$ 在点 $(1,2)$ 处有切线。若 $\displaystyle\lim_{h\to0}\frac{f(1+2h)-f(1)}h=6$，求该切线方程。
+\pt{我的解答}
+$f(1)=2$\\
+$\displaystyle\lim_{h\to0}\frac{f(1+2h)-2}{h}=6$\\
+$\Rightarrow\displaystyle\lim_{h\to0}\frac{f(1+2h)-2}{2h}=3$\\
+$\Rightarrow f'(1)=\displaystyle\lim_{2h\to0}\frac{f(1+2h)-f(1)}{2h-0}=3$\\
+$\Rightarrow y-2=3(x-1)$
+\end{document}
