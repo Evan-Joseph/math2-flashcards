@@ -13,8 +13,8 @@
 \section*{第1题}\pt{原题}设函数 $f$ 在 $0$ 处可导，且 $f(0)=0$。求 $\displaystyle\lim_{x\to0}\frac{f(\sin x)}x$。
 \pt{我的解答}
 $f$在$0$处可导，$f(0)=0$，求$\displaystyle\lim_{x\to0}\frac{f(\sin x)}x$\\
-$\displaystyle\lim_{x\to0}\frac{f(\sin x)}x=\lim_{x\to0}f'(\sin x)\cdot\cos x$。\\
-$=f'(\cos x)$
+\textcolor{problemred}{$\displaystyle\lim_{x\to0}\frac{f(\sin x)}x=\lim_{x\to0}f'(\sin x)\cdot\cos x$}。\quad\problem{题设只给出 $f$ 在 $0$ 处可导，不能保证 $f$ 在 $0$ 的去心邻域内可导，洛必达法的条件不足。}\\
+\textcolor{problemred}{$=f'(\cos x)$}\quad\problem{即使另有条件保证可以使用洛必达，这里也应继续取 $x\to0$ 的极限，结论应为 $f'(0)$。}
 \pt{正确解答}
 \fix{按当前题设的导数定义：}$\displaystyle\frac{f(\sin x)}x=\frac{f(\sin x)-f(0)}{\sin x-0}\cdot\frac{\sin x}{x}\to f'(0)\cdot1=f'(0)$。
 
