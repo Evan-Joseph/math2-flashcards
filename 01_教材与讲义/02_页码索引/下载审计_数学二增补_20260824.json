@@ -1,0 +1,36 @@
+{
+  "verified_at": "2026-08-24T10:15:00+08:00",
+  "source": "夸克已核验数学资料分享；精确分享标识不写入 Git",
+  "files": [
+    {
+      "path": "01_教材与讲义/【数学二】2025考研数学二真题及解析_网盘版.pdf",
+      "bytes": 924555,
+      "sha256": "0e6ec7ee87b630ff7c69bdbffc2e3bb7cf9b5b3ece376c109b2c27a0b79f8a09",
+      "format": "PDF",
+      "pages": 4
+    },
+    {
+      "path": "01_教材与讲义/【数学二】2026考研数学二参考答案_题面待补.pdf",
+      "bytes": 1456767,
+      "sha256": "08866734ead67d4a06d316d2e32778ec04226cb99069cfe35b963c9637c87fa0",
+      "format": "PDF",
+      "pages": 2
+    },
+    {
+      "path": "01_教材与讲义/【数学二】李林880题解析册_2027.pdf",
+      "bytes": 384184069,
+      "sha256": "cad1256c843d2c6770a69093277b8c28745b50cef824132ed733c355a5698acb",
+      "format": "PDF",
+      "pages": 359
+    },
+    {
+      "path": "01_教材与讲义/【数学二】李林880题试题册_2027.pdf",
+      "bytes": 102458205,
+      "sha256": "68be87d06fbcec2941b3643bbece8fd564c0514212d3949c6ffc7e9f609a07c5",
+      "format": "PDF",
+      "pages": 106
+    }
+  ],
+  "file_count": 4,
+  "total_bytes": 489023596
+}
