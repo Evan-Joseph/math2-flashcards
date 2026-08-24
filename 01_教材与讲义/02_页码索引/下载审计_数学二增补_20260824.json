@@ -1,36 +1,41 @@
 {
-  "verified_at": "2026-08-24T10:15:00+08:00",
-  "source": "夸克已核验数学资料分享；精确分享标识不写入 Git",
+  "verified_at": "2026-08-24T10:55:00+08:00",
+  "sources": {
+    "网盘增补": "已验证夸克数学资料分享",
+    "2026题面": "https://www.chinakaoyan.com/info/article/id/642319.shtml（公开图片版，4页切分重建）"
+  },
   "files": [
     {
       "path": "01_教材与讲义/【数学二】2025考研数学二真题及解析_网盘版.pdf",
       "bytes": 924555,
-      "sha256": "0e6ec7ee87b630ff7c69bdbffc2e3bb7cf9b5b3ece376c109b2c27a0b79f8a09",
-      "format": "PDF",
-      "pages": 4
+      "pages": 4,
+      "sha256": "0e6ec7ee87b630ff7c69bdbffc2e3bb7cf9b5b3ece376c109b2c27a0b79f8a09"
     },
     {
       "path": "01_教材与讲义/【数学二】2026考研数学二参考答案_题面待补.pdf",
       "bytes": 1456767,
-      "sha256": "08866734ead67d4a06d316d2e32778ec04226cb99069cfe35b963c9637c87fa0",
-      "format": "PDF",
-      "pages": 2
+      "pages": 2,
+      "sha256": "08866734ead67d4a06d316d2e32778ec04226cb99069cfe35b963c9637c87fa0"
     },
     {
-      "path": "01_教材与讲义/【数学二】李林880题解析册_2027.pdf",
-      "bytes": 384184069,
-      "sha256": "cad1256c843d2c6770a69093277b8c28745b50cef824132ed733c355a5698acb",
-      "format": "PDF",
-      "pages": 359
+      "path": "01_教材与讲义/【数学二】2026考研数学二真题_公开图片版.pdf",
+      "bytes": 1117927,
+      "pages": 4,
+      "sha256": "808e7746b8be9ab48a7eae97eab6024510337a0f459b37da49833fe9dcb713a3"
     },
     {
       "path": "01_教材与讲义/【数学二】李林880题试题册_2027.pdf",
       "bytes": 102458205,
-      "sha256": "68be87d06fbcec2941b3643bbece8fd564c0514212d3949c6ffc7e9f609a07c5",
-      "format": "PDF",
-      "pages": 106
+      "pages": 106,
+      "sha256": "68be87d06fbcec2941b3643bbece8fd564c0514212d3949c6ffc7e9f609a07c5"
+    },
+    {
+      "path": "01_教材与讲义/【数学二】李林880题解析册_2027.pdf",
+      "bytes": 384184069,
+      "pages": 359,
+      "sha256": "cad1256c843d2c6770a69093277b8c28745b50cef824132ed733c355a5698acb"
     }
   ],
-  "file_count": 4,
-  "total_bytes": 489023596
+  "file_count": 5,
+  "total_bytes": 490141523
 }
