@@ -54,7 +54,7 @@
     button, select { -webkit-tap-highlight-color: transparent; }
     ::selection { color: #fff; background: var(--signal); }
     :focus-visible {
-      outline: 3px solid rgba(236, 91, 62, 0.45);
+      outline: 3px solid var(--navy);
       outline-offset: 3px;
     }
     ::-webkit-scrollbar { width: 11px; height: 11px; }
@@ -175,7 +175,7 @@
       transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
     }
     .filter-field select:hover { background-color: #f1f6fa; border-color: var(--line); }
-    .filter-field select:focus-visible { border-color: var(--signal); box-shadow: 0 0 0 3px rgba(236, 91, 62, 0.16); outline: 0; }
+    .filter-field select:focus-visible { border-color: var(--signal); box-shadow: none; outline: 3px solid var(--navy); outline-offset: 2px; }
     .rail-action {
       width: 100%;
       min-height: 44px;
@@ -349,7 +349,7 @@
     }
     .answer-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
     .answer-heading h3 { margin: 0; color: var(--navy-deep); font-size: clamp(1.25rem, 2vw, 1.65rem); font-weight: 770; letter-spacing: -0.03em; }
-    .answer-heading .button { min-height: 40px; padding: 0 12px; font-size: 12px; }
+    .answer-heading .button { min-height: 44px; padding: 0 12px; font-size: 12px; }
     .formula-block {
       max-width: 100%;
       padding: clamp(16px, 2.8vw, 25px);
@@ -369,7 +369,7 @@
     .inline-math { white-space: nowrap; }
     .block-math { display: block; white-space: normal; }
     .source-details { color: var(--muted); font-size: 12px; line-height: 1.65; }
-    .source-details summary { display: inline-flex; align-items: center; gap: 7px; color: var(--ink-soft); cursor: pointer; font-weight: 700; }
+    .source-details summary { display: inline-flex; align-items: center; min-height: 44px; gap: 7px; padding: 9px 0; color: var(--ink-soft); cursor: pointer; font-weight: 700; }
     .source-details summary::marker { color: var(--signal); }
     .source-details p { margin: 8px 0 0; text-wrap: pretty; }
 
@@ -878,6 +878,7 @@
       if (!getDeck().length || revealed) return;
       revealed = true;
       renderCard();
+      refs.hideButton.focus({ preventScroll: true });
       announce("答案已展开。请核对公式、适用条件和辨析。");
     }
 
@@ -885,6 +886,7 @@
       if (!getDeck().length || !revealed) return;
       revealed = false;
       renderCard();
+      refs.revealButton.focus({ preventScroll: true });
       announce("答案已重新遮挡。");
     }
 
