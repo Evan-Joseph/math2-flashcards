@@ -5,7 +5,14 @@
 - 文件：[积分与反常积分识记闪卡.html](积分与反常积分识记闪卡.html)
 - 数据：[math2-flashcards-data.js](math2-flashcards-data.js)
 - 数学渲染：[katex-0.18.4.min.js](katex-0.18.4.min.js)
-- 使用方式：直接用现代浏览器打开，断网可用；不依赖 CDN、网络字体或构建步骤。
+- 直接打开 HTML 即可使用；不依赖 CDN、网络字体或构建步骤。
+
+### 手机与网页部署
+
+- 手机端默认先显示当前卡；筛选按需展开，横屏同样优先保留卡片。
+- 从 HTTPS 页面打开后可“添加到主屏幕”；首次加载完成后，页面与公式资源可离线打开。
+- Pages 产物通过 `node build-flashcards-site.mjs` 写入忽略目录 `.flashcards-site/`；发布命令为 `wrangler pages deploy .flashcards-site --project-name math2-flashcards`。
+- 网页端的“已会／待复习”仅保存在该浏览器和该站点域名的 localStorage 中，不上传答卷、材料或学习记录。
 
 ### 当前覆盖
 
