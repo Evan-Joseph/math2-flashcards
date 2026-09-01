@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
   <link rel="icon" href="data:,">
-  <title>数学二核心识记闪卡</title>
+  <title>数学二识记闪卡</title>
   <style>
     :root {
       --canvas: #edf2f7;
@@ -24,8 +24,6 @@
       --amber-soft: #fff6df;
       --violet: #6941c6;
       --violet-soft: #f1edff;
-      --rose: #b42348;
-      --rose-soft: #fff0f3;
       --shadow-lg: 0 20px 45px rgba(20, 33, 61, 0.13), 0 3px 10px rgba(20, 33, 61, 0.07);
       --shadow-sm: 0 3px 12px rgba(20, 33, 61, 0.08);
       --radius-card: 16px;
@@ -136,6 +134,7 @@
     }
     .filter-field select {
       width: 100%;
+      min-height: 44px;
       min-width: 0;
       appearance: none;
       padding: 2px 22px 2px 0;
@@ -276,7 +275,6 @@
     }
     .scope-core { color: #075c55; background: var(--teal-soft); }
     .scope-pending { color: #6040ad; background: var(--violet-soft); }
-    .scope-boundary { color: var(--rose); background: var(--rose-soft); }
 
     .card-content {
       position: relative;
@@ -389,6 +387,7 @@
       text-wrap: pretty;
     }
     .inline-math { white-space: nowrap; }
+    .block-math { display: block; white-space: normal; }
     .card-footer {
       position: relative;
       z-index: 1;
@@ -592,6 +591,7 @@
       .scope-stamp { min-width: 0; width: 100%; }
       .toolbar { grid-template-columns: 1fr 1fr; gap: 8px; padding: 16px 0; }
       .toolbar .filter-field:first-child { grid-column: 1 / -1; }
+      .toolbar .filter-field:nth-child(3) { grid-column: 1 / -1; }
       .toolbar .button { min-width: 0; padding: 0 10px; }
       .flashcard { min-height: 520px; }
       .card-topline { min-height: 68px; padding: 14px 17px 12px; }
@@ -617,21 +617,19 @@
       .card-title { font-size: 31px; }
     }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        scroll-behavior: auto !important;
-        transition-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
+      html { scroll-behavior: auto; }
+      .card-inner, .button, .progress-fill {
+        transition-duration: 0ms !important;
       }
     }
   </style>
 </head>
 <body>
-  <main class="app" aria-label="数学二核心识记闪卡">
+  <main class="app" aria-label="数学二识记闪卡">
     <header class="masthead">
       <div>
-        <h1>数学二核心识记闪卡</h1>
-        <p class="subtitle">先从记忆中写出公式、条件和辨析，再翻面核对。内容按数学二范围分层，浏览器中的标记仅用于本机复习导航。</p>
+        <h1>数学二识记闪卡</h1>
+        <p class="subtitle">先从记忆中写出公式、条件和辨析，再翻面核对。高等数学与线性代数按数学二范围分层，浏览器中的标记仅用于本机复习导航。</p>
       </div>
       <div class="scope-stamp">
         <strong>暂按数学二</strong>
@@ -658,9 +656,8 @@
         <label for="scopeFilter">范围</label>
         <select id="scopeFilter" aria-label="按范围筛选卡片">
           <option value="全部">全部范围</option>
-          <option value="当前已输入">当前已输入</option>
-          <option value="范围内未学">范围内未学</option>
-          <option value="数学一专有/待确认">边界提醒</option>
+          <option value="数学二核心（当前已输入）">数学二核心（已输入）</option>
+          <option value="数学二范围内但当前尚未学到">数学二范围内（尚未学到）</option>
         </select>
         <span class="select-caret" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></span>
       </div>
@@ -686,9 +683,9 @@
 
     <section class="workspace" aria-label="闪卡工作区">
       <div class="flashcard-wrap">
-        <article class="flashcard" id="flashcard" tabindex="0" role="button" aria-label="当前遮挡答案。点击或按空格显示答案。">
+        <article class="flashcard" id="flashcard" tabindex="0" role="button" aria-label="当前遮挡答案。点击或按空格显示答案。" aria-disabled="false">
           <div class="card-inner">
-            <section class="card-face card-front" aria-label="题面">
+            <section class="card-face card-front" id="frontFace" aria-label="题面" aria-hidden="false">
               <div class="card-topline">
                 <span class="category-name" id="frontCategory"></span>
                 <span class="scope-badge" id="frontScope"></span>
@@ -705,7 +702,7 @@
                 <span class="card-state" id="frontState"></span>
               </div>
             </section>
-            <section class="card-face card-back" aria-label="答案">
+            <section class="card-face card-back" id="backFace" aria-label="答案" aria-hidden="true" inert>
               <div class="card-topline">
                 <span class="category-name" id="backCategory"></span>
                 <span class="scope-badge" id="backScope"></span>
@@ -733,7 +730,7 @@
         </article>
         <nav class="deck-controls" aria-label="卡片导航">
           <button class="button" id="previousButton" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>上一张</button>
-          <button class="button primary" id="flipButton" type="button">翻卡<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h12a4 4 0 1 1 0 8H8"></path><path d="m8 19-4-4 4-4"></path></svg></button>
+          <button class="button primary" id="flipButton" type="button" aria-label="显示当前答案" aria-pressed="false">翻卡<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h12a4 4 0 1 1 0 8H8"></path><path d="m8 19-4-4 4-4"></path></svg></button>
           <button class="button" id="nextButton" type="button">下一张<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button>
         </nav>
       </div>
@@ -768,9 +765,8 @@
           </ul>
           <hr style="margin:16px 0;border:0;border-top:1px solid var(--line)">
           <ul class="scope-legend" aria-label="范围说明">
-            <li class="legend-row"><span class="legend-chip scope-core">当前已输入</span><span>已核验完成教材输入的高数第 1–8 讲内容；不表示掌握。</span></li>
-            <li class="legend-row"><span class="legend-chip scope-pending">范围内未学</span><span>数学二可用，但尚未作为当前已学内容。</span></li>
-            <li class="legend-row"><span class="legend-chip scope-boundary">边界提醒</span><span>仅用于提醒数学一专有或待官方确认内容。</span></li>
+            <li class="legend-row"><span class="legend-chip scope-core">数学二核心（当前已输入）</span><span>已核验完成教材输入的高数第 1–8 讲内容；不表示掌握。</span></li>
+            <li class="legend-row"><span class="legend-chip scope-pending">数学二范围内但当前尚未学到</span><span>已从数学二范围候选知识整理，尚未作为当前已学内容。</span></li>
           </ul>
         </section>
       </aside>
@@ -788,6 +784,8 @@
     const legacyStorageKey = "math2-integral-flashcards-v1";
     const refs = {
       flashcard: document.getElementById("flashcard"),
+      frontFace: document.getElementById("frontFace"),
+      backFace: document.getElementById("backFace"),
       subjectFilter: document.getElementById("subjectFilter"),
       unitFilter: document.getElementById("unitFilter"),
       scopeFilter: document.getElementById("scopeFilter"),
@@ -872,20 +870,23 @@
     }
 
     function scopeClass(scope) {
-      if (scope === "当前已输入") return "scope-core";
-      if (scope === "范围内未学") return "scope-pending";
-      return "scope-boundary";
+      if (scope === "数学二核心（当前已输入）") return "scope-core";
+      return "scope-pending";
     }
 
     function renderInlineText(target, value) {
       target.replaceChildren();
-      const parts = String(value).split(/(\$[^$]+\$)/g);
+      const parts = String(value).split(/(\$\$[\s\S]+?\$\$|\$[^$\n]+\$|\\\([\s\S]+?\\\))/g);
       parts.forEach(function (part) {
-        if (part.startsWith("$") && part.endsWith("$")) {
+        const isInlineDollar = part.startsWith("$") && part.endsWith("$") && !part.startsWith("$$");
+        const isBlockDollar = part.startsWith("$$") && part.endsWith("$$");
+        const isInlineParen = part.startsWith("\\(") && part.endsWith("\\)");
+        if (isInlineDollar || isBlockDollar || isInlineParen) {
           const holder = document.createElement("span");
-          holder.className = "inline-math";
+          holder.className = isBlockDollar ? "inline-math block-math" : "inline-math";
+          holder.dataset.tex = isInlineParen ? part.slice(2, -2) : part.slice(isBlockDollar ? 2 : 1, isBlockDollar ? -2 : -1);
           try {
-            katex.render(part.slice(1, -1), holder, { output: "mathml", throwOnError: false, strict: "ignore" });
+            katex.render(holder.dataset.tex, holder, { displayMode: isBlockDollar, output: "mathml", throwOnError: false, strict: "ignore" });
           } catch (error) {
             holder.textContent = part;
           }
@@ -901,6 +902,7 @@
       formulas.forEach(function (formula) {
         const line = document.createElement("div");
         line.className = "formula-line";
+        line.dataset.tex = formula;
         try {
           katex.render(formula, line, { displayMode: true, output: "mathml", throwOnError: false, strict: "ignore" });
         } catch (error) {
@@ -959,6 +961,21 @@
       target.textContent = stateText(state);
     }
 
+    function setFaceAccessibility(face, hidden) {
+      face.setAttribute("aria-hidden", hidden ? "true" : "false");
+      if (hidden) {
+        face.setAttribute("inert", "");
+      } else {
+        face.removeAttribute("inert");
+      }
+      face.inert = hidden;
+    }
+
+    function syncFaceAccessibility(isEmpty) {
+      setFaceAccessibility(refs.frontFace, isEmpty || revealed);
+      setFaceAccessibility(refs.backFace, isEmpty || !revealed);
+    }
+
     function setEmpty(isEmpty) {
       refs.frontContent.style.display = isEmpty ? "none" : "";
       refs.backContent.style.display = isEmpty ? "none" : "";
@@ -970,6 +987,9 @@
       refs.randomButton.disabled = isEmpty;
       refs.knownButton.disabled = isEmpty;
       refs.reviewButton.disabled = isEmpty;
+      refs.flashcard.setAttribute("aria-disabled", isEmpty ? "true" : "false");
+      refs.flashcard.tabIndex = isEmpty ? -1 : 0;
+      syncFaceAccessibility(isEmpty);
     }
 
     function renderProgress(deck) {
@@ -995,8 +1015,12 @@
       setEmpty(!deck.length);
       renderProgress(deck);
       if (!deck.length) {
+        revealed = false;
         refs.flashcard.classList.remove("is-revealed");
         refs.flashcard.setAttribute("aria-label", "当前筛选没有卡片。");
+        refs.flipButton.setAttribute("aria-label", "当前没有可翻阅的卡片");
+        refs.flipButton.setAttribute("aria-pressed", "false");
+        syncFaceAccessibility(true);
         return;
       }
       const card = deck[index];
@@ -1019,6 +1043,9 @@
       setState(refs.backState, state);
       refs.flashcard.classList.toggle("is-revealed", revealed);
       refs.flashcard.setAttribute("aria-label", revealed ? "当前显示答案。点击或按空格遮挡答案。" : "当前遮挡答案。点击或按空格显示答案。");
+      refs.flipButton.setAttribute("aria-label", revealed ? "遮挡当前答案" : "显示当前答案");
+      refs.flipButton.setAttribute("aria-pressed", revealed ? "true" : "false");
+      syncFaceAccessibility(false);
     }
 
     function announce(message) {
@@ -1108,6 +1135,7 @@
     refs.flashcard.addEventListener("keydown", function (event) {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
+        event.stopPropagation();
         flipCard();
       }
     });

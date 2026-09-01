@@ -12,6 +12,8 @@
     "高数8": "《基础 30 讲·高等数学》第 8 讲“积分学的概念与性质”，实体 195–229 页 / PDF 200–234 页。",
     "高数9": "《基础 30 讲·高等数学》第 9 讲“积分学的计算”，实体 230–262 页 / PDF 235–267 页。",
     "高数10": "《基础 30 讲·高等数学》第 10 讲“积分学的几何应用”，实体 263–281 页 / PDF 268–286 页。",
+    "高数11": "《基础 30 讲·高等数学》第 11 讲“积分等式与积分不等式”，实体 282–293 页 / PDF 287–298 页。",
+    "高数12": "《基础 30 讲·高等数学》第 12 讲“物理应用与经济应用”，实体 294–303 页 / PDF 299–308 页。",
     "高数13": "《基础 30 讲·高等数学》第 13 讲“多元函数微分学”，实体 304–337 页 / PDF 309–342 页。",
     "高数14": "《基础 30 讲·高等数学》第 14 讲“二重积分”，实体 338–376 页 / PDF 343–381 页。",
     "高数15": "《基础 30 讲·高等数学》第 15 讲“微分方程”，实体 377–408 页 / PDF 382–413 页。",
@@ -38,8 +40,8 @@
     };
   }
 
-  const input = "当前已输入";
-  const pending = "范围内未学";
+  const input = "数学二核心（当前已输入）";
+  const pending = "数学二范围内但当前尚未学到";
   const cards = [];
   window.MATH2_FLASHCARDS = cards;
 
@@ -55,7 +57,7 @@
     card("equiv-list", "高等数学", "函数与极限", input, "常用等价无穷小", "列出 $x\\to0$ 的第一组等价链。", ["\\sin x\\sim\\tan x\\sim\\arcsin x\\sim\\arctan x\\sim\\ln(1+x)\\sim e^x-1\\sim x", "1-\\cos x\\sim\\frac{x^2}{2},\\qquad(1+x)^\\alpha-1\\sim\\alpha x"], "都只在 $x\\to0$ 时使用；后一式取常数 $\\alpha\\ne0$。", "等价替换适于乘除、幂指数等结构；出现加减抵消时要保留高阶项。", "高数1"),
     card("equiv-no-addition", "高等数学", "函数与极限", input, "等价替换的禁区", "为什么 $x-\\sin x$ 不能直接把 $\\sin x$ 替成 $x$？", ["x-\\sin x\\sim\\frac{x^3}{6}\\qquad(x\\to0)"], "相减结构可能发生主项抵消。", "先做恒等变形或泰勒展开；直接替换会把决定极限的最低非零项消掉。", "高数1"),
     card("limit-growth-order", "高等数学", "函数与极限", input, "无穷远处的增长阶", "当 $x\\to+\\infty$ 时，$\\ln x$、$x^\\alpha$、$a^x$ 的相对增长如何？", ["\\ln x=o(x^\\alpha),\\qquad x^\\alpha=o(a^x)\\quad(\\alpha>0,\\ a>1)"], "只讨论 $x\\to+\\infty$，且 $\\alpha>0,a>1$。", "这是增长阶比较，不是 $x\\to0$ 的等价无穷小链。", "高数1"),
-    card("limit-lhopital", "高等数学", "函数与极限", input, "洛必达法则的触发条件", "何时可把 $\\lim f/g$ 改写为 $\\lim f'/g'$？", ["\\frac{f(x)}{g(x)}\\xrightarrow[x\\to x_0]{}\\frac00\\ \\text{或}\\ \\frac{\\infty}{\\infty},\\qquad\\lim\\frac{f'(x)}{g'(x)}=A\\ \\Longrightarrow\\ \\lim\\frac{f(x)}{g(x)}=A"], "在去心邻域可导，$g'(x)\\ne0$；导数比的极限存在或为无穷。", "$0\\cdot\\infty$、$\\infty-\\infty$、$1^\\infty$ 等先变形为商型。", "高数1"),
+    card("limit-lhopital", "高等数学", "函数与极限", input, "洛必达法则的触发条件", "何时可把 $\\lim f/g$ 改写为 $\\lim f'/g'$？", ["\\frac{f(x)}{g(x)}\\xrightarrow[x\\to x_0]{}\\frac{0}{0}\\ \\text{或}\\ \\frac{\\infty}{\\infty},\\qquad\\lim\\frac{f'(x)}{g'(x)}=A\\ \\Longrightarrow\\ \\lim\\frac{f(x)}{g(x)}=A"], "在去心邻域可导，$g'(x)\\ne0$；导数比的极限存在或为无穷。", "$0\\cdot\\infty$、$\\infty-\\infty$、$1^\\infty$ 等先变形为商型。", "高数1"),
     card("continuity-definition", "高等数学", "函数与极限", input, "连续的三件事", "函数在 $x_0$ 连续需要同时满足什么？", ["\\lim_{x\\to x_0}f(x)=f(x_0)"], "等式隐含：函数值存在、二侧极限存在、二者相等。", "单侧连续改为对应的单侧极限等于函数值。", "高数1"),
     card("discontinuity-types", "高等数学", "函数与极限", input, "间断点类型", "可去、跳跃、无穷、振荡间断点的核心区别是什么？", ["\\text{可去：}\\lim_{x\\to x_0}f(x)\\ \\text{存在但}\\ne f(x_0)"], "先分别检查左右极限与函数值。", "左右极限有限但不等是跳跃；至少一侧无穷是无穷间断；极限不存在且非上述情形常为振荡。", "高数1"),
     card("continuous-properties", "高等数学", "函数与极限", input, "闭区间连续函数的性质", "闭区间连续最常用的三个结论是什么？", ["f\\in C[a,b]\\ \\Longrightarrow\\ f\\ \\text{有界，能取到最大最小值，并具有介值性}"], "必须是闭区间连续。", "有界、最值、介值的前提不能从开区间连续直接搬用。", "高数1"),
@@ -63,7 +65,7 @@
     card("sequence-definition", "高等数学", "数列极限", input, "数列极限的语言", "用 $\\varepsilon$–$N$ 语言说明 $a_n\\to A$。", ["\\forall\\varepsilon>0,\\ \\exists N,\\ n>N\\Rightarrow|a_n-A|<\\varepsilon"], "量词顺序固定：先任意 $\\varepsilon$，再找到对应 $N$。", "$N$ 允许依赖 $\\varepsilon$，但不能依赖之后任取的 $n$。", "高数2"),
     card("sequence-monotone-bounded", "高等数学", "数列极限", input, "单调有界准则", "什么条件足以保证数列极限存在？", ["\\{a_n\\}\\ \\text{单调且有界}\\ \\Longrightarrow\\ \\lim_{n\\to\\infty}a_n\\ \\text{存在}"], "递增数列要有上界；递减数列要有下界。", "先证单调再证有界；仅有其中一个条件不能推出收敛。", "高数2"),
     card("sequence-squeeze", "高等数学", "数列极限", input, "数列夹逼准则", "若 $a_n\\le b_n\\le c_n$，哪两个极限相同可推出 $b_n$ 的极限？", ["\\lim_{n\\to\\infty}a_n=\\lim_{n\\to\\infty}c_n=A\\ \\Longrightarrow\\ \\lim_{n\\to\\infty}b_n=A"], "不等式从某一项起成立即可。", "有限个初始项不会改变数列极限。", "高数2"),
-    card("sequence-stolz", "高等数学", "数列极限", input, "Stolz 定理的触发信号", "遇到数列商 $a_n/b_n$ 且分母单调趋于无穷时，可优先联想什么？", ["b_n\\uparrow+\\infty,\\quad\\lim_{n\\to\\infty}\\frac{a_{n+1}-a_n}{b_{n+1}-b_n}=A\\ \\Longrightarrow\\ \\lim_{n\\to\\infty}\\frac{a_n}{b_n}=A"], "常用版本要求 $b_n$ 严格递增且趋于 $+\\infty$。", "先检查分母差分不为零；不要把它当作函数型洛必达。", "高数2"),
+    card("sequence-contraction", "高等数学", "数列极限", input, "递推数列的压缩估计", "若数列到候选极限 $A$ 的距离每步都按固定比例缩小，能推出什么？", ["|a_{n+1}-A|\\le q|a_n-A|,\\qquad 0<q<1\\ \\Longrightarrow\\ a_n\\to A"], "不等式从某一项起成立即可；通常先由递推式确定候选 $A$。", "压缩估计直接给出收敛；只写不动点方程仍不能证明收敛。", "高数2"),
     card("sequence-recursion", "高等数学", "数列极限", input, "递推数列求极限的顺序", "递推式 $a_{n+1}=\\varphi(a_n)$ 的极限题，先做什么再做什么？", ["a_n\\to A\\ \\Longrightarrow\\ A=\\varphi(A)"], "先用单调有界或压缩等方法证明收敛，再解不动点方程。", "直接令 $a_{n+1}=a_n=A$ 只能给候选值，不能证明极限存在。", "高数2"),
 
     card("derivative-definition", "高等数学", "导数与微分", input, "导数的定义", "写出 $f'(x_0)$ 的差商极限。", ["f'(x_0)=\\lim_{\\Delta x\\to0}\\frac{f(x_0+\\Delta x)-f(x_0)}{\\Delta x}"], "极限存在且有限。", "分母是自变量增量；不要把 $\\Delta x$ 与 $x_0$ 混写。", "高数3"),
@@ -85,7 +87,7 @@
     card("application-extreme-necessary", "高等数学", "导数应用", input, "极值点的必要条件", "内点极值且可导时，导数必须满足什么？", ["f\\ \\text{在 }x_0\\text{ 处取极值且可导}\\Longrightarrow f'(x_0)=0"], "必须是区间内点且在该点可导。", "$f'(x_0)=0$ 只是候选点；不可导点也可能是极值点。", "高数5"),
     card("application-first-test", "高等数学", "导数应用", input, "极值的第一充分条件", "如何由 $f'$ 在临界点两侧的符号判断极大、极小？", ["+\\to-\\Longrightarrow\\text{极大值},\\qquad-\\to+\\Longrightarrow\\text{极小值}"], "在 $x_0$ 邻域内考察一阶导数的变号。", "只看 $f'(x_0)=0$ 没有结论，必须看左右符号。", "高数5"),
     card("application-second-test", "高等数学", "导数应用", input, "极值的第二充分条件", "当 $f'(x_0)=0$ 时，$f''(x_0)$ 的符号如何判别极值？", ["f''(x_0)>0\\Longrightarrow\\text{极小值},\\qquad f''(x_0)<0\\Longrightarrow\\text{极大值}"], "要求二阶导数存在且非零。", "$f''(x_0)=0$ 时本判别法失效，转用高阶导数或第一充分条件。", "高数5"),
-    card("application-concavity", "高等数学", "导数应用", input, "凹凸性与拐点", "用二阶导数如何判断凹凸性？拐点如何筛选？", ["f''(x)>0\\Longrightarrow\\text{下凹},\\qquad f''(x)<0\\Longrightarrow\\text{上凹}"], "拐点候选来自 $f''=0$ 或 $f''$ 不存在处，最终要检验凹凸性改变。", "$f''(x_0)=0$ 不是拐点的充分条件。", "高数5"),
+    card("application-concavity", "高等数学", "导数应用", input, "凹凸性与拐点", "用二阶导数如何判断图像的弯曲方向？拐点如何筛选？", ["f''(x)>0\\Longrightarrow\\text{图像位于切线的上方（通常称下凹）}", "f''(x)<0\\Longrightarrow\\text{图像位于切线的下方（通常称上凹）}"], "拐点候选来自 $f''=0$ 或 $f''$ 不存在处，最终要检验凹凸性改变。", "术语“上凹/下凹”在不同教材中口径可能相反；以切线位置和二阶导数符号为准。", "高数5"),
     card("application-asymptotes", "高等数学", "导数应用", input, "三类渐近线", "水平、铅直、斜渐近线各怎样求？", ["\\lim_{x\\to\\infty}f(x)=b\\Rightarrow y=b", "\\lim_{x\\to x_0}f(x)=\\infty\\Rightarrow x=x_0", "k=\\lim_{x\\to\\infty}\\frac{f(x)}x,\\quad b=\\lim_{x\\to\\infty}[f(x)-kx]"], "斜渐近线要求上述 $k,b$ 都存在且有限。", "铅直渐近线来自函数值无界，不是函数值等于零。", "高数5"),
     card("application-closed-extreme", "高等数学", "导数应用", input, "闭区间最值的候选点", "求闭区间最值时必须比较哪些点？", ["\\text{端点}\\ +\\ \\text{区间内 }f'=0\\text{ 或 }f'\\text{不存在的候选点}"], "连续于闭区间，内点处按可导性列候选。", "只找驻点会漏掉端点最值。", "高数5"),
     card("application-curvature", "高等数学", "导数应用", input, "曲率与曲率半径", "平面曲线 $y=f(x)$ 的曲率公式是什么？", ["K=\\frac{|y''|}{[1+(y')^2]^{3/2}},\\qquad R=\\frac1K"], "需要二阶可导；$K\\ne0$ 时曲率半径有意义。", "曲率半径是曲率的倒数，不是导数的倒数。", "高数5"),
@@ -94,7 +96,11 @@
     card("mean-lagrange", "高等数学", "中值定理与泰勒", input, "拉格朗日中值定理", "拉格朗日中值定理的结论怎样写？", ["\\exists\\xi\\in(a,b):\\quad f'(\\xi)=\\frac{f(b)-f(a)}{b-a}"], "前提：$f\\in C[a,b]$ 且在 $(a,b)$ 可导。", "右边是割线斜率，不是端点导数的平均。", "高数6"),
     card("mean-cauchy", "高等数学", "中值定理与泰勒", input, "柯西中值定理", "如何把两个函数的增量比写成导数比？", ["\\exists\\xi\\in(a,b):\\quad\\frac{f(b)-f(a)}{g(b)-g(a)}=\\frac{f'(\\xi)}{g'(\\xi)}"], "两函数闭区间连续、开区间可导，且 $g'(x)\\ne0$；分母增量也须非零。", "它是拉格朗日中值定理的推广；不能漏掉分母条件。", "高数6"),
     card("taylor-peano", "高等数学", "中值定理与泰勒", input, "泰勒公式的 Peano 余项", "在 $x_0$ 附近，$n$ 阶泰勒展开的结构是什么？", ["f(x)=\\sum_{k=0}^{n}\\frac{f^{(k)}(x_0)}{k!}(x-x_0)^k+o\\bigl((x-x_0)^n\\bigr)"], "需要相应阶导数和余项条件。", "展开中心是 $x_0$；麦克劳林公式只是 $x_0=0$ 的特例。", "高数6"),
-    card("taylor-common", "高等数学", "中值定理与泰勒", input, "麦克劳林常用展开", "写出 $e^x,\\sin x,\\cos x,\\ln(1+x)$ 的前三个非零主项。", ["e^x=1+x+\\frac{x^2}{2}+\\frac{x^3}{6}+o(x^3)", "\\sin x=x-\\frac{x^3}{6}+o(x^3),\\quad\\cos x=1-\\frac{x^2}{2}+\\frac{x^4}{24}+o(x^4)", "\\ln(1+x)=x-\\frac{x^2}{2}+\\frac{x^3}{3}+o(x^3)"], "均在 $x\\to0$ 的适用邻域内。", "加减抵消题需要保留到抵消后最低非零项。", "高数6")
+    card("taylor-common", "高等数学", "中值定理与泰勒", input, "麦克劳林常用展开", "写出 $e^x,\\sin x,\\cos x,\\ln(1+x)$ 的常用阶数展开。", ["e^x=1+x+\\frac{x^2}{2}+\\frac{x^3}{6}+o(x^3)", "\\sin x=x-\\frac{x^3}{6}+o(x^3),\\quad\\cos x=1-\\frac{x^2}{2}+\\frac{x^4}{24}+o(x^4)", "\\ln(1+x)=x-\\frac{x^2}{2}+\\frac{x^3}{3}+o(x^3)"], "均在 $x\\to0$ 的适用邻域内。", "加减抵消题需要保留到抵消后最低非零项；展开阶数由抵消结构决定。", "高数6")
+  );
+
+  cards.push(
+    card("application-related-rates", "高等数学", "相关变化率", input, "相关变化率的通用链条", "若变量满足关系式 $F(x(t),y(t),\\ldots)=0$，怎样求未知变量的变化率？", ["F_x\\frac{\\mathrm{d}x}{\\mathrm{d}t}+F_y\\frac{\\mathrm{d}y}{\\mathrm{d}t}+\\cdots=0"], "先建立变量关系，再对时间 $t$ 求导，最后代入题目给出的时刻和已知变化率。", "不能先代入特殊时刻再把变量当常数；相关变量都要按链式法则求导。", "高数7")
   );
 
   cards.push(
@@ -103,7 +109,7 @@
     card("formula-sin-cos", "高等数学", "积分计算", pending, "正弦与余弦原函数", "不定积分中，谁导出谁？", ["\\int\\sin x\\,\\mathrm{d}x=-\\cos x+C", "\\int\\cos x\\,\\mathrm{d}x=\\sin x+C"], "在所讨论的连续区间内使用。", "对结果再求导复核：$-\\cos x$ 的导数才是 $\\sin x$。", "高数9"),
     card("formula-tan-cot", "高等数学", "积分计算", pending, "正切与余切原函数", "写出 $\\int\\tan x\\,\\mathrm{d}x$ 与 $\\int\\cot x\\,\\mathrm{d}x$。", ["\\int\\tan x\\,\\mathrm{d}x=-\\ln|\\cos x|+C", "\\int\\cot x\\,\\mathrm{d}x=\\ln|\\sin x|+C"], "分别在 $\\cos x\\ne0$、$\\sin x\\ne0$ 的连续区间内使用。", "对数内的绝对值不能省略；$\\tan x$ 的原函数前有负号。", "高数9"),
     card("formula-sec-csc", "高等数学", "积分计算", pending, "正割与余割原函数", "写出 $\\int\\sec x\\,\\mathrm{d}x$ 与 $\\int\\csc x\\,\\mathrm{d}x$。", ["\\int\\sec x\\,\\mathrm{d}x=\\ln|\\sec x+\\tan x|+C", "\\int\\csc x\\,\\mathrm{d}x=\\ln|\\csc x-\\cot x|+C"], "在相应三角函数有定义的连续区间内使用。", "第二式是 $\\csc x-\\cot x$；两式都保留绝对值。", "高数9"),
-    card("formula-arctan-arcsin", "高等数学", "积分计算", pending, "反三角型标准积分", "看到 $x^2+a^2$ 或 $\\sqrt{a^2-x^2}$，分别联想什么？", ["\\int\\frac{\\mathrm{d}x}{x^2+a^2}=\\frac1a\\arctan\\frac xa+C", "\\int\\frac{\\mathrm{d}x}{\\sqrt{a^2-x^2}}=\\arcsin\\frac xa+C\\quad(a>0)"], "根式被开方数要有意义。", "前者对应 $\\arctan$，后者对应 $\\arcsin$；先看分母结构。", "高数9"),
+    card("formula-arctan-arcsin", "高等数学", "积分计算", pending, "反三角型标准积分", "看到 $x^2+a^2$ 或 $\\sqrt{a^2-x^2}$，分别联想什么？", ["\\int\\frac{\\mathrm{d}x}{x^2+a^2}=\\frac1a\\arctan\\frac xa+C\\quad(a>0)", "\\int\\frac{\\mathrm{d}x}{\\sqrt{a^2-x^2}}=\\arcsin\\frac xa+C\\quad(a>0)"], "取 $a>0$，且根式被开方数要有意义。", "前者对应 $\\arctan$，后者对应 $\\arcsin$；先看分母结构。", "高数9"),
     card("formula-quadratic", "高等数学", "积分计算", pending, "平方差分母", "分别写出分母 $x^2-a^2$ 与 $a^2-x^2$ 的结果。", ["\\int\\frac{\\mathrm{d}x}{x^2-a^2}=\\frac1{2a}\\ln\\left|\\frac{x-a}{x+a}\\right|+C", "\\int\\frac{\\mathrm{d}x}{a^2-x^2}=\\frac1{2a}\\ln\\left|\\frac{a+x}{a-x}\\right|+C"], "$a>0$，且积分区间不能穿过分母为零处。", "分母整体变号会改变对数比；先因式分解核对。", "高数9"),
     card("formula-root", "高等数学", "积分计算", pending, "根式分母的对数型", "写出 $\\int\\mathrm{d}x/\\sqrt{x^2\\pm a^2}$。", ["\\int\\frac{\\mathrm{d}x}{\\sqrt{x^2+a^2}}=\\ln\\left|x+\\sqrt{x^2+a^2}\\right|+C", "\\int\\frac{\\mathrm{d}x}{\\sqrt{x^2-a^2}}=\\ln\\left|x+\\sqrt{x^2-a^2}\\right|+C"], "$a>0$，并限定在根式有意义的区间。", "两式外观近似，定义域不同；第二式要求 $|x|\\ge a$。", "高数9"),
     card("formula-trig-square", "高等数学", "积分计算", pending, "平方三角函数", "如何先降幂再积 $\\sin^2x$、$\\cos^2x$？", ["\\sin^2x=\\frac{1-\\cos2x}{2},\\qquad\\cos^2x=\\frac{1+\\cos2x}{2}"], "适合偶次幂的三角函数积分。", "先用降幂公式，不要把 $\\sin^2x$ 误写成 $\\sin2x$。", "高数9"),
@@ -141,6 +147,37 @@
     card("integral-volume", "高等数学", "积分应用", pending, "旋转体体积：圆盘法", "曲线 $y=f(x)\\ge0$ 绕 $x$ 轴旋转的体积公式是什么？", ["V=\\pi\\int_a^b[f(x)]^2\\,\\mathrm{d}x"], "绕 $x$ 轴，且半径由 $|f(x)|$ 给出。", "绕 $y$ 轴或有内外半径时要改用相应截面面积。", "高数10"),
     card("integral-arc", "高等数学", "积分应用", pending, "平面曲线弧长", "曲线 $y=f(x)$ 在 $[a,b]$ 的弧长如何计算？", ["L=\\int_a^b\\sqrt{1+[f'(x)]^2}\\,\\mathrm{d}x"], "函数在区间内足够光滑，且积分存在。", "根号内是 $1+(y')^2$，不是 $1+y^2$。", "高数10"),
     card("integral-average", "高等数学", "积分应用", pending, "函数的平均值", "连续函数 $f$ 在 $[a,b]$ 上的平均值是什么？", ["f_{\\mathrm{avg}}=\\frac1{b-a}\\int_a^bf(x)\\,\\mathrm{d}x"], "$a<b$，定积分存在。", "积分中值定理说明某个 $\\xi$ 使 $f(\\xi)=f_{\\mathrm{avg}}$，但 $\\xi$ 不一定是中点。", "高数10")
+  );
+
+  cards.push(
+    card("integral-between-curves", "高等数学", "积分应用", pending, "两曲线之间的面积", "若在一段区间内 $y_{\\text{上}}(x)\\ge y_{\\text{下}}(x)$，两曲线围成的面积怎样写？", ["S=\\int_a^b\\bigl[y_{\\text{上}}(x)-y_{\\text{下}}(x)\\bigr]\\,\\mathrm{d}x"], "先求交点并判断每一段的上下关系。", "曲线交叉时不能整段固定相减；应按交点分段，或使用绝对值后再正确拆分。", "高数10"),
+    card("integral-polar-area", "高等数学", "积分应用", pending, "极坐标下的面积", "极坐标曲线 $r=r(\\theta)$ 与射线围成的扇形区域面积怎样表达？", ["S=\\frac12\\int_\\alpha^\\beta r^2(\\theta)\\,\\mathrm{d}\\theta"], "曲线在 $[\\alpha,\\beta]$ 上按题意恰当描出区域，且半径取非负表示。", "系数是 $\\frac12$；还要检查角度范围是否重复覆盖区域。", "高数10"),
+    card("integral-washer", "高等数学", "积分应用", pending, "旋转体体积：垫片法", "垂直于旋转轴的截面有外半径 $R(x)$、内半径 $r(x)$ 时，体积怎样写？", ["V=\\pi\\int_a^b\\bigl[R^2(x)-r^2(x)\\bigr]\\,\\mathrm{d}x"], "在区间内 $R(x)\\ge r(x)\\ge0$，且截面与旋转轴垂直。", "有空心部分时要减去内圆盘；不能只套外半径的圆盘公式。", "高数10"),
+    card("integral-shell", "高等数学", "积分应用", pending, "旋转体体积：柱壳法", "用平行于竖直旋转轴的薄条生成柱壳时，体积微元怎样写？", ["V=2\\pi\\int_a^b|x-c|\\bigl[y_{\\text{上}}(x)-y_{\\text{下}}(x)\\bigr]\\,\\mathrm{d}x"], "绕竖直直线 $x=c$ 旋转，并按不穿过旋转轴的区间或分段处理。", "柱壳微元是“周长 × 高 × 厚度”；半径是到旋转轴的距离。", "高数10"),
+    card("integral-arc-parametric", "高等数学", "积分应用", pending, "参数与极坐标弧长", "曲线用参数方程或极坐标表示时，弧长公式分别是什么？", ["L=\\int_\\alpha^\\beta\\sqrt{[x'(t)]^2+[y'(t)]^2}\\,\\mathrm{d}t", "L=\\int_\\alpha^\\beta\\sqrt{r^2(\\theta)+[r'(\\theta)]^2}\\,\\mathrm{d}\\theta"], "参数函数或极坐标函数足够光滑，并按题意取不重复的参数区间。", "极坐标弧长根号内同时有 $r^2$ 与 $[r'(\\theta)]^2$，不能漏掉任一项。", "高数10"),
+    card("integral-surface-area", "高等数学", "积分应用", pending, "旋转曲面的面积", "曲线 $y=f(x)$ 绕 $x$ 轴旋转一周所得侧面积怎样写？", ["S=2\\pi\\int_a^b|f(x)|\\sqrt{1+[f'(x)]^2}\\,\\mathrm{d}x"], "曲线光滑，且旋转曲面按题意不重复计数。", "算体积用面积截面；算侧面积要用弧长微元 $\\mathrm{d}s$ 与旋转半径相乘。", "高数10"),
+    card("integral-centroid", "高等数学", "积分应用", pending, "平面图形的形心", "对 $D=\\{(x,y):a\\le x\\le b,\\ 0\\le y\\le f(x)\\}$，形心坐标怎样写？", ["S=\\int_a^bf(x)\\,\\mathrm{d}x,\\qquad\\bar{x}=\\frac1S\\int_a^bxf(x)\\,\\mathrm{d}x,\\qquad\\bar{y}=\\frac1{2S}\\int_a^b[f(x)]^2\\,\\mathrm{d}x"], "要求 $f(x)\\ge0$ 且 $S>0$；若下边界不是 $0$，应先改写上下边界。", "形心坐标是面积矩除以总面积；$\\bar y$ 的分子来自水平条的矩。", "高数10"),
+    card("integral-cross-section-volume", "高等数学", "积分应用", pending, "平行截面求体积", "若垂直于 $x$ 轴的截面面积为 $A(x)$，立体体积如何表达？", ["V=\\int_a^bA(x)\\,\\mathrm{d}x"], "截面面积函数在 $[a,b]$ 上可积，且每个截面与题设方向一致。", "旋转体体积只是 $A(x)$ 取圆盘或垫片面积的特例。", "高数10")
+  );
+
+  cards.push(
+    card("integral-weighted-mean", "高等数学", "积分等式与不等式", pending, "积分形式的中值定理", "若 $f$ 连续、$g$ 不变号，两个函数的乘积积分怎样取中值？", ["\\int_a^bf(x)g(x)\\,\\mathrm{d}x=f(\\xi)\\int_a^bg(x)\\,\\mathrm{d}x,\\qquad\\xi\\in[a,b]"], "通常要求 $f$ 在 $[a,b]$ 连续，$g$ 可积且不变号，且不在区间上恒为零。", "中值点 $\\xi$ 一般不能指定；$g$ 的符号条件决定能否把它作为权函数。", "高数11"),
+    card("integral-reflection", "高等数学", "积分等式与不等式", pending, "定积分的区间反射", "把变量换成 $u=a+b-x$ 后，定积分可以改写成什么对称形式？", ["\\int_a^bf(x)\\,\\mathrm{d}x=\\int_a^bf(a+b-x)\\,\\mathrm{d}x"], "被积函数在对应区间上可积。", "换元后积分上下限同时反向，两个负号相抵；不能只替换被积函数而不处理限。", "高数11"),
+    card("integral-squeeze-limit", "高等数学", "积分等式与不等式", pending, "用夹逼准则处理积分极限", "若 $0\\le f_n(x)\\le g_n(x)$，且大函数的积分趋于 $0$，能推出什么？", ["0\\le f_n\\le g_n,\\quad\\lim_{n\\to\\infty}\\int_a^bg_n(x)\\,\\mathrm{d}x=0\\ \\Longrightarrow\\ \\lim_{n\\to\\infty}\\int_a^bf_n(x)\\,\\mathrm{d}x=0"], "不等式在 $[a,b]$ 上成立，且相关函数可积、非负。", "先把函数不等式积分成数列不等式，再使用数列夹逼；不能直接交换极限与积分。", "高数11")
+  );
+
+  cards.push(
+    card("integral-variable-work", "高等数学", "积分物理应用", pending, "变力沿直线做功", "物体沿直线移动，力的方向分量为 $F(x)$ 时，区间 $[a,b]$ 上的功怎样表达？", ["W=\\int_a^bF(x)\\,\\mathrm{d}x"], "位移方向取为积分变量方向，且 $F(x)$ 表示沿位移方向的力分量。", "功的微元是 $\\mathrm{d}W=F(x)\\,\\mathrm{d}x$；反向力分量会贡献负功。", "高数12"),
+    card("integral-pumping-work", "高等数学", "积分物理应用", pending, "抽水做功", "在高度 $y$ 处厚度为 $\\mathrm{d}y$ 的水层截面积为 $A(y)$，提升距离为 $D(y)$ 时总功怎样写？", ["W=\\rho g\\int_a^bA(y)D(y)\\,\\mathrm{d}y"], "水密度为 $\\rho$、重力加速度为 $g$，并正确建立截面面积和提升距离。", "最容易漏的是水平截面面积 $A(y)$ 或提升距离 $D(y)$；先画坐标并相似三角形求截面。", "高数12"),
+    card("integral-hydrostatic-pressure", "高等数学", "积分物理应用", pending, "静水压力", "深度为 $d(y)$、水平条宽度为 $w(y)$ 的平板微元受到的压力怎样积分？", ["P=\\rho g\\int_a^bd(y)w(y)\\,\\mathrm{d}y"], "液体静止，$d(y)\\ge0$ 为液面以下深度，且条带宽度按同一坐标描述。", "压力密度随深度线性增加；微元是“压强 × 面积”，不是只积宽度。", "高数12"),
+    card("integral-linear-centroid", "高等数学", "积分物理应用", pending, "连续线密度的质量与质心", "一根沿 $x$ 轴分布、线密度为 $\\lambda(x)$ 的细棒，其总质量和质心怎样写？", ["M=\\int_a^b\\lambda(x)\\,\\mathrm{d}x,\\qquad\\bar{x}=\\frac1M\\int_a^bx\\lambda(x)\\,\\mathrm{d}x"], "线密度可积、非负且 $M>0$。", "质心是质量加权平均位置；均匀密度时可退化为几何中点（对称区间情形）。", "高数12"),
+    card("integral-center-terms", "高等数学", "积分物理应用", pending, "重心、质心与形心", "在什么条件下重心、质心和形心重合？", ["\\text{均匀重力场} + \\text{均质}\\quad\\Longrightarrow\\quad\\text{重心} = \\text{质心} = \\text{形心}"], "讨论同一物体，且重力场均匀、密度均匀。", "质心由质量分布决定，形心由几何分布决定，重心还依赖重力场；三者不能无条件混称。", "高数12")
+  );
+
+  cards.push(
+    card("multi-limit-path", "高等数学", "多元函数微分", pending, "二重极限的路径检验", "若沿两条趋近 $(x_0,y_0)$ 的路径得到不同极限，可以推出什么？", ["\\lim_{t\\to0}f(x_1(t),y_1(t))\\ne\\lim_{t\\to0}f(x_2(t),y_2(t))\\ \\Longrightarrow\\ \\lim_{(x,y)\\to(x_0,y_0)}f(x,y)\\ \\text{不存在}"], "两条路径都趋于 $(x_0,y_0)$，且各自的极限存在并不相等。", "路径结果相同只能保留‘可能存在’，不能单独证明二重极限存在。", "高数13"),
+    card("multi-continuity", "高等数学", "多元函数微分", pending, "二元函数的连续性", "二元函数在 $(x_0,y_0)$ 连续的判定式是什么？", ["\\lim_{(x,y)\\to(x_0,y_0)}f(x,y)=f(x_0,y_0)"], "函数值存在，且二重极限存在并等于该函数值。", "连续性要求所有趋近方式都给出同一结果；只检查坐标轴路径不够。", "高数13"),
+    card("double-estimate-mean", "高等数学", "二重积分", pending, "二重积分的估值与中值", "若在区域 $D$ 上 $m\\le f\\le M$，二重积分怎样估值？连续时的中值式怎样写？", ["mS_D\\le\\iint_Df(x,y)\\,\\mathrm{d}\\sigma\\le MS_D", "\\iint_Df(x,y)\\,\\mathrm{d}\\sigma=f(\\xi,\\eta)S_D"], "区域 $D$ 为有界闭区域，$S_D$ 为面积；中值式还要求 $f$ 在 $D$ 上连续。", "二重积分的估值本质是‘函数值 × 区域面积’的夹逼；$(\\xi,\\eta)$ 一般未知。", "高数14")
   );
 
   cards.push(
