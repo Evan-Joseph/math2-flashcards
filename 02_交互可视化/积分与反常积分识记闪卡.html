@@ -36,7 +36,8 @@
       --shadow-sheet: 0 18px 44px rgba(20, 42, 70, 0.12), 0 3px 10px rgba(20, 42, 70, 0.05);
       --shadow-control: 0 4px 12px rgba(20, 42, 70, 0.08);
       --sans: -apple-system, BlinkMacSystemFont, "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      --math: "STIX Two Math", "Cambria Math", "Times New Roman", serif;
+      --reading: "Songti SC", "STSong", "Noto Serif CJK SC", "Source Han Serif SC", serif;
+      --math: "STIX Two Math", "Cambria Math", "Latin Modern Math", "Times New Roman", serif;
       --safe-bottom: max(12px, env(safe-area-inset-bottom));
     }
 
@@ -93,22 +94,6 @@
       line-height: 1;
       text-wrap: balance;
     }
-    .scope-note {
-      display: inline-flex;
-      align-items: center;
-      flex: 0 0 auto;
-      min-width: 0;
-      padding: 7px 10px;
-      color: var(--ink-soft);
-      background: var(--paper);
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 720;
-      line-height: 1;
-    }
-    .scope-note strong { color: inherit; font-size: inherit; }
-
     .study-layout {
       display: grid;
       grid-template-columns: minmax(238px, 272px) minmax(0, 1fr);
@@ -190,7 +175,7 @@
     .rail-action:hover { color: var(--navy); background: var(--paper-soft); border-color: var(--line-strong); transform: translateY(-1px); }
     .rail-action:active { transform: scale(0.98); }
     .mobile-filter-button, .mobile-filter-done { display: none; }
-    .rail-action svg, .button svg, .icon-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+    .rail-action svg, .button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
 
     .study-stage { min-width: 0; scroll-margin-top: max(10px, env(safe-area-inset-top)); }
     .session-bar {
@@ -201,54 +186,33 @@
       margin-bottom: 12px;
       padding: 0 2px;
     }
-    .session-copy { min-width: 0; margin-right: auto; }
-    .session-title-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
-    .session-title-row > strong { min-width: 0; color: var(--navy-deep); font-size: 13px; font-weight: 760; white-space: nowrap; }
-    .session-copy .card-position { display: block; margin-top: 1px; }
-    .session-progress { width: min(168px, 18vw); min-width: 88px; }
-    .progress-meta { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 5px; color: var(--muted); font-size: 11px; }
-    .progress-meta strong { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
-    .progress-track { height: 6px; overflow: hidden; background: #d8e2ea; border-radius: 999px; }
-    .progress-fill { width: 100%; height: 100%; background: var(--mint-ink); border-radius: inherit; transform: scaleX(0); transform-origin: left; transition: transform 230ms cubic-bezier(0.2, 0.75, 0.2, 1); }
-    .session-review-button {
-      min-height: 34px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      padding: 0 9px;
-      color: var(--amber-ink);
-      background: var(--amber);
-      border: 1px solid #efd391;
-      border-radius: 999px;
-      cursor: pointer;
-      font-size: 11px;
-      font-weight: 760;
-      font-variant-numeric: tabular-nums;
-      white-space: nowrap;
-      transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
-    }
-    .session-review-button:hover { background: #ffe9b8; border-color: #e7bd65; transform: translateY(-1px); }
-    .session-review-button:active { transform: scale(0.98); }
-    .session-review-button[aria-pressed="true"] { color: #fff; background: var(--amber-ink); border-color: var(--amber-ink); }
-    .session-review-button[disabled] { color: #9c8b65; background: #f6f0e4; border-color: #eee1c9; cursor: not-allowed; transform: none; }
-    .icon-button {
-      width: 44px;
-      min-width: 44px;
-      height: 44px;
+    .navigation-mode {
+      min-height: 40px;
       display: inline-grid;
-      place-items: center;
-      color: var(--navy);
-      background: var(--paper);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-control);
-      box-shadow: var(--shadow-control);
-      cursor: pointer;
-      transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      flex: 0 0 auto;
+      gap: 2px;
+      padding: 3px;
+      background: rgba(217, 227, 237, 0.72);
+      border-radius: 12px;
     }
-    .icon-button:hover { color: var(--signal-deep); background: #fff8f5; border-color: #f3b3a4; transform: translateY(-1px); box-shadow: 0 7px 15px rgba(20, 42, 70, 0.11); }
-    .icon-button:active { transform: scale(0.97); }
-    .icon-button[disabled], .button[disabled], .rating-button[disabled] { color: #9cabb9; background: #edf2f6; border-color: #e1e8ee; box-shadow: none; cursor: not-allowed; transform: none; }
+    .mode-button {
+      min-width: 58px;
+      min-height: 34px;
+      padding: 0 10px;
+      color: var(--muted);
+      background: transparent;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 760;
+      letter-spacing: 0.01em;
+      transition: color 160ms ease, background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    }
+    .mode-button:hover { color: var(--navy); }
+    .mode-button:active { transform: scale(0.98); }
+    .mode-button[aria-pressed="true"] { color: var(--navy-deep); background: var(--paper); box-shadow: 0 2px 6px rgba(20, 42, 70, 0.11); }
+    .button[disabled], .rating-button[disabled], .mode-button[disabled] { color: #9cabb9; background: #edf2f6; border-color: #e1e8ee; box-shadow: none; cursor: not-allowed; transform: none; }
 
     .study-sheet {
       overflow: hidden;
@@ -258,36 +222,21 @@
       box-shadow: var(--shadow-sheet);
     }
     .sheet-meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      min-height: 67px;
-      padding: 15px clamp(20px, 4vw, 42px);
+      min-height: 0;
+      padding: 15px clamp(22px, 4vw, 42px);
       border-bottom: 1px solid var(--line);
     }
-    .meta-topic { min-width: 0; color: var(--muted); font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .scope-chip, .legend-chip {
-      display: inline-flex;
-      align-items: center;
-      max-width: min(62%, 290px);
-      padding: 5px 9px;
-      border-radius: 999px;
-      font-size: 10px;
-      font-weight: 760;
-      line-height: 1.35;
-    }
-    .scope-chip.core, .legend-chip.core { color: var(--mint-ink); background: var(--mint); }
-    .scope-chip.pending, .legend-chip.pending { color: var(--violet-ink); background: var(--violet); }
+    .meta-topic { display: block; min-width: 0; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: 0.015em; }
 
     .prompt-panel { padding: clamp(32px, 5vw, 64px) clamp(22px, 6vw, 72px) clamp(26px, 4vw, 48px); }
     .prompt-title {
       max-width: 16ch;
       margin: 0;
       color: var(--navy-deep);
+      font-family: var(--reading);
       font-size: clamp(2rem, 4.1vw, 4.25rem);
-      font-weight: 780;
-      letter-spacing: -0.045em;
+      font-weight: 700;
+      letter-spacing: -0.035em;
       line-height: 1.04;
       text-wrap: balance;
     }
@@ -295,6 +244,7 @@
       max-width: 58ch;
       margin: 20px 0 0;
       color: var(--ink-soft);
+      font-family: var(--reading);
       font-size: clamp(1rem, 1.75vw, 1.22rem);
       line-height: 1.76;
       text-wrap: pretty;
@@ -359,6 +309,12 @@
       from { opacity: 0; filter: blur(4px); transform: translateY(10px); }
       to { opacity: 1; filter: blur(0); transform: translateY(0); }
     }
+    .study-sheet.is-card-changing .sheet-meta,
+    .study-sheet.is-card-changing .prompt-panel { animation: card-settle 220ms cubic-bezier(0.2, 0.75, 0.2, 1) both; }
+    @keyframes card-settle {
+      from { opacity: 0.2; filter: blur(3px); transform: translateY(7px); }
+      to { opacity: 1; filter: blur(0); transform: translateY(0); }
+    }
     .answer-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
     .answer-heading h3 { margin: 0; color: var(--navy-deep); font-size: clamp(1.2rem, 2vw, 1.55rem); font-weight: 770; letter-spacing: -0.03em; }
     .answer-heading .button { min-height: 44px; padding: 0 12px; font-size: 12px; }
@@ -392,7 +348,9 @@
       color: var(--navy-deep);
       background: #f1f6fb;
       border-radius: 12px;
+      font-family: var(--math);
       font-size: clamp(1.05rem, 4.4vw, 1.25rem);
+      font-variant-numeric: lining-nums tabular-nums;
     }
     .formula-line {
       min-width: 0;
@@ -407,15 +365,16 @@
     .formula-line + .formula-line { margin-top: 10px; border-top: 1px solid rgba(186, 201, 215, 0.62); padding-top: 16px; }
     .formula-line.is-overflowing { cursor: ew-resize; }
     .formula-line.is-overflowing:focus-visible { outline-offset: 1px; }
-    .formula-line .katex { font-size: var(--formula-size); }
+    .formula-line .katex, .formula-line math { font-family: var(--math); font-size: var(--formula-size); }
     .katex-display { margin: 0.12em 0; }
     .formula-hint { display: inline-flex; align-items: center; gap: 6px; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.45; }
     .formula-hint svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
     .answer-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin: 0; }
     .answer-grid > div { min-width: 0; padding-top: 13px; border-top: 1px solid var(--line-strong); }
     .answer-grid dt { margin: 0 0 7px; color: var(--muted); font-size: 10px; font-weight: 760; letter-spacing: 0.06em; }
-    .answer-grid dd { margin: 0; color: var(--ink-soft); font-size: 14px; line-height: 1.72; text-wrap: pretty; }
-    .inline-math { white-space: nowrap; }
+    .answer-grid dd { margin: 0; color: var(--ink-soft); font-family: var(--reading); font-size: 14px; line-height: 1.72; text-wrap: pretty; }
+    .inline-math { font-family: var(--math); font-size: 1.04em; font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+    .inline-math math { font-family: var(--math); }
     .block-math { display: block; white-space: normal; }
     .source-details { color: var(--muted); font-size: 12px; line-height: 1.65; }
     .source-details summary { display: inline-flex; align-items: center; min-height: 44px; gap: 7px; padding: 9px 0; color: var(--ink-soft); cursor: pointer; font-weight: 700; }
@@ -465,9 +424,9 @@
     .rating-button:hover { transform: translateY(-1px); box-shadow: 0 8px 17px rgba(20, 42, 70, 0.11); }
     .rating-button:active { transform: scale(0.98); }
     .rating-button.known { color: var(--mint-ink); background: var(--mint); border-color: #b7dfd4; }
-    .rating-button.review { color: var(--amber-ink); background: var(--amber); border-color: #efd391; }
+    .rating-button.retry { color: var(--amber-ink); background: var(--amber); border-color: #efd391; }
     .rating-button[aria-pressed="true"] { box-shadow: inset 0 0 0 1px currentColor, 0 7px 14px rgba(20, 42, 70, 0.09); }
-    .card-position { color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+    .card-position { min-width: 0; margin-right: auto; color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; }
     .card-position strong { color: var(--ink-soft); font-weight: 740; }
     .live-region { position: fixed; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
 
@@ -481,7 +440,6 @@
       .study-app { width: calc(100% - 24px); padding-top: max(14px, env(safe-area-inset-top)); }
       .masthead { gap: 12px; padding-bottom: 12px; }
       .masthead h1 { font-size: clamp(1.55rem, 7.5vw, 2rem); }
-      .scope-note { padding: 7px 9px; font-size: 11px; }
       .study-layout { display: flex; flex-direction: column; gap: 10px; padding-top: 10px; }
       .study-stage { order: 0; width: 100%; }
       .control-rail { order: -1; display: none; width: 100%; scroll-margin-top: max(10px, env(safe-area-inset-top)); }
@@ -509,13 +467,9 @@
       .mobile-filter-button:active { transform: scale(0.98); }
       .mobile-filter-done { display: inline-flex; }
       .session-bar { gap: 8px; min-height: 44px; margin-bottom: 10px; }
-      .session-copy { flex: 1 1 0; }
-      .session-title-row > strong { font-size: 12px; }
-      .session-progress { display: none; }
-      .session-review-button { min-height: 44px; padding: 0 10px; }
-      .progress-meta { margin-bottom: 4px; font-size: 10px; }
-      .progress-track { height: 5px; }
-      .sheet-meta { min-height: 54px; padding: 12px 20px; }
+      .navigation-mode { min-height: 44px; }
+      .mode-button { min-width: 55px; min-height: 38px; }
+      .sheet-meta { padding: 12px 20px; }
       .prompt-title { max-width: 100%; }
       .prompt-panel { padding: 28px 22px 24px; }
       .prompt-text { margin-top: 16px; font-size: 16px; line-height: 1.7; }
@@ -533,16 +487,14 @@
       .formula-block { padding: 16px; }
       .formula-line { padding: 7px 2px 10px; }
       .formula-hint { font-size: 12px; }
-      .card-position { font-size: 10px; }
+      .card-position { margin-right: auto; font-size: 11px; }
     }
     @media (max-width: 430px) {
-      .icon-button { width: 44px; min-width: 44px; height: 44px; }
       .mobile-filter-button { min-width: 44px; padding: 0 10px; }
       .mobile-filter-button span { display: none; }
       .answer-heading { gap: 10px; }
       .answer-heading .button { padding: 0 10px; }
-      .meta-topic { max-width: 47%; }
-      .scope-chip { max-width: 53%; }
+      .mode-button { min-width: 52px; padding: 0 8px; }
     }
     @media (max-height: 500px) and (orientation: landscape) {
       .study-app { padding-top: max(12px, env(safe-area-inset-top)); }
@@ -553,31 +505,22 @@
       .prompt-footer { margin-top: 22px; }
     }
     @media (pointer: coarse) {
-      .button, .rating-button, .rail-action, .session-review-button { min-height: 48px; }
+      .button, .rating-button, .rail-action { min-height: 48px; }
+      .navigation-mode { min-height: 48px; }
+      .mode-button { min-height: 42px; }
       .filter-field select { min-height: 48px; font-size: 16px; }
       .formula-zoom-button { width: 44px; min-width: 44px; height: 44px; }
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
-      .answer-panel, .button, .icon-button, .rail-action, .rating-button, .filter-field select, .progress-fill { animation-duration: 1ms; transition-duration: 1ms; }
+      .answer-panel, .study-sheet, .button, .mode-button, .rail-action, .rating-button, .filter-field select { animation-duration: 1ms; transition-duration: 1ms; }
     }
   </style>
 </head>
 <body>
-  <!--
-  THESIS: A single reading surface turns active recall into an explicit reveal, refusing the fragile double-sided 3D flashcard.
-  OWN-WORLD: A calm exam-workbench in mineral blue, signal vermilion, white study sheets, precise rules, and compact status chips.
-  STORY: Choose a range, retrieve from memory, reveal the checked formula and conditions, then mark only local navigation status.
-  FIRST VIEWPORT: A narrow range rail sits beside one large prompt sheet; the visible “查看答案” control anchors the lower prompt edge and the answer unfolds below it.
-  FORM: Candidate 4, seed 1a06c0d8; code-led secondary development informed by manderwall/aplusstudyapp’s MIT-licensed conditional reveal model.
-  FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
-  -->
   <main class="study-app" aria-label="数学二识记">
     <header class="masthead">
       <h1>数学二识记</h1>
-      <div class="scope-note" title="2027 官方目录与大纲待确认" aria-label="暂按数学二，2027 官方目录与大纲待确认">
-        <strong>暂按数二</strong>
-      </div>
     </header>
 
     <div class="study-layout">
@@ -598,11 +541,11 @@
               <select id="unitFilter" aria-label="按模块筛选卡片"></select>
             </div>
             <div class="filter-field">
-              <label for="scopeFilter">范围</label>
+              <label for="scopeFilter">进度</label>
               <select id="scopeFilter" aria-label="按范围筛选卡片">
                 <option value="全部">全部范围</option>
-                <option value="数学二核心（当前已输入）">数学二核心（已输入）</option>
-                <option value="数学二范围内但当前尚未学到">数学二范围内（尚未学到）</option>
+                <option value="input">已学</option>
+                <option value="later">后续</option>
               </select>
             </div>
             <div class="filter-field">
@@ -611,7 +554,7 @@
                 <option value="全部">全部状态</option>
                 <option value="未标记">未标记</option>
                 <option value="顺畅">顺畅</option>
-                <option value="回看">回看</option>
+                <option value="再练">再练</option>
               </select>
             </div>
           </div>
@@ -625,25 +568,14 @@
 
       <section class="study-stage" id="studyStage" aria-label="闪卡学习区">
         <div class="session-bar">
-          <div class="session-copy">
-            <div class="session-title-row">
-              <strong id="sessionTitle">当前筛选</strong>
-              <button class="session-review-button" id="reviewQueueButton" type="button" aria-pressed="false" disabled>
-                回看 <span id="reviewQueueCount">0</span>
-              </button>
-            </div>
-            <span class="card-position" id="cardPosition" aria-live="polite"><strong>0</strong> / 0</span>
-          </div>
-          <div class="session-progress" role="progressbar" aria-label="当前筛选内的顺畅标记进度" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" id="progressTrack">
-            <div class="progress-meta"><strong id="progressText">0 / 0</strong></div>
-            <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+          <span class="card-position" id="cardPosition" aria-live="polite"><strong>0</strong> / 0</span>
+          <div class="navigation-mode" role="group" aria-label="导航模式">
+            <button class="mode-button" id="randomModeButton" type="button" aria-pressed="true">随机</button>
+            <button class="mode-button" id="sequenceModeButton" type="button" aria-pressed="false">顺序</button>
           </div>
           <button class="mobile-filter-button" id="filterToggle" type="button" aria-controls="filterPanel" aria-expanded="false">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"></path><path d="M7 12h10"></path><path d="M10 17h4"></path></svg>
             <span>筛选</span>
-          </button>
-          <button class="icon-button" id="randomButton" type="button" title="随机抽取当前筛选中的卡片" aria-label="随机抽取当前筛选中的卡片">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3h5v5"></path><path d="m4 20 6-6"></path><path d="m21 16-5 5"></path><path d="m15 15 6 6"></path><path d="M4 4l5 5"></path><path d="M21 3v5h-5"></path></svg>
           </button>
         </div>
 
@@ -651,7 +583,6 @@
           <div id="studyContent">
             <header class="sheet-meta">
               <span class="meta-topic" id="cardTopic"></span>
-              <span class="scope-chip" id="scopeChip"></span>
             </header>
             <section class="prompt-panel" id="promptPanel" aria-label="主动回忆提示">
               <h2 class="prompt-title" id="cardTitle"></h2>
@@ -694,12 +625,12 @@
                 <div><dt>适用条件</dt><dd id="conditionText"></dd></div>
                 <div><dt>极短辨析</dt><dd id="distinctionText"></dd></div>
               </dl>
-              <div class="recall-actions" aria-label="核对后的本机标记">
+              <div class="recall-actions" aria-label="本机标记">
                 <button class="rating-button known" id="knownButton" type="button" aria-pressed="false">顺畅 <span class="keycap">G</span></button>
-                <button class="rating-button review" id="reviewButton" type="button" aria-pressed="false">回看 <span class="keycap">R</span></button>
+                <button class="rating-button retry" id="retryButton" type="button" aria-pressed="false">再练 <span class="keycap">R</span></button>
               </div>
               <details class="source-details">
-                <summary>来源</summary>
+                <summary>定位</summary>
                 <p id="sourceText"></p>
               </details>
             </section>
@@ -717,7 +648,7 @@
               上一张
             </button>
             <button class="button" id="nextButton" type="button">
-              下一张
+              <span id="nextButtonLabel">换一张</span>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
             </button>
           </nav>
@@ -734,7 +665,8 @@
     "use strict";
 
     const cards = Array.isArray(window.MATH2_FLASHCARDS) ? window.MATH2_FLASHCARDS : [];
-    const storageKey = "math2-integral-flashcards-v2";
+    const storageKey = "math2-integral-flashcards-v3";
+    const previousStorageKey = "math2-integral-flashcards-v2";
     const legacyStorageKey = "math2-integral-flashcards-v1";
     const refs = {
       subjectFilter: document.getElementById("subjectFilter"),
@@ -745,19 +677,13 @@
       filterPanel: document.getElementById("filterPanel"),
       filterToggle: document.getElementById("filterToggle"),
       closeFiltersButton: document.getElementById("closeFiltersButton"),
-      randomButton: document.getElementById("randomButton"),
-      reviewQueueButton: document.getElementById("reviewQueueButton"),
-      reviewQueueCount: document.getElementById("reviewQueueCount"),
-      progressTrack: document.getElementById("progressTrack"),
-      progressText: document.getElementById("progressText"),
-      progressFill: document.getElementById("progressFill"),
-      sessionTitle: document.getElementById("sessionTitle"),
+      randomModeButton: document.getElementById("randomModeButton"),
+      sequenceModeButton: document.getElementById("sequenceModeButton"),
       studyStage: document.getElementById("studyStage"),
       studySheet: document.getElementById("studySheet"),
       studyContent: document.getElementById("studyContent"),
       emptyState: document.getElementById("emptyState"),
       cardTopic: document.getElementById("cardTopic"),
-      scopeChip: document.getElementById("scopeChip"),
       cardTitle: document.getElementById("cardTitle"),
       promptText: document.getElementById("promptText"),
       revealButton: document.getElementById("revealButton"),
@@ -773,22 +699,23 @@
       hideButton: document.getElementById("hideButton"),
       previousButton: document.getElementById("previousButton"),
       nextButton: document.getElementById("nextButton"),
+      nextButtonLabel: document.getElementById("nextButtonLabel"),
       knownButton: document.getElementById("knownButton"),
-      reviewButton: document.getElementById("reviewButton"),
+      retryButton: document.getElementById("retryButton"),
       cardPosition: document.getElementById("cardPosition"),
       liveRegion: document.getElementById("liveRegion")
     };
 
-    let progress = { known: [], review: [] };
+    let progress = { smooth: [], retry: [] };
     let index = 0;
     let revealed = false;
     let pointerStartX = null;
-    let reviewQueue = [];
-    let queueMode = false;
-    let queueReturnCardId = null;
     let formulaScale = 1;
+    let navigationMode = "random";
+    let cardMotionTimer = null;
 
     const formulaScaleKey = "math2-flashcards-formula-scale-v1";
+    const navigationModeKey = "math2-flashcards-navigation-mode-v1";
     const formulaScaleStep = 0.1;
     const formulaScaleMin = 0.9;
     const formulaScaleMax = 1.4;
@@ -799,17 +726,19 @@
 
     function readProgress() {
       try {
-        const raw = localStorage.getItem(storageKey) || localStorage.getItem(legacyStorageKey);
+        const raw = localStorage.getItem(storageKey) || localStorage.getItem(previousStorageKey) || localStorage.getItem(legacyStorageKey);
         const stored = JSON.parse(raw);
-        if (stored && Array.isArray(stored.known) && Array.isArray(stored.review)) {
+        if (stored) {
+          const smooth = Array.isArray(stored.smooth) ? stored.smooth : stored.known;
+          const retry = Array.isArray(stored.retry) ? stored.retry : stored.review;
           progress = {
-            known: Array.from(new Set(stored.known.filter(isCardId))),
-            review: Array.from(new Set(stored.review.filter(isCardId)))
+            smooth: Array.from(new Set((Array.isArray(smooth) ? smooth : []).filter(isCardId))),
+            retry: Array.from(new Set((Array.isArray(retry) ? retry : []).filter(isCardId)))
           };
-          progress.review = progress.review.filter(function (id) { return !progress.known.includes(id); });
+          progress.retry = progress.retry.filter(function (id) { return !progress.smooth.includes(id); });
         }
       } catch (error) {
-        progress = { known: [], review: [] };
+        progress = { smooth: [], retry: [] };
       }
     }
 
@@ -818,14 +747,14 @@
     }
 
     function stateFor(id) {
-      if (progress.known.includes(id)) return "smooth";
-      if (progress.review.includes(id)) return "review";
+      if (progress.smooth.includes(id)) return "smooth";
+      if (progress.retry.includes(id)) return "retry";
       return "unmarked";
     }
 
     function stateText(state) {
       if (state === "smooth") return "顺畅";
-      if (state === "review") return "回看";
+      if (state === "retry") return "再练";
       return "未标记";
     }
 
@@ -834,12 +763,15 @@
       index = ((index % deck.length) + deck.length) % deck.length;
     }
 
-    function normalizeReviewQueue() {
-      reviewQueue = Array.from(new Set(reviewQueue.filter(isCardId)));
-      if (!reviewQueue.length) {
-        if (queueMode) exitReviewQueue();
-        else queueReturnCardId = null;
-      }
+    function readNavigationMode() {
+      try {
+        const stored = localStorage.getItem(navigationModeKey);
+        if (stored === "random" || stored === "sequence") navigationMode = stored;
+      } catch (error) {}
+    }
+
+    function saveNavigationMode() {
+      try { localStorage.setItem(navigationModeKey, navigationMode); } catch (error) {}
     }
 
     function readFormulaScale() {
@@ -907,29 +839,26 @@
     }
 
     function getDeck() {
-      if (!queueMode) return getFilteredDeck();
-      return cards.filter(function (card) { return reviewQueue.includes(card.id); });
+      return getFilteredDeck();
     }
 
-    function exitReviewQueue() {
-      const returnCardId = queueReturnCardId;
-      queueMode = false;
-      queueReturnCardId = null;
-      const deck = getFilteredDeck();
-      const returnIndex = deck.findIndex(function (card) { return card.id === returnCardId; });
-      index = returnIndex >= 0 ? returnIndex : 0;
+    function updateNavigationModeControl() {
+      const isRandom = navigationMode === "random";
+      refs.randomModeButton.setAttribute("aria-pressed", isRandom ? "true" : "false");
+      refs.sequenceModeButton.setAttribute("aria-pressed", isRandom ? "false" : "true");
+      refs.previousButton.disabled = isRandom;
+      refs.previousButton.title = isRandom ? "随机模式不保留上一步" : "上一张";
+      refs.nextButtonLabel.textContent = isRandom ? "换一张" : "下一张";
+      refs.nextButton.setAttribute("aria-label", isRandom ? "随机换一张" : "下一张");
     }
 
-    function updateReviewQueueControl() {
-      const count = reviewQueue.length;
-      const active = queueMode && count > 0;
-      refs.reviewQueueCount.textContent = String(count);
-      refs.reviewQueueButton.disabled = count === 0;
-      refs.reviewQueueButton.setAttribute("aria-pressed", active ? "true" : "false");
-      refs.reviewQueueButton.setAttribute("aria-label", count
-        ? (active ? "退出本轮回看，当前 " + String(count) + " 张" : "打开本轮回看，当前 " + String(count) + " 张")
-        : "本轮回看暂无卡片");
-      refs.reviewQueueButton.title = count ? "本轮回看 " + String(count) + " 张" : "本轮回看暂无卡片";
+    function setNavigationMode(mode) {
+      if (mode !== "random" && mode !== "sequence") return;
+      if (navigationMode === mode) return;
+      navigationMode = mode;
+      saveNavigationMode();
+      updateNavigationModeControl();
+      announce(mode === "random" ? "已切换为随机模式。" : "已切换为顺序模式。");
     }
 
     function hasKaTeX() {
@@ -1032,20 +961,6 @@
       announce("公式字号已调整为 " + String(Math.round(formulaScale * 100)) + "% 。");
     }
 
-    function updateProgress(deck) {
-      const smooth = deck.filter(function (card) { return stateFor(card.id) === "smooth"; }).length;
-      const percent = deck.length ? smooth / deck.length : 0;
-      refs.progressText.textContent = String(smooth) + " / " + String(deck.length);
-      refs.progressFill.style.transform = "scaleX(" + String(percent) + ")";
-      refs.progressTrack.setAttribute("aria-valuemax", String(deck.length));
-      refs.progressTrack.setAttribute("aria-valuenow", String(smooth));
-      refs.progressTrack.setAttribute("aria-valuetext", "本机顺畅 " + String(smooth) + " 张，共 " + String(deck.length) + " 张");
-      refs.sessionTitle.textContent = queueMode
-        ? "本轮回看 · " + String(deck.length) + " 张"
-        : deck.length ? "当前 · " + String(deck.length) + " 张" : "当前筛选";
-      updateReviewQueueControl();
-    }
-
     function setAnswerVisible(visible) {
       refs.answerPanel.hidden = !visible;
       refs.answerPanel.toggleAttribute("inert", !visible);
@@ -1059,25 +974,37 @@
 
     function setControlsDisabled(disabled) {
       [
-        refs.randomButton,
         refs.revealButton,
         refs.hideButton,
         refs.previousButton,
         refs.nextButton,
         refs.knownButton,
-        refs.reviewButton,
+        refs.retryButton,
         refs.formulaDecreaseButton,
-        refs.formulaIncreaseButton
+        refs.formulaIncreaseButton,
+        refs.randomModeButton,
+        refs.sequenceModeButton
       ].forEach(function (control) {
         control.disabled = disabled;
       });
+      if (!disabled) updateNavigationModeControl();
     }
 
-    function renderCard() {
-      normalizeReviewQueue();
+    function pulseCardChange() {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      refs.studySheet.classList.remove("is-card-changing");
+      void refs.studySheet.offsetWidth;
+      refs.studySheet.classList.add("is-card-changing");
+      if (cardMotionTimer) window.clearTimeout(cardMotionTimer);
+      cardMotionTimer = window.setTimeout(function () {
+        refs.studySheet.classList.remove("is-card-changing");
+      }, 260);
+    }
+
+    function renderCard(options) {
+      const shouldAnimate = Boolean(options && options.animate);
       const deck = getDeck();
       normalizeIndex(deck);
-      updateProgress(deck);
       const isEmpty = deck.length === 0;
       refs.studyContent.hidden = isEmpty;
       refs.emptyState.hidden = !isEmpty;
@@ -1087,15 +1014,13 @@
         setAnswerVisible(false);
         refs.cardPosition.innerHTML = "<strong>0</strong> / 0";
         refs.knownButton.setAttribute("aria-pressed", "false");
-        refs.reviewButton.setAttribute("aria-pressed", "false");
+        refs.retryButton.setAttribute("aria-pressed", "false");
         refs.formulaHint.hidden = true;
         return;
       }
       const card = deck[index];
       const state = stateFor(card.id);
       refs.cardTopic.textContent = card.subject + " · " + card.unit;
-      refs.scopeChip.textContent = card.scope;
-      refs.scopeChip.className = "scope-chip " + (card.scope === "数学二核心（当前已输入）" ? "core" : "pending");
       renderRichText(refs.cardTitle, card.title);
       renderRichText(refs.promptText, card.prompt);
       renderFormula(refs.formulaBlock, card.formulas);
@@ -1105,9 +1030,10 @@
       setAnswerVisible(revealed);
       refs.revealButton.disabled = revealed;
       refs.knownButton.setAttribute("aria-pressed", state === "smooth" ? "true" : "false");
-      refs.reviewButton.setAttribute("aria-pressed", state === "review" ? "true" : "false");
-      refs.cardPosition.innerHTML = "<strong>" + String(index + 1) + "</strong> / " + String(deck.length) + " · " + stateText(state);
+      refs.retryButton.setAttribute("aria-pressed", state === "retry" ? "true" : "false");
+      refs.cardPosition.innerHTML = "<strong>" + String(index + 1) + "</strong> / " + String(deck.length);
       scheduleFormulaOverflowCheck();
+      if (shouldAnimate) pulseCardChange();
     }
 
     function announce(message) {
@@ -1147,10 +1073,14 @@
     function move(delta) {
       const deck = getDeck();
       if (!deck.length) return;
+      if (navigationMode === "random") {
+        chooseRandom();
+        return;
+      }
       index += delta;
       normalizeIndex(deck);
       revealed = false;
-      renderCard();
+      renderCard({ animate: true });
       announceCurrentCard("已切换到");
     }
 
@@ -1162,8 +1092,8 @@
       while (nextIndex === index) nextIndex = Math.floor(Math.random() * deck.length);
       index = nextIndex;
       revealed = false;
-      renderCard();
-      announceCurrentCard("已随机抽取");
+      renderCard({ animate: true });
+      announceCurrentCard("已换到");
     }
 
     function markCurrent(status) {
@@ -1175,53 +1105,26 @@
         return;
       }
       const current = stateFor(card.id);
-      progress.known = progress.known.filter(function (id) { return id !== card.id; });
-      progress.review = progress.review.filter(function (id) { return id !== card.id; });
+      progress.smooth = progress.smooth.filter(function (id) { return id !== card.id; });
+      progress.retry = progress.retry.filter(function (id) { return id !== card.id; });
       const clearing = current === status;
-      if (!clearing && status === "smooth") progress.known.push(card.id);
-      if (!clearing && status === "review") progress.review.push(card.id);
-      reviewQueue = reviewQueue.filter(function (id) { return id !== card.id; });
-      if (!clearing && status === "review") reviewQueue.push(card.id);
-      normalizeReviewQueue();
+      if (!clearing && status === "smooth") progress.smooth.push(card.id);
+      if (!clearing && status === "retry") progress.retry.push(card.id);
       saveProgress();
       renderCard();
       announce(clearing
         ? "已清除当前卡的本机标记。"
-        : status === "review"
-          ? "已加入本轮回看。"
+        : status === "retry"
+          ? "已标记为再练。"
           : "已标记为顺畅。");
     }
 
-    function toggleReviewQueue() {
-      normalizeReviewQueue();
-      if (!reviewQueue.length) {
-        announce("本轮回看暂无卡片。");
-        return;
-      }
-      if (queueMode) {
-        exitReviewQueue();
-        revealed = false;
-        renderCard();
-        announce("已回到当前筛选。");
-        return;
-      }
-      const current = getFilteredDeck()[index];
-      queueReturnCardId = current ? current.id : null;
-      queueMode = true;
-      index = 0;
-      revealed = false;
-      renderCard();
-      announce("已进入本轮回看，共 " + String(reviewQueue.length) + " 张。");
-    }
-
     function resetProgress() {
-      if (!window.confirm("清空本浏览器中这套闪卡的顺畅与回看标记？")) return;
-      progress = { known: [], review: [] };
-      reviewQueue = [];
-      queueMode = false;
-      queueReturnCardId = null;
+      if (!window.confirm("清空本浏览器中这套闪卡的顺畅与再练标记？")) return;
+      progress = { smooth: [], retry: [] };
       try {
         localStorage.removeItem(storageKey);
+        localStorage.removeItem(previousStorageKey);
         localStorage.removeItem(legacyStorageKey);
       } catch (error) {}
       renderCard();
@@ -1229,11 +1132,13 @@
     }
 
     function resetDeckAfterFilter(message) {
-      queueMode = false;
-      queueReturnCardId = null;
       index = 0;
       revealed = false;
-      renderCard();
+      if (navigationMode === "random") {
+        const deck = getDeck();
+        if (deck.length > 1) index = Math.floor(Math.random() * deck.length);
+      }
+      renderCard({ animate: true });
       announceCurrentCard(message + "当前为");
     }
 
@@ -1248,10 +1153,10 @@
     refs.hideButton.addEventListener("click", hideAnswer);
     refs.previousButton.addEventListener("click", function () { move(-1); });
     refs.nextButton.addEventListener("click", function () { move(1); });
-    refs.randomButton.addEventListener("click", chooseRandom);
-    refs.reviewQueueButton.addEventListener("click", toggleReviewQueue);
+    refs.randomModeButton.addEventListener("click", function () { setNavigationMode("random"); });
+    refs.sequenceModeButton.addEventListener("click", function () { setNavigationMode("sequence"); });
     refs.knownButton.addEventListener("click", function () { markCurrent("smooth"); });
-    refs.reviewButton.addEventListener("click", function () { markCurrent("review"); });
+    refs.retryButton.addEventListener("click", function () { markCurrent("retry"); });
     refs.formulaDecreaseButton.addEventListener("click", function () { setFormulaScale(formulaScale - formulaScaleStep); });
     refs.formulaIncreaseButton.addEventListener("click", function () { setFormulaScale(formulaScale + formulaScaleStep); });
     refs.resetButton.addEventListener("click", resetProgress);
@@ -1305,19 +1210,21 @@
       } else if (event.key === "ArrowRight") {
         event.preventDefault();
         move(1);
-      } else if (event.key.toLowerCase() === "s") {
-        chooseRandom();
       } else if (event.key.toLowerCase() === "g" && revealed) {
         markCurrent("smooth");
       } else if (event.key.toLowerCase() === "r" && revealed) {
-        markCurrent("review");
+        markCurrent("retry");
       }
     });
 
     window.addEventListener("storage", function (event) {
-      if (event.key === storageKey || event.key === legacyStorageKey) {
+      if (event.key === storageKey || event.key === previousStorageKey || event.key === legacyStorageKey) {
         readProgress();
         renderCard();
+      }
+      if (event.key === navigationModeKey) {
+        readNavigationMode();
+        updateNavigationModeControl();
       }
       if (event.key === formulaScaleKey) {
         readFormulaScale();
@@ -1332,7 +1239,11 @@
 
     readProgress();
     readFormulaScale();
+    readNavigationMode();
     updateUnitOptions();
+    if (navigationMode === "random" && getDeck().length > 1) {
+      index = Math.floor(Math.random() * getDeck().length);
+    }
     renderCard();
   </script>
   <script>

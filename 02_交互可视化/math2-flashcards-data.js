@@ -40,8 +40,8 @@
     };
   }
 
-  const input = "数学二核心（当前已输入）";
-  const pending = "数学二范围内但当前尚未学到";
+  const input = "input";
+  const pending = "later";
   const cards = [];
   window.MATH2_FLASHCARDS = cards;
 

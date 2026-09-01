@@ -1,4 +1,4 @@
-const CACHE_NAME = "math2-flashcards-v2";
+const CACHE_NAME = "math2-flashcards-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
