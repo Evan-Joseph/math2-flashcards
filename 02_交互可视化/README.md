@@ -10,9 +10,10 @@
 ### 手机与网页部署
 
 - 手机端默认先显示当前卡；筛选按需展开，横屏同样优先保留卡片。
+- 答案里的显示公式可在 90%–140% 之间调整字号，偏好只保存在当前浏览器。公式过长时只在公式行内横向滑动，不会制造整页横向滚动；触控可直接左右滑动，键盘聚焦公式行后可用左右方向键。
 - 从 HTTPS 页面打开后可“添加到主屏幕”；首次加载完成后，页面与公式资源可离线打开。
 - Pages 产物通过 `node build-flashcards-site.mjs` 写入忽略目录 `.flashcards-site/`；发布命令为 `wrangler pages deploy .flashcards-site --project-name math2-flashcards`。
-- 网页端的“已会／待复习”仅保存在该浏览器和该站点域名的 localStorage 中，不上传答卷、材料或学习记录。
+- 网页端的“顺畅／回看”仅保存在该浏览器和该站点域名的 localStorage 中，不上传答卷、材料或学习记录。
 
 ### 当前覆盖
 
@@ -42,7 +43,8 @@
 ### 交互与数据边界
 
 - 页面已移除双面 3D 翻卡。题面是唯一常驻内容面；答案区初始为 `hidden + inert`，查看答案后在同一阅读流中展开，因此没有正反面重叠渲染的路径。
-- 支持科目、模块、范围和复习状态筛选，查看/重新遮挡答案、随机抽取、触控滑动、键盘快捷键及本机标记。
+- 支持科目、模块、范围和本机状态筛选，查看/重新遮挡答案、随机抽取、触控滑动、键盘快捷键及本机标记。只有答案已展开，才可用 `G` 标记“顺畅”或用 `R` 加入“回看”。
+- “本轮回看”是页面会话内的临时队列；完成本轮、刷新页面或关闭页面后不保留。单张卡的“回看”本机状态仍按上文保存在 localStorage。它不是间隔复习计划，也不生成正确率、掌握结论或复习日志。
 - 标记只写入当前浏览器的 localStorage，不写入 study-ledger，不替代原题作答、官方解析核对、订正或间隔复习证据。
 - 页面不读取教材图片；知识定位以本地可检索教材文本、MinerU 解析和持久页码索引为导航与交叉核验依据。
 
@@ -55,6 +57,6 @@
 - [zsh-eng/spaced2](https://github.com/zsh-eng/spaced2)：local-first 闪卡和离线体验。
 - [davisilva169/quanta-flashcards](https://github.com/davisilva169/quanta-flashcards)：Markdown、LaTeX 与本地数据边界。
 - [alexthillen/better-markdown-anki](https://github.com/alexthillen/better-markdown-anki)：Markdown/KaTeX 和可访问交互提示。
-- [open-spaced-repetition/fsrs.js](https://github.com/open-spaced-repetition/fsrs.js)：间隔重复算法参考；当前页面只保留手动复习标记，未宣称实现 FSRS。
+- [open-spaced-repetition/ts-fsrs](https://github.com/open-spaced-repetition/ts-fsrs)：正式 FSRS 需要根据真实作答后写入评分与复习日志；当前页面只保留会话内导航，未实现或宣称实现 FSRS。
 
 闪卡用于主动回忆：先闭卷写出公式、条件和辨析，再展开答案核对。它不改变本科目的学习状态、题目批阅和结构化学习记录。
