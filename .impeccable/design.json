@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-01T13:51:27+08:00",
+  "title": "Design System: 数学二识记",
+  "extensions": {
+    "colorMeta": {
+      "canvas": { "role": "neutral", "displayName": "矿物画布", "canonical": "#e9f0f5" },
+      "paper": { "role": "neutral", "displayName": "学习纸张", "canonical": "#ffffff" },
+      "paper-soft": { "role": "neutral", "displayName": "柔和纸面", "canonical": "#f7fafc" },
+      "ink": { "role": "neutral", "displayName": "主墨色", "canonical": "#13213b" },
+      "ink-soft": { "role": "neutral", "displayName": "辅助墨色", "canonical": "#3c506d" },
+      "muted": { "role": "neutral", "displayName": "静默文字", "canonical": "#586b80" },
+      "line": { "role": "neutral", "displayName": "细线", "canonical": "#d9e3ed" },
+      "line-strong": { "role": "neutral", "displayName": "强调线", "canonical": "#bac9d7" },
+      "navy": { "role": "primary", "displayName": "海军蓝", "canonical": "#17395d" },
+      "navy-deep": { "role": "primary", "displayName": "深海军蓝", "canonical": "#102b4a" },
+      "signal": { "role": "primary", "displayName": "朱红信号", "canonical": "#c63f2a" },
+      "signal-deep": { "role": "primary", "displayName": "深朱红信号", "canonical": "#c9462c" },
+      "mint": { "role": "secondary", "displayName": "薄荷状态底色", "canonical": "#e4f4ee" },
+      "mint-ink": { "role": "secondary", "displayName": "薄荷状态文字", "canonical": "#116658" },
+      "amber": { "role": "tertiary", "displayName": "琥珀状态底色", "canonical": "#fff3d7" },
+      "amber-ink": { "role": "tertiary", "displayName": "琥珀状态文字", "canonical": "#8a5908" },
+      "violet": { "role": "tertiary", "displayName": "浅紫范围底色", "canonical": "#efecff" },
+      "violet-ink": { "role": "tertiary", "displayName": "浅紫范围文字", "canonical": "#5941a6" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "题面显示级", "purpose": "题面标题与页面主标题。" },
+      "body": { "displayName": "阅读正文", "purpose": "题面说明、条件、辨析与界面正文。" },
+      "math": { "displayName": "数学公式", "purpose": "数学公式的本地回退字体栈。" }
+    },
+    "shadows": [
+      { "name": "sheet", "value": "0 18px 44px rgba(20, 42, 70, 0.12), 0 3px 10px rgba(20, 42, 70, 0.05)", "purpose": "完整学习纸张。" },
+      { "name": "control", "value": "0 4px 12px rgba(20, 42, 70, 0.08)", "purpose": "筛选轨道与常规控件。" },
+      { "name": "focus-visible", "value": "0 0 0 3px rgba(236, 91, 62, 0.16)", "purpose": "筛选字段的键盘焦点环。" }
+    ],
+    "motion": [
+      { "name": "control-state", "value": "160ms ease", "purpose": "按钮、图标按钮、筛选字段与标记按钮的状态过渡。" },
+      { "name": "answer-enter", "value": "250ms cubic-bezier(0.2, 0.75, 0.2, 1)", "purpose": "答案展开时的进入动画。" },
+      { "name": "progress", "value": "230ms cubic-bezier(0.2, 0.75, 0.2, 1)", "purpose": "进度填充缩放。" },
+      { "name": "reduced-motion", "value": "1ms", "purpose": "prefers-reduced-motion 下的动画与过渡时长。" }
+    ],
+    "breakpoints": [
+      { "name": "rail-stack", "value": "1050px", "purpose": "两列学习布局改为单列，筛选轨道变为三列。" },
+      { "name": "mobile", "value": "720px", "purpose": "学习区前置，筛选轨道与答案字段改为单列。" },
+      { "name": "compact", "value": "430px", "purpose": "筛选、导航、答案标题进一步单列化。" }
+    ]
+  },
+  "components": [
+    {
+      "name": "主答案操作",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "在题面底部明确揭示条件答案的主操作。",
+      "html": "<button class=\"ds-button ds-button-primary\" type=\"button\">查看答案 <svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"></path></svg></button>",
+      "css": ".ds-button { min-height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 0 16px; border: 1px solid var(--line); border-radius: var(--radius-control); box-shadow: var(--shadow-control); cursor: pointer; font: 730 13px var(--sans); transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease; } .ds-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; } .ds-button-primary { color: #fff; background: var(--signal); border-color: var(--signal); box-shadow: 0 10px 19px rgba(198, 70, 43, 0.25); } .ds-button-primary:hover { background: var(--signal-deep); border-color: var(--signal-deep); transform: translateY(-1px); } .ds-button-primary:focus-visible { outline: 3px solid rgba(236, 91, 62, 0.45); outline-offset: 3px; } .ds-button-primary:active { transform: scale(0.98); }"
+    },
+    {
+      "name": "常规导航按钮",
+      "kind": "nav",
+      "refersTo": "button-default",
+      "description": "用于上一张与下一张等同级导航。",
+      "html": "<button class=\"ds-button ds-button-default\" type=\"button\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"m15 18-6-6 6-6\"></path></svg>上一张</button>",
+      "css": ".ds-button { min-height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 0 16px; border: 1px solid var(--line); border-radius: var(--radius-control); box-shadow: var(--shadow-control); cursor: pointer; font: 730 13px var(--sans); transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease; } .ds-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; } .ds-button-default { color: var(--ink); background: var(--paper); } .ds-button-default:hover { background: #fbfdff; border-color: var(--line-strong); box-shadow: 0 8px 17px rgba(20, 42, 70, 0.12); transform: translateY(-1px); } .ds-button-default:focus-visible { outline: 3px solid rgba(236, 91, 62, 0.45); outline-offset: 3px; } .ds-button-default:active { transform: scale(0.98); }"
+    },
+    {
+      "name": "筛选字段",
+      "kind": "input",
+      "refersTo": "filter-field",
+      "description": "按科目、模块、范围或本机标记筛选当前队列。",
+      "html": "<label class=\"ds-filter-field\">范围<select class=\"ds-filter-select\"><option>全部范围</option><option>数学二核心（已输入）</option></select></label>",
+      "css": ".ds-filter-field { display: grid; gap: 5px; color: var(--muted); font: 720 11px var(--sans); letter-spacing: 0.045em; } .ds-filter-select { width: 100%; min-height: 44px; padding: 0 36px 0 12px; color: var(--ink); appearance: none; background-color: var(--paper-soft); border: 1px solid transparent; border-radius: var(--radius-control); cursor: pointer; font: 650 13px var(--sans); letter-spacing: normal; transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease; } .ds-filter-select:hover { background-color: #f1f6fa; border-color: var(--line); } .ds-filter-select:focus-visible { border-color: var(--signal); box-shadow: 0 0 0 3px rgba(236, 91, 62, 0.16); outline: 0; }"
+    },
+    {
+      "name": "范围芯片",
+      "kind": "chip",
+      "refersTo": "scope-chip-core",
+      "description": "用文本和语义色标记当前已输入范围。",
+      "html": "<span class=\"ds-scope-chip ds-scope-chip-core\">当前已输入</span>",
+      "css": ".ds-scope-chip { display: inline-flex; align-items: center; max-width: min(62%, 290px); padding: 5px 9px; border-radius: 999px; font: 760 10px/1.35 var(--sans); } .ds-scope-chip-core { color: var(--mint-ink); background: var(--mint); }"
+    },
+    {
+      "name": "本机复习标记",
+      "kind": "button",
+      "refersTo": "rating-known",
+      "description": "仅标示当前浏览器的复习导航状态。",
+      "html": "<button class=\"ds-rating-button ds-rating-known\" type=\"button\" aria-pressed=\"false\">已会 <span class=\"ds-keycap\">K</span></button>",
+      "css": ".ds-rating-button { min-width: 106px; min-height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 0 13px; border: 1px solid var(--line); border-radius: var(--radius-control); box-shadow: var(--shadow-control); cursor: pointer; font: 740 12px var(--sans); transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease; } .ds-rating-known { color: var(--mint-ink); background: var(--mint); border-color: #b7dfd4; } .ds-keycap { min-width: 27px; padding: 2px 6px; color: var(--ink-soft); background: var(--paper-soft); border: 1px solid var(--line); border-radius: 5px; font: 720 10px/1.25 var(--sans); } .ds-rating-button:hover { transform: translateY(-1px); box-shadow: 0 8px 17px rgba(20, 42, 70, 0.11); } .ds-rating-button:focus-visible { outline: 3px solid rgba(236, 91, 62, 0.45); outline-offset: 3px; } .ds-rating-button:active { transform: scale(0.98); } .ds-rating-button[aria-pressed=\"true\"] { box-shadow: inset 0 0 0 1px currentColor, 0 7px 14px rgba(20, 42, 70, 0.09); }"
+    },
+    {
+      "name": "图标随机按钮",
+      "kind": "button",
+      "refersTo": "icon-button",
+      "description": "在当前筛选内随机切换卡片的紧凑操作。",
+      "html": "<button class=\"ds-icon-button\" type=\"button\" aria-label=\"随机抽取当前筛选中的卡片\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M16 3h5v5\"></path><path d=\"m4 20 6-6\"></path><path d=\"m21 16-5 5\"></path><path d=\"m15 15 6 6\"></path><path d=\"M4 4l5 5\"></path><path d=\"M21 3v5h-5\"></path></svg></button>",
+      "css": ".ds-icon-button { width: 44px; min-width: 44px; height: 44px; display: inline-grid; place-items: center; color: var(--navy); background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-control); box-shadow: var(--shadow-control); cursor: pointer; transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease; } .ds-icon-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; } .ds-icon-button:hover { color: var(--signal-deep); background: #fff8f5; border-color: #f3b3a4; transform: translateY(-1px); box-shadow: 0 7px 15px rgba(20, 42, 70, 0.11); } .ds-icon-button:focus-visible { outline: 3px solid rgba(236, 91, 62, 0.45); outline-offset: 3px; } .ds-icon-button:active { transform: scale(0.97); }"
+    },
+    {
+      "name": "学习纸张",
+      "kind": "card",
+      "refersTo": "sheet",
+      "description": "承载单张题面与条件答案的连续阅读容器。",
+      "html": "<article class=\"ds-study-sheet\"><header class=\"ds-sheet-meta\">高等数学 · 积分<span class=\"ds-scope-chip ds-scope-chip-core\">当前已输入</span></header><section class=\"ds-prompt-panel\"><p>先写，再核对</p><h2>定积分性质</h2><button class=\"ds-reveal-button\" type=\"button\" aria-controls=\"ds-answer-panel\" aria-expanded=\"false\">查看答案</button></section><section class=\"ds-answer-panel\" id=\"ds-answer-panel\" aria-hidden=\"true\" hidden inert><h3>核对答案</h3></section></article>",
+      "css": ".ds-study-sheet { overflow: hidden; background: var(--paper); border-radius: var(--radius-shell); box-shadow: var(--shadow-sheet); font-family: var(--sans); } .ds-sheet-meta { min-height: 67px; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 15px clamp(20px, 4vw, 42px); color: var(--muted); border-bottom: 1px solid var(--line); font-size: 12px; font-weight: 700; } .ds-scope-chip { padding: 5px 9px; border-radius: 999px; font: 760 10px/1.35 var(--sans); } .ds-scope-chip-core { color: var(--mint-ink); background: var(--mint); } .ds-prompt-panel { padding: clamp(34px, 6vw, 72px) clamp(22px, 6vw, 72px) clamp(28px, 5vw, 56px); } .ds-prompt-panel p { color: var(--signal-deep); font: 760 12px var(--sans); letter-spacing: 0.025em; } .ds-prompt-panel h2 { max-width: 16ch; margin: 17px 0 34px; color: var(--navy-deep); font: 780 clamp(2rem, 4.1vw, 4.25rem)/1.04 var(--sans); letter-spacing: -0.045em; } .ds-reveal-button { min-height: 46px; padding: 0 16px; color: #fff; background: var(--signal); border: 1px solid var(--signal); border-radius: var(--radius-control); cursor: pointer; font: 730 13px var(--sans); transition: background-color 160ms ease, transform 160ms ease; } .ds-reveal-button:hover { background: var(--signal-deep); transform: translateY(-1px); } .ds-reveal-button:focus-visible { outline: 3px solid rgba(236, 91, 62, 0.45); outline-offset: 3px; } .ds-reveal-button:active { transform: scale(0.98); } .ds-answer-panel { display: grid; gap: 25px; padding: clamp(27px, 5vw, 54px) clamp(22px, 6vw, 72px) clamp(30px, 5vw, 58px); color: var(--navy-deep); background: var(--paper-soft); border-top: 1px solid var(--line); animation: ds-answer-enter 250ms cubic-bezier(0.2, 0.75, 0.2, 1) both; } .ds-answer-panel[hidden] { display: none; } @keyframes ds-answer-enter { from { opacity: 0; filter: blur(4px); transform: translateY(10px); } to { opacity: 1; filter: blur(0); transform: translateY(0); } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "矿物蓝考场工作台",
+    "overview": "系统以低干扰的白色学习纸张置于浅矿物蓝画布上。深海军蓝负责标题与阅读重心，朱红只用于“先写，再核对”的动作提示和主操作；筛选、进度与本机标记保持紧凑，避免把导航状态误读为学习结论。\n\n单张卡始终是一块连续阅读面板：题面先占据主阅读区，答案在用户显式操作后于其下方展开。该设计拒绝双面叠放与 3D 翻转；答案的可见性、可交互性与 ARIA 状态保持一致。",
+    "keyCharacteristics": [
+      "白色学习纸张、矿物蓝文字与克制的朱红信号。",
+      "单一题面优先，条件答案按需展开。",
+      "紧凑筛选轨道、明确的本机状态芯片与键盘可达控件。"
+    ],
+    "rules": [
+      { "name": "Signal Reserve", "body": "朱红只指向当前的主动操作、提示或细小强调；大块阅读区始终保持冷白与蓝灰。", "section": "colors" },
+      { "name": "Reading-First Type", "body": "大字号只给页面与题面标题；公式、条件和辨析由清晰的正文行高与宽度承担，而不是用展示字体抢占注意力。", "section": "typography" },
+      { "name": "Sheet-Above-Controls", "body": "只有完整学习纸张可使用较深的 --shadow-sheet；其他可操作元素保持 --shadow-control，通过状态变化而非持续强阴影表达可点击性。", "section": "elevation" }
+    ],
+    "dos": [
+      "Do 用白色学习纸张和矿物画布承载长阅读，把朱红保留给当前的主动揭示和提示。",
+      "Do 保持题面、条件答案和来源说明处于同一纵向阅读容器，并同步 hidden、inert 与 ARIA 状态。",
+      "Do 在 1050px、720px、430px 使用已实现的重排规则，并保留至少 44px 的主要触控控件高度。",
+      "Do 用文字、范围标签与 aria-pressed 说明本机状态；颜色只作补充。"
+    ],
+    "donts": [
+      "Don't 将答案恢复为 3D 双面翻卡、同坐标叠放卡面或纯视觉的翻转状态。",
+      "Don't 将“已会”或“待复习”的本机标记设计成掌握、订正或长期保持的证明。",
+      "Don't 扩张朱红为大面积背景，或用强阴影、炫技动效破坏题面阅读优先级。",
+      "Don't 把页面现有的局部字距、半径、边框和悬停色未经验证地提升为全局 token。"
+    ]
+  }
+}

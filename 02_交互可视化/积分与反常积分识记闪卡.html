@@ -5,36 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
   <link rel="icon" href="data:,">
-  <title>数学二识记闪卡</title>
+  <title>数学二识记</title>
   <style>
     :root {
-      --canvas: #edf2f7;
-      --surface: #ffffff;
-      --surface-muted: #f7fafc;
-      --ink: #14213d;
-      --muted: #60748a;
-      --muted-strong: #40566d;
-      --line: #d7e0ea;
-      --line-strong: #b7c5d4;
-      --navy: #12355b;
-      --navy-dark: #0c2746;
-      --teal: #0f766e;
-      --teal-soft: #e5f6f2;
-      --amber: #9a6207;
-      --amber-soft: #fff6df;
-      --violet: #6941c6;
-      --violet-soft: #f1edff;
-      --shadow-lg: 0 20px 45px rgba(20, 33, 61, 0.13), 0 3px 10px rgba(20, 33, 61, 0.07);
-      --shadow-sm: 0 3px 12px rgba(20, 33, 61, 0.08);
-      --radius-card: 16px;
-      --radius-panel: 12px;
-      --radius-control: 8px;
-      --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
-      --serif: "Iowan Old Style", "Noto Serif CJK SC", "Songti SC", STSong, serif;
+      --canvas: #e9f0f5;
+      --paper: #ffffff;
+      --paper-soft: #f7fafc;
+      --ink: #13213b;
+      --ink-soft: #3c506d;
+      --muted: #586b80;
+      --line: #d9e3ed;
+      --line-strong: #bac9d7;
+      --navy: #17395d;
+      --navy-deep: #102b4a;
+      --signal: #c63f2a;
+      --signal-deep: #c9462c;
+      --mint: #e4f4ee;
+      --mint-ink: #116658;
+      --amber: #fff3d7;
+      --amber-ink: #8a5908;
+      --violet: #efecff;
+      --violet-ink: #5941a6;
+      --radius-shell: 16px;
+      --radius-control: 10px;
+      --shadow-sheet: 0 18px 44px rgba(20, 42, 70, 0.12), 0 3px 10px rgba(20, 42, 70, 0.05);
+      --shadow-control: 0 4px 12px rgba(20, 42, 70, 0.08);
+      --sans: -apple-system, BlinkMacSystemFont, "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       --math: "STIX Two Math", "Cambria Math", "Times New Roman", serif;
     }
 
     * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
     html { min-width: 320px; background: var(--canvas); }
     body {
       min-width: 320px;
@@ -44,734 +45,580 @@
       background: var(--canvas);
       font-family: var(--sans);
       font-size: 16px;
-      line-height: 1.5;
+      line-height: 1.55;
       -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
-
     button, select { font: inherit; }
     button { border: 0; }
     button, select { -webkit-tap-highlight-color: transparent; }
-    button:focus-visible, select:focus-visible, summary:focus-visible, .flashcard:focus-visible {
-      outline: 3px solid rgba(15, 118, 110, 0.42);
+    ::selection { color: #fff; background: var(--signal); }
+    :focus-visible {
+      outline: 3px solid rgba(236, 91, 62, 0.45);
       outline-offset: 3px;
     }
-    ::selection { color: #fff; background: var(--teal); }
+    ::-webkit-scrollbar { width: 11px; height: 11px; }
+    ::-webkit-scrollbar-thumb { background: #b9c8d7; border: 3px solid var(--paper-soft); border-radius: 999px; }
+    ::-webkit-scrollbar-track { background: var(--paper-soft); }
 
-    .app {
-      width: min(1200px, calc(100% - 36px));
+    .study-app {
+      width: min(1420px, calc(100% - 40px));
       margin: 0 auto;
-      padding: 32px 0 54px;
+      padding: 26px 0 46px;
     }
 
     .masthead {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 24px;
-      align-items: end;
-      padding: 0 2px 26px;
-      border-bottom: 1px solid rgba(18, 53, 91, 0.15);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 32px;
+      padding: 4px 2px 25px;
+      border-bottom: 1px solid rgba(19, 33, 59, 0.16);
     }
-    h1, h2, h3, p { margin-top: 0; }
-    h1 {
-      max-width: 760px;
-      margin-bottom: 9px;
-      font-family: var(--serif);
-      font-size: 42px;
-      font-weight: 650;
-      letter-spacing: -0.03em;
-      line-height: 1.08;
+    .masthead h1 {
+      margin: 0;
+      color: var(--navy-deep);
+      font-size: clamp(2rem, 4vw, 3.75rem);
+      font-weight: 780;
+      letter-spacing: -0.045em;
+      line-height: 0.98;
       text-wrap: balance;
     }
-    .subtitle {
-      max-width: 720px;
-      margin-bottom: 0;
-      color: var(--muted);
+    .masthead p {
+      max-width: 670px;
+      margin: 12px 0 0;
+      color: var(--ink-soft);
       font-size: 14px;
-      line-height: 1.7;
+      line-height: 1.72;
       text-wrap: pretty;
     }
-    .scope-stamp {
-      min-width: 210px;
-      padding: 12px 14px;
-      color: #173758;
-      background: rgba(255, 255, 255, 0.82);
-      border: 1px solid rgba(18, 53, 91, 0.16);
-      border-left: 1px solid var(--navy);
-      border-radius: var(--radius-control);
-      box-shadow: var(--shadow-sm);
-      font-size: 13px;
-      line-height: 1.55;
-    }
-    .scope-stamp strong { display: block; color: var(--navy-dark); }
-
-    .toolbar {
+    .scope-note {
       display: grid;
-      grid-template-columns: 1.2fr 1fr 1fr 1fr auto auto;
-      gap: 10px;
-      align-items: center;
-      padding: 20px 0;
-    }
-    .filter-field {
-      position: relative;
-      display: flex;
-      align-items: center;
-      min-width: 0;
-      min-height: 46px;
-      padding: 0 12px;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-control);
-      box-shadow: var(--shadow-sm);
-    }
-    .filter-field label {
+      gap: 3px;
       flex: 0 0 auto;
-      margin-right: 9px;
+      min-width: 220px;
+      padding: 13px 15px 12px;
+      color: #dfeaf4;
+      background: var(--navy);
+      border-radius: var(--radius-control);
+      box-shadow: 0 8px 18px rgba(17, 43, 74, 0.17);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .scope-note strong { color: #fff; font-size: 13px; }
+
+    .study-layout {
+      display: grid;
+      grid-template-columns: minmax(238px, 272px) minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+      padding-top: 22px;
+    }
+
+    .control-rail {
+      position: sticky;
+      top: 18px;
+      display: grid;
+      gap: 0;
+      overflow: hidden;
+      background: var(--paper);
+      border-radius: var(--radius-shell);
+      box-shadow: var(--shadow-control);
+    }
+    .rail-section {
+      padding: 19px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .rail-section:last-child { border-bottom: 0; }
+    .rail-section h2 {
+      margin: 0 0 5px;
+      color: var(--navy-deep);
+      font-size: 16px;
+      font-weight: 760;
+      letter-spacing: -0.018em;
+    }
+    .rail-section > p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.65;
+      text-wrap: pretty;
+    }
+    .filter-list {
+      display: grid;
+      gap: 11px;
+      margin-top: 16px;
+    }
+    .filter-field { display: grid; gap: 5px; }
+    .filter-field label {
       color: var(--muted);
       font-size: 11px;
-      font-weight: 750;
-      letter-spacing: 0.03em;
-      white-space: nowrap;
+      font-weight: 720;
+      letter-spacing: 0.045em;
     }
     .filter-field select {
       width: 100%;
       min-height: 44px;
-      min-width: 0;
-      appearance: none;
-      padding: 2px 22px 2px 0;
+      padding: 0 36px 0 12px;
       color: var(--ink);
-      background: transparent;
-      border: 0;
+      appearance: none;
+      background-color: var(--paper-soft);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364758b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.8'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+      border: 1px solid transparent;
+      border-radius: var(--radius-control);
       cursor: pointer;
       font-size: 13px;
-      font-weight: 680;
-      text-overflow: ellipsis;
+      font-weight: 650;
+      transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
     }
-    .select-caret {
-      position: absolute;
-      right: 11px;
-      width: 15px;
-      height: 15px;
-      color: var(--muted);
-      pointer-events: none;
+    .filter-field select:hover { background-color: #f1f6fa; border-color: var(--line); }
+    .filter-field select:focus-visible { border-color: var(--signal); box-shadow: 0 0 0 3px rgba(236, 91, 62, 0.16); outline: 0; }
+    .rail-action {
+      width: 100%;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 15px;
+      padding: 0 13px;
+      color: var(--ink-soft);
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-control);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 690;
+      transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
     }
-    .select-caret svg, .button svg {
-      width: 17px;
-      height: 17px;
-      fill: none;
-      stroke: currentColor;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      stroke-width: 1.8;
+    .rail-action:hover { color: var(--navy); background: var(--paper-soft); border-color: var(--line-strong); transform: translateY(-1px); }
+    .rail-action:active { transform: scale(0.98); }
+    .rail-action svg, .button svg, .icon-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+    .legend-list { display: grid; gap: 10px; margin: 15px 0 0; padding: 0; list-style: none; }
+    .legend-list li { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px; align-items: start; color: var(--muted); font-size: 11px; line-height: 1.58; }
+    .legend-chip { align-self: start; white-space: nowrap; }
+
+    .study-stage { min-width: 0; }
+    .session-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 52px;
+      margin-bottom: 14px;
+      padding: 0 2px;
+    }
+    .session-copy { min-width: 0; margin-right: auto; }
+    .session-copy strong { display: block; color: var(--navy-deep); font-size: 14px; font-weight: 760; }
+    .session-copy span { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; }
+    .session-progress { width: min(210px, 22vw); min-width: 132px; }
+    .progress-meta { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 6px; color: var(--muted); font-size: 11px; }
+    .progress-meta strong { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+    .progress-track { height: 6px; overflow: hidden; background: #d8e2ea; border-radius: 999px; }
+    .progress-fill { width: 100%; height: 100%; background: var(--mint-ink); border-radius: inherit; transform: scaleX(0); transform-origin: left; transition: transform 230ms cubic-bezier(0.2, 0.75, 0.2, 1); }
+    .icon-button {
+      width: 44px;
+      min-width: 44px;
+      height: 44px;
+      display: inline-grid;
+      place-items: center;
+      color: var(--navy);
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-control);
+      box-shadow: var(--shadow-control);
+      cursor: pointer;
+      transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+    }
+    .icon-button:hover { color: var(--signal-deep); background: #fff8f5; border-color: #f3b3a4; transform: translateY(-1px); box-shadow: 0 7px 15px rgba(20, 42, 70, 0.11); }
+    .icon-button:active { transform: scale(0.97); }
+    .icon-button[disabled], .button[disabled], .rating-button[disabled] { color: #9cabb9; background: #edf2f6; border-color: #e1e8ee; box-shadow: none; cursor: not-allowed; transform: none; }
+
+    .study-sheet {
+      overflow: hidden;
+      background: var(--paper);
+      border-radius: var(--radius-shell);
+      box-shadow: var(--shadow-sheet);
+    }
+    .sheet-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      min-height: 67px;
+      padding: 15px clamp(20px, 4vw, 42px);
+      border-bottom: 1px solid var(--line);
+    }
+    .meta-topic { min-width: 0; color: var(--muted); font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .scope-chip, .legend-chip {
+      display: inline-flex;
+      align-items: center;
+      max-width: min(62%, 290px);
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 760;
+      line-height: 1.35;
+    }
+    .scope-chip.core, .legend-chip.core { color: var(--mint-ink); background: var(--mint); }
+    .scope-chip.pending, .legend-chip.pending { color: var(--violet-ink); background: var(--violet); }
+
+    .prompt-panel { padding: clamp(34px, 6vw, 72px) clamp(22px, 6vw, 72px) clamp(28px, 5vw, 56px); }
+    .prompt-signal { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 17px; color: var(--signal-deep); font-size: 12px; font-weight: 760; letter-spacing: 0.025em; }
+    .prompt-signal::before { width: 8px; height: 8px; content: ""; background: currentColor; border-radius: 50%; }
+    .prompt-title {
+      max-width: 16ch;
+      margin: 0;
+      color: var(--navy-deep);
+      font-size: clamp(2rem, 4.1vw, 4.25rem);
+      font-weight: 780;
+      letter-spacing: -0.045em;
+      line-height: 1.04;
+      text-wrap: balance;
+    }
+    .prompt-text {
+      max-width: 58ch;
+      margin: 22px 0 0;
+      color: var(--ink-soft);
+      font-size: clamp(1rem, 1.75vw, 1.22rem);
+      line-height: 1.76;
+      text-wrap: pretty;
+    }
+    .prompt-footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 17px;
+      margin-top: clamp(34px, 5vw, 54px);
+    }
+    .retrieval-note { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .keycap {
+      display: inline-block;
+      min-width: 27px;
+      padding: 2px 6px;
+      color: var(--ink-soft);
+      background: var(--paper-soft);
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      font-size: 10px;
+      font-weight: 720;
+      line-height: 1.25;
+      text-align: center;
+      vertical-align: 1px;
     }
     .button {
       min-height: 46px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 7px;
-      padding: 0 13px;
+      gap: 9px;
+      padding: 0 16px;
       color: var(--ink);
-      background: var(--surface);
+      background: var(--paper);
       border: 1px solid var(--line);
       border-radius: var(--radius-control);
-      box-shadow: var(--shadow-sm);
+      box-shadow: var(--shadow-control);
       cursor: pointer;
       font-size: 13px;
-      font-weight: 680;
-      white-space: nowrap;
-      transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
-    }
-    .button:hover {
-      border-color: var(--line-strong);
-      background: #fcfdff;
-      box-shadow: 0 5px 16px rgba(20, 33, 61, 0.12);
-      transform: translateY(-1px);
-    }
-    .button:active { transform: translateY(0) scale(0.98); }
-    .button.primary {
-      color: #fff;
-      background: var(--navy);
-      border-color: var(--navy);
-    }
-    .button.primary:hover { background: var(--navy-dark); border-color: var(--navy-dark); }
-    .button.known { color: #075c55; background: var(--teal-soft); border-color: #a9ddd5; }
-    .button.review { color: #925d05; background: var(--amber-soft); border-color: #ecd595; }
-    .button.ghost { color: var(--muted); background: transparent; box-shadow: none; }
-    .button[disabled] { color: #9aa8b6; background: #f2f5f8; border-color: #e1e7ed; box-shadow: none; cursor: not-allowed; transform: none; }
-
-    .workspace {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 286px;
-      gap: 22px;
-      align-items: start;
-    }
-    .flashcard-wrap { min-width: 0; }
-    .flashcard {
-      position: relative;
-      min-height: 500px;
-      border-radius: var(--radius-card);
-      cursor: pointer;
-      perspective: 1300px;
-      touch-action: pan-y;
-    }
-    .card-inner {
-      position: absolute;
-      inset: 0;
-      transform-style: preserve-3d;
-      transition: transform 500ms cubic-bezier(0.2, 0.76, 0.2, 1);
-    }
-    .flashcard.is-revealed .card-inner { transform: rotateY(180deg); }
-    .card-face {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-card);
-      backface-visibility: hidden;
-      box-shadow: var(--shadow-lg);
-    }
-    .card-face::after {
-      position: absolute;
-      right: -76px;
-      bottom: -92px;
-      width: 280px;
-      height: 280px;
-      content: "";
-      border: 1px solid rgba(18, 53, 91, 0.07);
-      border-radius: 50%;
-      pointer-events: none;
-    }
-    .card-back { transform: rotateY(180deg); background: #fdfefe; }
-    .card-topline {
-      min-height: 70px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 16px 22px 14px;
-      border-bottom: 1px solid var(--line);
-    }
-    .category-name {
-      min-width: 0;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 720;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
-    }
-    .scope-badge {
-      flex: 0 0 auto;
-      max-width: 56%;
-      padding: 5px 9px;
-      border-radius: 999px;
-      font-size: 10px;
       font-weight: 730;
-      line-height: 1.35;
-      text-align: right;
+      white-space: nowrap;
+      transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
     }
-    .scope-core { color: #075c55; background: var(--teal-soft); }
-    .scope-pending { color: #6040ad; background: var(--violet-soft); }
+    .button:hover { border-color: var(--line-strong); background: #fbfdff; box-shadow: 0 8px 17px rgba(20, 42, 70, 0.12); transform: translateY(-1px); }
+    .button:active { transform: scale(0.98); }
+    .button.primary { color: #fff; background: var(--signal); border-color: var(--signal); box-shadow: 0 10px 19px rgba(198, 70, 43, 0.25); }
+    .button.primary:hover { background: var(--signal-deep); border-color: var(--signal-deep); }
+    .button.quiet { color: var(--ink-soft); background: transparent; box-shadow: none; }
+    .button.quiet:hover { color: var(--navy); background: var(--paper-soft); }
+    .button .button-label { position: relative; top: -0.5px; }
 
-    .card-content {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-      justify-content: center;
-      padding: 46px clamp(28px, 5vw, 62px);
-    }
-    .answer-body {
-      justify-content: flex-start;
-      gap: 17px;
-      overflow-y: auto;
-      scrollbar-color: #b8c5d4 #f1f4f7;
-      scrollbar-width: thin;
-    }
-    .prompt-label, .answer-label {
-      margin-bottom: 17px;
-      color: var(--teal);
-      font-size: 11px;
-      font-weight: 780;
-      letter-spacing: 0.12em;
-    }
-    .card-title {
-      max-width: 730px;
-      margin-bottom: 16px;
-      font-family: var(--serif);
-      font-size: 44px;
-      font-weight: 640;
-      letter-spacing: -0.025em;
-      line-height: 1.14;
-      text-wrap: balance;
-    }
-    .card-hint {
-      max-width: 690px;
-      margin: 0;
-      color: var(--muted-strong);
-      font-size: 18px;
-      line-height: 1.72;
-      text-wrap: pretty;
-    }
-    .reveal-cue {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 34px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 620;
-    }
-    .keycap {
-      padding: 2px 7px;
-      color: #38516d;
-      background: #eef3f8;
-      border: 1px solid #d5e0ea;
-      border-radius: 5px;
-      box-shadow: inset 0 -1px 0 rgba(20, 33, 61, 0.08);
-      font-size: 10px;
-      font-weight: 680;
-    }
-    .answer-title {
-      margin: 0;
-      font-family: var(--serif);
-      font-size: 32px;
-      font-weight: 640;
-      letter-spacing: -0.02em;
-      line-height: 1.2;
-      text-wrap: balance;
-    }
-    .formula-block {
-      max-width: 780px;
-      padding: 18px 20px;
-      color: var(--navy-dark);
-      background: #f4f8fb;
-      border: 1px solid #d9e5ef;
-      border-left: 1px solid var(--navy);
-      border-radius: var(--radius-control);
-      font-size: 22px;
-      line-height: 1.72;
-      overflow-wrap: anywhere;
-    }
-    .formula-line + .formula-line { margin-top: 10px; }
-    .formula-line { overflow-x: auto; scrollbar-width: thin; }
-    .katex-display { margin: 0.1em 0; overflow-x: auto; overflow-y: hidden; }
-    .katex { font-size: 1em; }
-    .answer-notes {
+    .answer-panel {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      max-width: 780px;
-    }
-    .note-block {
-      min-width: 0;
-      padding-top: 11px;
+      gap: 25px;
+      padding: clamp(27px, 5vw, 54px) clamp(22px, 6vw, 72px) clamp(30px, 5vw, 58px);
+      background: var(--paper-soft);
       border-top: 1px solid var(--line);
+      animation: answer-enter 250ms cubic-bezier(0.2, 0.75, 0.2, 1) both;
     }
-    .note-block strong {
-      display: block;
-      margin-bottom: 5px;
-      color: var(--muted);
-      font-size: 10px;
-      letter-spacing: 0.06em;
+    @keyframes answer-enter {
+      from { opacity: 0; filter: blur(4px); transform: translateY(10px); }
+      to { opacity: 1; filter: blur(0); transform: translateY(0); }
     }
-    .note-block p {
-      margin: 0;
-      color: var(--muted-strong);
-      font-size: 13px;
-      line-height: 1.65;
-      text-wrap: pretty;
+    .answer-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .answer-heading h3 { margin: 0; color: var(--navy-deep); font-size: clamp(1.25rem, 2vw, 1.65rem); font-weight: 770; letter-spacing: -0.03em; }
+    .answer-heading .button { min-height: 40px; padding: 0 12px; font-size: 12px; }
+    .formula-block {
+      max-width: 100%;
+      padding: clamp(16px, 2.8vw, 25px);
+      overflow: hidden;
+      color: var(--navy-deep);
+      background: #f1f6fb;
+      border-radius: 12px;
     }
+    .formula-line { overflow-x: auto; overflow-y: hidden; scrollbar-color: #adc0d2 transparent; }
+    .formula-line + .formula-line { margin-top: 13px; }
+    .katex-display { margin: 0.12em 0; overflow-x: auto; overflow-y: hidden; }
+    .katex { font-size: 1em; }
+    .answer-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin: 0; }
+    .answer-grid > div { min-width: 0; padding-top: 13px; border-top: 1px solid var(--line-strong); }
+    .answer-grid dt { margin: 0 0 7px; color: var(--muted); font-size: 10px; font-weight: 760; letter-spacing: 0.06em; }
+    .answer-grid dd { margin: 0; color: var(--ink-soft); font-size: 14px; line-height: 1.72; text-wrap: pretty; }
     .inline-math { white-space: nowrap; }
     .block-math { display: block; white-space: normal; }
-    .card-footer {
-      position: relative;
-      z-index: 1;
-      min-height: 52px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 11px 22px;
-      color: var(--muted);
-      border-top: 1px solid var(--line);
-      font-size: 11px;
-    }
-    .card-number { font-variant-numeric: tabular-nums; }
-    .card-state { font-weight: 720; }
-    .card-state.known { color: var(--teal); }
-    .card-state.review { color: var(--amber); }
+    .source-details { color: var(--muted); font-size: 12px; line-height: 1.65; }
+    .source-details summary { display: inline-flex; align-items: center; gap: 7px; color: var(--ink-soft); cursor: pointer; font-weight: 700; }
+    .source-details summary::marker { color: var(--signal); }
+    .source-details p { margin: 8px 0 0; text-wrap: pretty; }
 
-    .deck-controls {
+    .empty-state {
+      min-height: 470px;
       display: grid;
-      grid-template-columns: 1fr 1.15fr 1fr;
-      gap: 9px;
+      place-content: center;
+      gap: 8px;
+      padding: 46px 28px;
+      text-align: center;
+    }
+    .empty-state strong { color: var(--navy-deep); font-size: clamp(1.45rem, 4vw, 2.15rem); letter-spacing: -0.035em; }
+    .empty-state p { max-width: 38ch; margin: 0; color: var(--muted); font-size: 14px; text-wrap: pretty; }
+
+    .study-footer {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      min-height: 74px;
       margin-top: 14px;
     }
-    .deck-controls .button { width: 100%; }
-    .sidepanel {
-      display: grid;
-      gap: 13px;
-      position: sticky;
-      top: 18px;
-    }
-    .panel {
-      padding: 18px;
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-panel);
-      box-shadow: var(--shadow-sm);
-    }
-    .panel h2 {
-      margin-bottom: 7px;
-      font-size: 14px;
-      font-weight: 760;
-      letter-spacing: -0.01em;
-      text-wrap: balance;
-    }
-    .panel-copy {
-      margin-bottom: 15px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.65;
-      text-wrap: pretty;
-    }
-    .progress-row {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 8px;
-    }
-    .progress-count {
-      color: var(--navy-dark);
-      font-family: var(--math);
-      font-size: 25px;
-      font-variant-numeric: tabular-nums;
-      line-height: 1;
-    }
-    .progress-label { color: var(--muted); font-size: 11px; }
-    .progress-track {
-      height: 7px;
-      overflow: hidden;
-      background: #e8edf3;
-      border-radius: 999px;
-    }
-    .progress-fill {
-      width: 100%;
-      height: 100%;
-      background: var(--teal);
-      border-radius: inherit;
-      transform: scaleX(0);
-      transform-origin: left center;
-      transition: transform 220ms ease;
-    }
-    .state-list {
-      display: grid;
-      gap: 8px;
-      margin-top: 16px;
-    }
-    .state-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-    .state-row strong { color: var(--ink); font-variant-numeric: tabular-nums; }
-    .state-dot {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      margin-right: 7px;
-      border-radius: 999px;
-    }
-    .state-dot.known { background: var(--teal); }
-    .state-dot.review { background: var(--amber); }
-    .state-dot.unmarked { background: #a8b5c3; }
-    .mark-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
-    .mark-actions .button { min-height: 42px; padding: 0 8px; font-size: 12px; }
-    kbd {
-      min-width: 26px;
-      padding: 2px 5px;
-      color: #3b4f67;
-      background: #f2f5f8;
-      border: 1px solid #d5dee7;
-      border-bottom-color: #b9c7d4;
-      border-radius: 5px;
-      box-shadow: inset 0 -1px 0 rgba(20, 33, 61, 0.08);
-      font-family: var(--sans);
-      font-size: 10px;
-      font-weight: 680;
-      text-align: center;
-    }
-    .shortcut-list, .scope-legend {
-      display: grid;
-      gap: 8px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-    .shortcut-list li {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      color: var(--muted);
-      font-size: 11px;
-    }
-    .scope-legend { gap: 9px; }
-    .legend-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 7px;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.55;
-    }
-    .legend-chip {
-      flex: 0 0 auto;
-      padding: 3px 6px;
-      border-radius: 5px;
-      font-size: 9px;
-      font-weight: 750;
-      line-height: 1.35;
-    }
-    .source-details {
-      max-width: 780px;
-      margin-top: 1px;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.65;
-    }
-    .source-details summary {
-      color: var(--muted-strong);
-      cursor: pointer;
-      font-weight: 680;
-    }
-    .source-details p { margin: 8px 0 0; }
-    .empty-state {
-      display: none;
-      min-height: 100%;
+    .navigation { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .navigation .button { width: 100%; }
+    .rating-actions { display: flex; gap: 9px; }
+    .rating-button {
+      min-width: 106px;
+      min-height: 46px;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 48px 28px;
-      color: var(--muted);
-      text-align: center;
+      gap: 7px;
+      padding: 0 13px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-control);
+      box-shadow: var(--shadow-control);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 740;
+      transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
     }
-    .empty-state strong { display: block; margin-bottom: 5px; color: var(--ink); }
-    .live-region {
-      position: fixed;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      clip: rect(0 0 0 0);
-      white-space: nowrap;
-      clip-path: inset(50%);
-    }
+    .rating-button:hover { transform: translateY(-1px); box-shadow: 0 8px 17px rgba(20, 42, 70, 0.11); }
+    .rating-button:active { transform: scale(0.98); }
+    .rating-button.known { color: var(--mint-ink); background: var(--mint); border-color: #b7dfd4; }
+    .rating-button.review { color: var(--amber-ink); background: var(--amber); border-color: #efd391; }
+    .rating-button[aria-pressed="true"] { box-shadow: inset 0 0 0 1px currentColor, 0 7px 14px rgba(20, 42, 70, 0.09); }
+    .card-position { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+    .card-position strong { color: var(--ink-soft); font-weight: 740; }
+    .live-region { position: fixed; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
 
-    @media (max-width: 1080px) {
-      .toolbar { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .toolbar .filter-field:first-child { grid-column: span 2; }
+    .page-footer { margin: 24px 2px 0; color: var(--muted); font-size: 11px; line-height: 1.62; text-wrap: pretty; }
+    .page-footer a { color: inherit; text-decoration-color: rgba(100, 117, 139, 0.5); text-underline-offset: 3px; }
+    .page-footer a:hover { color: var(--navy); }
+
+    @media (max-width: 1050px) {
+      .study-layout { grid-template-columns: 1fr; }
+      .control-rail { position: static; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .rail-section { border-bottom: 0; border-right: 1px solid var(--line); }
+      .rail-section:last-child { border-right: 0; }
+      .filter-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .rail-action { grid-column: 1 / -1; }
     }
-    @media (max-width: 860px) {
-      .workspace { grid-template-columns: 1fr; }
-      .sidepanel { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .sidepanel .panel:last-child { grid-column: 1 / -1; }
+    @media (max-width: 720px) {
+      .study-app { width: min(100% - 24px, 1420px); padding-top: 16px; }
+      .masthead { display: grid; gap: 18px; align-items: start; padding-bottom: 20px; }
+      .scope-note { width: 100%; min-width: 0; }
+      .study-stage { order: -1; }
+      .control-rail { grid-template-columns: 1fr; }
+      .rail-section { border-right: 0; border-bottom: 1px solid var(--line); }
+      .rail-section:last-child { border-bottom: 0; }
+      .session-bar { flex-wrap: wrap; min-height: 0; margin-bottom: 12px; }
+      .session-copy { flex: 1 1 190px; }
+      .session-progress { flex: 1 1 180px; width: auto; }
+      .sheet-meta { min-height: 62px; }
+      .prompt-title { max-width: 100%; }
+      .answer-grid { grid-template-columns: 1fr; gap: 15px; }
+      .study-footer { grid-template-columns: 1fr; }
+      .rating-actions { display: grid; grid-template-columns: 1fr 1fr; }
+      .rating-button { width: 100%; min-width: 0; }
     }
-    @media (max-width: 660px) {
-      .app { width: min(100% - 24px, 1200px); padding-top: 20px; }
-      .masthead { grid-template-columns: 1fr; gap: 15px; padding-bottom: 20px; }
-      h1 { font-size: 34px; }
-      .scope-stamp { min-width: 0; width: 100%; }
-      .toolbar { grid-template-columns: 1fr 1fr; gap: 8px; padding: 16px 0; }
-      .toolbar .filter-field:first-child { grid-column: 1 / -1; }
-      .toolbar .filter-field:nth-child(3) { grid-column: 1 / -1; }
-      .toolbar .button { min-width: 0; padding: 0 10px; }
-      .flashcard { min-height: 520px; }
-      .card-topline { min-height: 68px; padding: 14px 17px 12px; }
-      .scope-badge { max-width: 59%; font-size: 9px; }
-      .card-content { padding: 30px 24px; }
-      .card-title { font-size: 35px; }
-      .card-hint { font-size: 16px; line-height: 1.7; }
-      .answer-body { padding-bottom: 23px; }
-      .answer-title { font-size: 27px; }
-      .formula-block { padding: 15px 16px; font-size: 19px; }
-      .answer-notes { grid-template-columns: 1fr; gap: 11px; }
-      .card-footer { padding: 11px 17px; }
-      .deck-controls { grid-template-columns: 1fr 1fr; }
-      .deck-controls .button.primary { grid-column: 1 / -1; grid-row: 1; }
-      .sidepanel { grid-template-columns: 1fr; }
-      .sidepanel .panel:last-child { grid-column: auto; }
-      .panel { padding: 16px; }
-    }
-    @media (max-width: 390px) {
-      .toolbar .button span { display: none; }
-      .toolbar .button { min-width: 0; }
-      .flashcard { min-height: 540px; }
-      .card-title { font-size: 31px; }
+    @media (max-width: 430px) {
+      .filter-list { grid-template-columns: 1fr; }
+      .session-progress { order: 3; flex-basis: 100%; }
+      .prompt-footer { align-items: stretch; }
+      .prompt-footer .button { width: 100%; }
+      .answer-heading { align-items: flex-start; flex-direction: column; }
+      .answer-heading .button { width: 100%; }
+      .navigation { grid-template-columns: 1fr; }
+      .meta-topic { max-width: 47%; }
+      .scope-chip { max-width: 53%; }
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
-      .card-inner, .button, .progress-fill {
-        transition-duration: 0ms !important;
-      }
+      .answer-panel, .button, .icon-button, .rail-action, .rating-button, .filter-field select, .progress-fill { animation-duration: 1ms; transition-duration: 1ms; }
     }
   </style>
 </head>
 <body>
-  <main class="app" aria-label="数学二识记闪卡">
+  <!--
+  THESIS: A single reading surface turns active recall into an explicit reveal, refusing the fragile double-sided 3D flashcard.
+  OWN-WORLD: A calm exam-workbench in mineral blue, signal vermilion, white study sheets, precise rules, and compact status chips.
+  STORY: Choose a range, retrieve from memory, reveal the checked formula and conditions, then mark only local navigation status.
+  FIRST VIEWPORT: A narrow range rail sits beside one large prompt sheet; the visible “查看答案” control anchors the lower prompt edge and the answer unfolds below it.
+  FORM: Candidate 4, seed 1a06c0d8; code-led secondary development informed by manderwall/aplusstudyapp’s MIT-licensed conditional reveal model.
+  FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+  -->
+  <main class="study-app" aria-label="数学二识记">
     <header class="masthead">
       <div>
-        <h1>数学二识记闪卡</h1>
-        <p class="subtitle">先从记忆中写出公式、条件和辨析，再翻面核对。高等数学与线性代数按数学二范围分层，浏览器中的标记仅用于本机复习导航。</p>
+        <h1>数学二识记</h1>
+        <p>先从记忆中写出公式、条件和辨析，再查看答案核对。这里的标记只用于本机复习导航，不代表作答、订正或掌握。</p>
       </div>
-      <div class="scope-stamp">
+      <div class="scope-note">
         <strong>暂按数学二</strong>
-        2027 官方目录与大纲待确认
+        <span>2027 官方目录与大纲待确认</span>
       </div>
     </header>
 
-    <section class="toolbar" aria-label="闪卡筛选与工具">
-      <div class="filter-field">
-        <label for="subjectFilter">科目</label>
-        <select id="subjectFilter" aria-label="按科目筛选卡片">
-          <option value="全部">全部科目</option>
-          <option value="高等数学">高等数学</option>
-          <option value="线性代数">线性代数</option>
-        </select>
-        <span class="select-caret" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></span>
-      </div>
-      <div class="filter-field">
-        <label for="unitFilter">模块</label>
-        <select id="unitFilter" aria-label="按模块筛选卡片"></select>
-        <span class="select-caret" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></span>
-      </div>
-      <div class="filter-field">
-        <label for="scopeFilter">范围</label>
-        <select id="scopeFilter" aria-label="按范围筛选卡片">
-          <option value="全部">全部范围</option>
-          <option value="数学二核心（当前已输入）">数学二核心（已输入）</option>
-          <option value="数学二范围内但当前尚未学到">数学二范围内（尚未学到）</option>
-        </select>
-        <span class="select-caret" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></span>
-      </div>
-      <div class="filter-field">
-        <label for="statusFilter">状态</label>
-        <select id="statusFilter" aria-label="按复习标记筛选卡片">
-          <option value="全部">全部状态</option>
-          <option value="未标记">未标记</option>
-          <option value="已会">已会</option>
-          <option value="待复习">待复习</option>
-        </select>
-        <span class="select-caret" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></span>
-      </div>
-      <button class="button" id="randomButton" type="button" title="随机抽取当前筛选中的卡片">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3h5v5"></path><path d="m4 20 6-6"></path><path d="m21 16-5 5"></path><path d="m15 15 6 6"></path><path d="M4 4l5 5"></path><path d="M21 3v5h-5"></path></svg>
-        <span>随机</span>
-      </button>
-      <button class="button ghost" id="resetButton" type="button" title="清除本机浏览器中的闪卡标记">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path></svg>
-        <span>清零</span>
-      </button>
-    </section>
-
-    <section class="workspace" aria-label="闪卡工作区">
-      <div class="flashcard-wrap">
-        <article class="flashcard" id="flashcard" tabindex="0" role="button" aria-label="当前遮挡答案。点击或按空格显示答案。" aria-disabled="false">
-          <div class="card-inner">
-            <section class="card-face card-front" id="frontFace" aria-label="题面" aria-hidden="false">
-              <div class="card-topline">
-                <span class="category-name" id="frontCategory"></span>
-                <span class="scope-badge" id="frontScope"></span>
-              </div>
-              <div class="card-content" id="frontContent">
-                <div class="prompt-label">提示</div>
-                <h2 class="card-title" id="frontTitle"></h2>
-                <p class="card-hint" id="frontHint"></p>
-                <div class="reveal-cue"><span>点击翻面</span><span class="keycap">Space</span></div>
-              </div>
-              <div class="empty-state" id="frontEmpty"><div><strong>当前筛选没有卡片</strong><span>请调整科目、模块、范围或状态。</span></div></div>
-              <div class="card-footer">
-                <span class="card-number" id="frontNumber"></span>
-                <span class="card-state" id="frontState"></span>
-              </div>
-            </section>
-            <section class="card-face card-back" id="backFace" aria-label="答案" aria-hidden="true" inert>
-              <div class="card-topline">
-                <span class="category-name" id="backCategory"></span>
-                <span class="scope-badge" id="backScope"></span>
-              </div>
-              <div class="card-content answer-body" id="backContent">
-                <div class="answer-label">答案</div>
-                <h2 class="answer-title" id="backTitle"></h2>
-                <div class="formula-block" id="formulaBlock"></div>
-                <div class="answer-notes">
-                  <div class="note-block"><strong>适用条件</strong><p id="conditionText"></p></div>
-                  <div class="note-block"><strong>极短辨析</strong><p id="distinctionText"></p></div>
-                </div>
-                <details class="source-details">
-                  <summary>来源与范围</summary>
-                  <p id="sourceText"></p>
-                </details>
-              </div>
-              <div class="empty-state" id="backEmpty"><div><strong>当前筛选没有卡片</strong><span>请调整筛选条件。</span></div></div>
-              <div class="card-footer">
-                <span class="card-number" id="backNumber"></span>
-                <span class="card-state" id="backState"></span>
-              </div>
-            </section>
+    <div class="study-layout">
+      <aside class="control-rail" aria-label="复习范围与说明">
+        <section class="rail-section">
+          <h2>本次范围</h2>
+          <p>筛选只改变当前复习队列，不会改写数学内容或学习记录。</p>
+          <div class="filter-list">
+            <div class="filter-field">
+              <label for="subjectFilter">科目</label>
+              <select id="subjectFilter" aria-label="按科目筛选卡片">
+                <option value="全部">全部科目</option>
+                <option value="高等数学">高等数学</option>
+                <option value="线性代数">线性代数</option>
+              </select>
+            </div>
+            <div class="filter-field">
+              <label for="unitFilter">模块</label>
+              <select id="unitFilter" aria-label="按模块筛选卡片"></select>
+            </div>
+            <div class="filter-field">
+              <label for="scopeFilter">范围</label>
+              <select id="scopeFilter" aria-label="按范围筛选卡片">
+                <option value="全部">全部范围</option>
+                <option value="数学二核心（当前已输入）">数学二核心（已输入）</option>
+                <option value="数学二范围内但当前尚未学到">数学二范围内（尚未学到）</option>
+              </select>
+            </div>
+            <div class="filter-field">
+              <label for="statusFilter">本机标记</label>
+              <select id="statusFilter" aria-label="按复习标记筛选卡片">
+                <option value="全部">全部状态</option>
+                <option value="未标记">未标记</option>
+                <option value="已会">已会</option>
+                <option value="待复习">待复习</option>
+              </select>
+            </div>
           </div>
-        </article>
-        <nav class="deck-controls" aria-label="卡片导航">
-          <button class="button" id="previousButton" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>上一张</button>
-          <button class="button primary" id="flipButton" type="button" aria-label="显示当前答案" aria-pressed="false">翻卡<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h12a4 4 0 1 1 0 8H8"></path><path d="m8 19-4-4 4-4"></path></svg></button>
-          <button class="button" id="nextButton" type="button">下一张<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button>
-        </nav>
-      </div>
-
-      <aside class="sidepanel" aria-label="复习进度与快捷操作">
-        <section class="panel">
-          <h2>当前筛选进度</h2>
-          <p class="panel-copy" id="deckProgressCopy"></p>
-          <div class="progress-row"><span class="progress-count" id="knownProgress">0 / 0</span><span class="progress-label">已会</span></div>
-          <div class="progress-track" role="progressbar" aria-label="已会标记进度" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0"><div class="progress-fill" id="progressFill"></div></div>
-          <div class="state-list">
-            <div class="state-row"><span><i class="state-dot known"></i>已会</span><strong id="knownCount">0</strong></div>
-            <div class="state-row"><span><i class="state-dot review"></i>待复习</span><strong id="reviewCount">0</strong></div>
-            <div class="state-row"><span><i class="state-dot unmarked"></i>未标记</span><strong id="unmarkedCount">0</strong></div>
-          </div>
+          <button class="rail-action" id="resetButton" type="button" title="清除本浏览器保存的闪卡标记">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path></svg>
+            清除本机标记
+          </button>
         </section>
-        <section class="panel">
-          <h2>标记当前卡</h2>
-          <p class="panel-copy">标记只保存在当前浏览器，用于筛选复习，不代表掌握或间隔保持。</p>
-          <div class="mark-actions">
-            <button class="button known" id="knownButton" type="button">已会 <kbd>K</kbd></button>
-            <button class="button review" id="reviewButton" type="button">待复习 <kbd>R</kbd></button>
-          </div>
-        </section>
-        <section class="panel">
-          <h2>快捷键与范围</h2>
-          <ul class="shortcut-list" aria-label="快捷键说明">
-            <li><span>显示或遮挡答案</span><kbd>Space</kbd></li>
-            <li><span>上一张 / 下一张</span><kbd>← / →</kbd></li>
-            <li><span>随机抽取</span><kbd>S</kbd></li>
-            <li><span>标记状态</span><kbd>K / R</kbd></li>
-          </ul>
-          <hr style="margin:16px 0;border:0;border-top:1px solid var(--line)">
-          <ul class="scope-legend" aria-label="范围说明">
-            <li class="legend-row"><span class="legend-chip scope-core">数学二核心（当前已输入）</span><span>已核验完成教材输入的高数第 1–8 讲内容；不表示掌握。</span></li>
-            <li class="legend-row"><span class="legend-chip scope-pending">数学二范围内但当前尚未学到</span><span>已从数学二范围候选知识整理，尚未作为当前已学内容。</span></li>
+        <section class="rail-section">
+          <h2>范围说明</h2>
+          <ul class="legend-list" aria-label="范围说明">
+            <li><span class="legend-chip core">当前已输入</span><span>已核验完成教材输入的高数第 1–8 讲内容；不表示掌握。</span></li>
+            <li><span class="legend-chip pending">尚未学到</span><span>数学二范围候选，后续按实际讲次再进入当前学习范围。</span></li>
           </ul>
         </section>
       </aside>
-    </section>
-    <div class="live-region" id="liveRegion" aria-live="polite"></div>
+
+      <section class="study-stage" aria-label="闪卡学习区">
+        <div class="session-bar">
+          <div class="session-copy">
+            <strong id="sessionTitle">当前筛选</strong>
+            <span id="sessionDescription">先主动回忆，再查看答案。</span>
+          </div>
+          <div class="session-progress" role="progressbar" aria-label="当前筛选内的已会标记进度" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" id="progressTrack">
+            <div class="progress-meta"><span>已会标记</span><strong id="progressText">0 / 0</strong></div>
+            <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+          </div>
+          <button class="icon-button" id="randomButton" type="button" title="随机抽取当前筛选中的卡片" aria-label="随机抽取当前筛选中的卡片">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3h5v5"></path><path d="m4 20 6-6"></path><path d="m21 16-5 5"></path><path d="m15 15 6 6"></path><path d="M4 4l5 5"></path><path d="M21 3v5h-5"></path></svg>
+          </button>
+        </div>
+
+        <article class="study-sheet" id="studySheet" aria-labelledby="cardTitle">
+          <div id="studyContent">
+            <header class="sheet-meta">
+              <span class="meta-topic" id="cardTopic"></span>
+              <span class="scope-chip" id="scopeChip"></span>
+            </header>
+            <section class="prompt-panel" id="promptPanel" aria-label="主动回忆提示">
+              <p class="prompt-signal">先写，再核对</p>
+              <h2 class="prompt-title" id="cardTitle"></h2>
+              <p class="prompt-text" id="promptText"></p>
+              <div class="prompt-footer">
+                <p class="retrieval-note">写完后按 <span class="keycap">Space</span>，或直接查看答案。</p>
+                <button class="button primary" id="revealButton" type="button" aria-controls="answerPanel" aria-expanded="false">
+                  <span class="button-label">查看答案</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+                </button>
+              </div>
+            </section>
+            <section class="answer-panel" id="answerPanel" aria-labelledby="answerHeading" aria-hidden="true" hidden inert>
+              <div class="answer-heading">
+                <h3 id="answerHeading">核对答案</h3>
+                <button class="button quiet" id="hideButton" type="button">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12"></path><path d="M6 18 18 6"></path></svg>
+                  重新遮挡
+                </button>
+              </div>
+              <div class="formula-block" id="formulaBlock" aria-label="公式"></div>
+              <dl class="answer-grid">
+                <div><dt>适用条件</dt><dd id="conditionText"></dd></div>
+                <div><dt>极短辨析</dt><dd id="distinctionText"></dd></div>
+              </dl>
+              <details class="source-details">
+                <summary>来源与范围</summary>
+                <p id="sourceText"></p>
+              </details>
+            </section>
+          </div>
+          <section class="empty-state" id="emptyState" hidden aria-live="polite">
+            <strong>当前筛选没有卡片</strong>
+            <p>请调整科目、模块、范围或本机标记后继续。</p>
+          </section>
+        </article>
+
+        <footer class="study-footer">
+          <nav class="navigation" aria-label="卡片导航">
+            <button class="button" id="previousButton" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+              上一张
+            </button>
+            <button class="button" id="nextButton" type="button">
+              下一张
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+            </button>
+          </nav>
+          <div class="rating-actions" aria-label="本机复习标记">
+            <button class="rating-button known" id="knownButton" type="button" aria-pressed="false">已会 <span class="keycap">K</span></button>
+            <button class="rating-button review" id="reviewButton" type="button" aria-pressed="false">待复习 <span class="keycap">R</span></button>
+          </div>
+        </footer>
+        <p class="card-position" id="cardPosition" aria-live="polite"><strong>0</strong> / 0</p>
+      </section>
+    </div>
+
+    <p class="page-footer">离线识记页面只提供主动回忆与本机导航。数学事实、学习范围和材料定位见同目录 <a href="README.md">README</a>。</p>
+    <div class="live-region" id="liveRegion" aria-live="polite" aria-atomic="true"></div>
   </main>
 
   <script src="katex-0.18.4.min.js"></script>
@@ -783,54 +630,43 @@
     const storageKey = "math2-integral-flashcards-v2";
     const legacyStorageKey = "math2-integral-flashcards-v1";
     const refs = {
-      flashcard: document.getElementById("flashcard"),
-      frontFace: document.getElementById("frontFace"),
-      backFace: document.getElementById("backFace"),
       subjectFilter: document.getElementById("subjectFilter"),
       unitFilter: document.getElementById("unitFilter"),
       scopeFilter: document.getElementById("scopeFilter"),
       statusFilter: document.getElementById("statusFilter"),
-      liveRegion: document.getElementById("liveRegion"),
-      frontContent: document.getElementById("frontContent"),
-      frontEmpty: document.getElementById("frontEmpty"),
-      backContent: document.getElementById("backContent"),
-      backEmpty: document.getElementById("backEmpty"),
-      frontCategory: document.getElementById("frontCategory"),
-      frontScope: document.getElementById("frontScope"),
-      frontTitle: document.getElementById("frontTitle"),
-      frontHint: document.getElementById("frontHint"),
-      frontNumber: document.getElementById("frontNumber"),
-      frontState: document.getElementById("frontState"),
-      backCategory: document.getElementById("backCategory"),
-      backScope: document.getElementById("backScope"),
-      backTitle: document.getElementById("backTitle"),
+      resetButton: document.getElementById("resetButton"),
+      randomButton: document.getElementById("randomButton"),
+      progressTrack: document.getElementById("progressTrack"),
+      progressText: document.getElementById("progressText"),
+      progressFill: document.getElementById("progressFill"),
+      sessionTitle: document.getElementById("sessionTitle"),
+      sessionDescription: document.getElementById("sessionDescription"),
+      studySheet: document.getElementById("studySheet"),
+      studyContent: document.getElementById("studyContent"),
+      emptyState: document.getElementById("emptyState"),
+      cardTopic: document.getElementById("cardTopic"),
+      scopeChip: document.getElementById("scopeChip"),
+      cardTitle: document.getElementById("cardTitle"),
+      promptText: document.getElementById("promptText"),
+      revealButton: document.getElementById("revealButton"),
+      answerPanel: document.getElementById("answerPanel"),
       formulaBlock: document.getElementById("formulaBlock"),
       conditionText: document.getElementById("conditionText"),
       distinctionText: document.getElementById("distinctionText"),
       sourceText: document.getElementById("sourceText"),
-      backNumber: document.getElementById("backNumber"),
-      backState: document.getElementById("backState"),
-      knownProgress: document.getElementById("knownProgress"),
-      deckProgressCopy: document.getElementById("deckProgressCopy"),
-      progressTrack: document.querySelector(".progress-track"),
-      progressFill: document.getElementById("progressFill"),
-      knownCount: document.getElementById("knownCount"),
-      reviewCount: document.getElementById("reviewCount"),
-      unmarkedCount: document.getElementById("unmarkedCount"),
+      hideButton: document.getElementById("hideButton"),
       previousButton: document.getElementById("previousButton"),
       nextButton: document.getElementById("nextButton"),
-      flipButton: document.getElementById("flipButton"),
-      randomButton: document.getElementById("randomButton"),
-      resetButton: document.getElementById("resetButton"),
       knownButton: document.getElementById("knownButton"),
-      reviewButton: document.getElementById("reviewButton")
+      reviewButton: document.getElementById("reviewButton"),
+      cardPosition: document.getElementById("cardPosition"),
+      liveRegion: document.getElementById("liveRegion")
     };
 
     let progress = { known: [], review: [] };
     let index = 0;
     let revealed = false;
     let pointerStartX = null;
-    let didSwipe = false;
 
     function isCardId(id) {
       return cards.some(function (card) { return card.id === id; });
@@ -838,13 +674,12 @@
 
     function readProgress() {
       try {
-        let raw = localStorage.getItem(storageKey);
-        if (!raw) raw = localStorage.getItem(legacyStorageKey);
-        const saved = JSON.parse(raw);
-        if (saved && Array.isArray(saved.known) && Array.isArray(saved.review)) {
+        const raw = localStorage.getItem(storageKey) || localStorage.getItem(legacyStorageKey);
+        const stored = JSON.parse(raw);
+        if (stored && Array.isArray(stored.known) && Array.isArray(stored.review)) {
           progress = {
-            known: Array.from(new Set(saved.known.filter(isCardId))),
-            review: Array.from(new Set(saved.review.filter(isCardId)))
+            known: Array.from(new Set(stored.known.filter(isCardId))),
+            review: Array.from(new Set(stored.review.filter(isCardId)))
           };
           progress.review = progress.review.filter(function (id) { return !progress.known.includes(id); });
         }
@@ -857,7 +692,7 @@
       try { localStorage.setItem(storageKey, JSON.stringify(progress)); } catch (error) {}
     }
 
-    function getState(id) {
+    function stateFor(id) {
       if (progress.known.includes(id)) return "known";
       if (progress.review.includes(id)) return "review";
       return "unmarked";
@@ -869,31 +704,78 @@
       return "未标记";
     }
 
-    function scopeClass(scope) {
-      if (scope === "数学二核心（当前已输入）") return "scope-core";
-      return "scope-pending";
+    function normalizeIndex(deck) {
+      if (!deck.length) { index = 0; return; }
+      index = ((index % deck.length) + deck.length) % deck.length;
     }
 
-    function renderInlineText(target, value) {
+    function updateUnitOptions() {
+      const subject = refs.subjectFilter.value;
+      const selected = refs.unitFilter.value;
+      const units = Array.from(new Set(cards
+        .filter(function (card) { return subject === "全部" || card.subject === subject; })
+        .map(function (card) { return card.unit; })));
+      refs.unitFilter.replaceChildren();
+      const all = document.createElement("option");
+      all.value = "全部";
+      all.textContent = "全部模块";
+      refs.unitFilter.appendChild(all);
+      units.forEach(function (unit) {
+        const option = document.createElement("option");
+        option.value = unit;
+        option.textContent = unit;
+        refs.unitFilter.appendChild(option);
+      });
+      refs.unitFilter.value = units.includes(selected) ? selected : "全部";
+    }
+
+    function getDeck() {
+      const subject = refs.subjectFilter.value;
+      const unit = refs.unitFilter.value;
+      const scope = refs.scopeFilter.value;
+      const status = refs.statusFilter.value;
+      return cards.filter(function (card) {
+        return (subject === "全部" || card.subject === subject)
+          && (unit === "全部" || card.unit === unit)
+          && (scope === "全部" || card.scope === scope)
+          && (status === "全部" || stateText(stateFor(card.id)) === status);
+      });
+    }
+
+    function hasKaTeX() {
+      return Boolean(window.katex && typeof window.katex.render === "function");
+    }
+
+    function renderRichText(target, value) {
       target.replaceChildren();
-      const parts = String(value).split(/(\$\$[\s\S]+?\$\$|\$[^$\n]+\$|\\\([\s\S]+?\\\))/g);
+      const parts = String(value).split(/(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^$\n]+\$)/g);
       parts.forEach(function (part) {
-        const isInlineDollar = part.startsWith("$") && part.endsWith("$") && !part.startsWith("$$");
         const isBlockDollar = part.startsWith("$$") && part.endsWith("$$");
+        const isBlockBracket = part.startsWith("\\[") && part.endsWith("\\]");
         const isInlineParen = part.startsWith("\\(") && part.endsWith("\\)");
-        if (isInlineDollar || isBlockDollar || isInlineParen) {
-          const holder = document.createElement("span");
-          holder.className = isBlockDollar ? "inline-math block-math" : "inline-math";
-          holder.dataset.tex = isInlineParen ? part.slice(2, -2) : part.slice(isBlockDollar ? 2 : 1, isBlockDollar ? -2 : -1);
+        const isInlineDollar = part.startsWith("$") && part.endsWith("$") && !isBlockDollar;
+        const isMath = isBlockDollar || isBlockBracket || isInlineParen || isInlineDollar;
+        if (!isMath) {
+          target.appendChild(document.createTextNode(part));
+          return;
+        }
+        const displayMode = isBlockDollar || isBlockBracket;
+        const tex = isBlockDollar ? part.slice(2, -2)
+          : isBlockBracket || isInlineParen ? part.slice(2, -2)
+            : part.slice(1, -1);
+        const holder = document.createElement("span");
+        holder.className = displayMode ? "inline-math block-math" : "inline-math";
+        holder.dataset.tex = tex;
+        if (hasKaTeX()) {
           try {
-            katex.render(holder.dataset.tex, holder, { displayMode: isBlockDollar, output: "mathml", throwOnError: false, strict: "ignore" });
+            window.katex.render(tex, holder, { displayMode: displayMode, output: "mathml", strict: "ignore", throwOnError: false });
           } catch (error) {
             holder.textContent = part;
           }
-          target.appendChild(holder);
         } else {
-          target.appendChild(document.createTextNode(part));
+          holder.textContent = part;
         }
+        target.appendChild(holder);
       });
     }
 
@@ -903,149 +785,80 @@
         const line = document.createElement("div");
         line.className = "formula-line";
         line.dataset.tex = formula;
-        try {
-          katex.render(formula, line, { displayMode: true, output: "mathml", throwOnError: false, strict: "ignore" });
-        } catch (error) {
+        if (hasKaTeX()) {
+          try {
+            window.katex.render(formula, line, { displayMode: true, output: "mathml", strict: "ignore", throwOnError: false });
+          } catch (error) {
+            line.textContent = formula;
+          }
+        } else {
           line.textContent = formula;
         }
         target.appendChild(line);
       });
     }
 
-    function updateOptions() {
-      const subject = refs.subjectFilter.value;
-      const currentUnit = refs.unitFilter.value;
-      const units = Array.from(new Set(cards
-        .filter(function (card) { return subject === "全部" || card.subject === subject; })
-        .map(function (card) { return card.unit; })));
-      refs.unitFilter.replaceChildren();
-      const allOption = document.createElement("option");
-      allOption.value = "全部";
-      allOption.textContent = "全部模块";
-      refs.unitFilter.appendChild(allOption);
-      units.forEach(function (unit) {
-        const option = document.createElement("option");
-        option.value = unit;
-        option.textContent = unit;
-        refs.unitFilter.appendChild(option);
-      });
-      refs.unitFilter.value = units.includes(currentUnit) ? currentUnit : "全部";
-    }
-
-    function getDeck() {
-      const subject = refs.subjectFilter.value;
-      const unit = refs.unitFilter.value;
-      const scope = refs.scopeFilter.value;
-      const status = refs.statusFilter.value;
-      return cards.filter(function (card) {
-        const matchesSubject = subject === "全部" || card.subject === subject;
-        const matchesUnit = unit === "全部" || card.unit === unit;
-        const matchesScope = scope === "全部" || card.scope === scope;
-        const matchesStatus = status === "全部" || stateText(getState(card.id)) === status;
-        return matchesSubject && matchesUnit && matchesScope && matchesStatus;
-      });
-    }
-
-    function normalizeIndex(deck) {
-      if (!deck.length) { index = 0; return; }
-      index = ((index % deck.length) + deck.length) % deck.length;
-    }
-
-    function setScope(target, scope) {
-      target.className = "scope-badge " + scopeClass(scope);
-      target.textContent = scope;
-    }
-
-    function setState(target, state) {
-      target.className = "card-state " + (state === "unmarked" ? "" : state);
-      target.textContent = stateText(state);
-    }
-
-    function setFaceAccessibility(face, hidden) {
-      face.setAttribute("aria-hidden", hidden ? "true" : "false");
-      if (hidden) {
-        face.setAttribute("inert", "");
-      } else {
-        face.removeAttribute("inert");
-      }
-      face.inert = hidden;
-    }
-
-    function syncFaceAccessibility(isEmpty) {
-      setFaceAccessibility(refs.frontFace, isEmpty || revealed);
-      setFaceAccessibility(refs.backFace, isEmpty || !revealed);
-    }
-
-    function setEmpty(isEmpty) {
-      refs.frontContent.style.display = isEmpty ? "none" : "";
-      refs.backContent.style.display = isEmpty ? "none" : "";
-      refs.frontEmpty.style.display = isEmpty ? "flex" : "none";
-      refs.backEmpty.style.display = isEmpty ? "flex" : "none";
-      refs.previousButton.disabled = isEmpty;
-      refs.nextButton.disabled = isEmpty;
-      refs.flipButton.disabled = isEmpty;
-      refs.randomButton.disabled = isEmpty;
-      refs.knownButton.disabled = isEmpty;
-      refs.reviewButton.disabled = isEmpty;
-      refs.flashcard.setAttribute("aria-disabled", isEmpty ? "true" : "false");
-      refs.flashcard.tabIndex = isEmpty ? -1 : 0;
-      syncFaceAccessibility(isEmpty);
-    }
-
-    function renderProgress(deck) {
+    function updateProgress(deck) {
       const known = deck.filter(function (card) { return progress.known.includes(card.id); }).length;
-      const review = deck.filter(function (card) { return progress.review.includes(card.id); }).length;
-      const unmarked = deck.length - known - review;
-      const percent = deck.length ? (known / deck.length) * 100 : 0;
-      refs.knownProgress.textContent = String(known) + " / " + String(deck.length);
-      refs.deckProgressCopy.textContent = refs.statusFilter.value === "全部"
-        ? "当前筛选范围内的本机标记。"
-        : "当前筛选范围内的“" + refs.statusFilter.value + "”卡片。";
-      refs.progressFill.style.transform = "scaleX(" + String(percent / 100) + ")";
+      const percent = deck.length ? known / deck.length : 0;
+      refs.progressText.textContent = String(known) + " / " + String(deck.length);
+      refs.progressFill.style.transform = "scaleX(" + String(percent) + ")";
       refs.progressTrack.setAttribute("aria-valuemax", String(deck.length));
       refs.progressTrack.setAttribute("aria-valuenow", String(known));
-      refs.knownCount.textContent = String(known);
-      refs.reviewCount.textContent = String(review);
-      refs.unmarkedCount.textContent = String(unmarked);
+      refs.progressTrack.setAttribute("aria-valuetext", "已会 " + String(known) + " 张，共 " + String(deck.length) + " 张");
+      refs.sessionTitle.textContent = deck.length ? "当前筛选 · " + String(deck.length) + " 张" : "当前筛选";
+      refs.sessionDescription.textContent = deck.length ? "先主动回忆，再查看答案。" : "调整筛选条件后继续。";
+    }
+
+    function setAnswerVisible(visible) {
+      refs.answerPanel.hidden = !visible;
+      refs.answerPanel.toggleAttribute("inert", !visible);
+      refs.answerPanel.setAttribute("aria-hidden", visible ? "false" : "true");
+      refs.revealButton.setAttribute("aria-expanded", visible ? "true" : "false");
+      refs.revealButton.hidden = visible;
+      refs.revealButton.querySelector(".button-label").textContent = visible ? "答案已展开" : "查看答案";
+      refs.revealButton.setAttribute("aria-label", visible ? "答案已展开，请使用重新遮挡回到主动回忆" : "查看当前答案");
+      refs.revealButton.title = visible ? "答案已展开，请使用重新遮挡回到主动回忆" : "查看当前答案";
+    }
+
+    function setControlsDisabled(disabled) {
+      [refs.randomButton, refs.revealButton, refs.hideButton, refs.previousButton, refs.nextButton, refs.knownButton, refs.reviewButton].forEach(function (control) {
+        control.disabled = disabled;
+      });
     }
 
     function renderCard() {
       const deck = getDeck();
       normalizeIndex(deck);
-      setEmpty(!deck.length);
-      renderProgress(deck);
-      if (!deck.length) {
+      updateProgress(deck);
+      const isEmpty = deck.length === 0;
+      refs.studyContent.hidden = isEmpty;
+      refs.emptyState.hidden = !isEmpty;
+      setControlsDisabled(isEmpty);
+      if (isEmpty) {
         revealed = false;
-        refs.flashcard.classList.remove("is-revealed");
-        refs.flashcard.setAttribute("aria-label", "当前筛选没有卡片。");
-        refs.flipButton.setAttribute("aria-label", "当前没有可翻阅的卡片");
-        refs.flipButton.setAttribute("aria-pressed", "false");
-        syncFaceAccessibility(true);
+        setAnswerVisible(false);
+        refs.cardPosition.innerHTML = "<strong>0</strong> / 0";
+        refs.knownButton.setAttribute("aria-pressed", "false");
+        refs.reviewButton.setAttribute("aria-pressed", "false");
         return;
       }
       const card = deck[index];
-      const state = getState(card.id);
-      const position = String(index + 1) + " / " + String(deck.length);
-      refs.frontCategory.textContent = card.subject + " · " + card.unit;
-      setScope(refs.frontScope, card.scope);
-      refs.frontTitle.textContent = card.title;
-      renderInlineText(refs.frontHint, card.prompt);
-      refs.frontNumber.textContent = position;
-      setState(refs.frontState, state);
-      refs.backCategory.textContent = card.subject + " · " + card.unit;
-      setScope(refs.backScope, card.scope);
-      refs.backTitle.textContent = card.title;
+      const state = stateFor(card.id);
+      refs.cardTopic.textContent = card.subject + " · " + card.unit;
+      refs.scopeChip.textContent = card.scope;
+      refs.scopeChip.className = "scope-chip " + (card.scope === "数学二核心（当前已输入）" ? "core" : "pending");
+      refs.cardTitle.textContent = card.title;
+      renderRichText(refs.promptText, card.prompt);
       renderFormula(refs.formulaBlock, card.formulas);
-      renderInlineText(refs.conditionText, card.condition);
-      renderInlineText(refs.distinctionText, card.distinction);
+      renderRichText(refs.conditionText, card.condition);
+      renderRichText(refs.distinctionText, card.distinction);
       refs.sourceText.textContent = card.source;
-      refs.backNumber.textContent = position;
-      setState(refs.backState, state);
-      refs.flashcard.classList.toggle("is-revealed", revealed);
-      refs.flashcard.setAttribute("aria-label", revealed ? "当前显示答案。点击或按空格遮挡答案。" : "当前遮挡答案。点击或按空格显示答案。");
-      refs.flipButton.setAttribute("aria-label", revealed ? "遮挡当前答案" : "显示当前答案");
-      refs.flipButton.setAttribute("aria-pressed", revealed ? "true" : "false");
-      syncFaceAccessibility(false);
+      setAnswerVisible(revealed);
+      refs.revealButton.disabled = revealed;
+      refs.knownButton.setAttribute("aria-pressed", state === "known" ? "true" : "false");
+      refs.reviewButton.setAttribute("aria-pressed", state === "review" ? "true" : "false");
+      refs.cardPosition.innerHTML = "<strong>" + String(index + 1) + "</strong> / " + String(deck.length) + " · " + stateText(state);
     }
 
     function announce(message) {
@@ -1053,11 +866,30 @@
       window.setTimeout(function () { refs.liveRegion.textContent = message; }, 10);
     }
 
-    function flipCard() {
-      if (!getDeck().length) return;
-      revealed = !revealed;
+    function announceCurrentCard(prefix) {
+      const deck = getDeck();
+      const card = deck[index];
+      if (!card) { announce(prefix); return; }
+      const prompt = refs.promptText.innerText.replace(/\s+/g, " ").trim();
+      announce(prefix + "第 " + String(index + 1) + " 张：" + card.title + "。提示：" + prompt);
+    }
+
+    function revealAnswer() {
+      if (!getDeck().length || revealed) return;
+      revealed = true;
       renderCard();
-      announce(revealed ? "已显示答案。" : "已遮挡答案。");
+      announce("答案已展开。请核对公式、适用条件和辨析。");
+    }
+
+    function hideAnswer() {
+      if (!getDeck().length || !revealed) return;
+      revealed = false;
+      renderCard();
+      announce("答案已重新遮挡。");
+    }
+
+    function toggleAnswer() {
+      if (revealed) hideAnswer(); else revealAnswer();
     }
 
     function move(delta) {
@@ -1067,32 +899,34 @@
       normalizeIndex(deck);
       revealed = false;
       renderCard();
-      announce("已切换到第 " + String(index + 1) + " 张。");
+      announceCurrentCard("已切换到");
     }
 
     function chooseRandom() {
       const deck = getDeck();
       if (!deck.length) return;
-      if (deck.length < 2) { announce("当前筛选只有一张卡。"); return; }
+      if (deck.length === 1) { announce("当前筛选只有一张卡。"); return; }
       let nextIndex = index;
       while (nextIndex === index) nextIndex = Math.floor(Math.random() * deck.length);
       index = nextIndex;
       revealed = false;
       renderCard();
-      announce("已随机抽取一张卡。");
+      announceCurrentCard("已随机抽取");
     }
 
     function markCurrent(status) {
       const deck = getDeck();
       const card = deck[index];
       if (!card) return;
+      const current = stateFor(card.id);
       progress.known = progress.known.filter(function (id) { return id !== card.id; });
       progress.review = progress.review.filter(function (id) { return id !== card.id; });
-      if (status === "known") progress.known.push(card.id);
-      if (status === "review") progress.review.push(card.id);
+      const clearing = current === status;
+      if (!clearing && status === "known") progress.known.push(card.id);
+      if (!clearing && status === "review") progress.review.push(card.id);
       saveProgress();
       renderCard();
-      announce("已标记为" + stateText(status) + "。");
+      announce(clearing ? "已清除当前卡的本机标记。" : "已标记为“" + stateText(status) + "”。");
     }
 
     function resetProgress() {
@@ -1103,62 +937,51 @@
         localStorage.removeItem(legacyStorageKey);
       } catch (error) {}
       renderCard();
-      announce("本浏览器的闪卡标记已清零。");
+      announce("本浏览器的闪卡标记已清除。");
     }
 
-    refs.subjectFilter.addEventListener("change", function () {
-      updateOptions();
+    function resetDeckAfterFilter(message) {
       index = 0;
       revealed = false;
       renderCard();
-      announce("已切换科目：" + refs.subjectFilter.options[refs.subjectFilter.selectedIndex].text + "。");
+      announceCurrentCard(message + "当前为");
+    }
+
+    refs.subjectFilter.addEventListener("change", function () {
+      updateUnitOptions();
+      resetDeckAfterFilter("已切换科目。");
     });
     [refs.unitFilter, refs.scopeFilter, refs.statusFilter].forEach(function (select) {
-      select.addEventListener("change", function () {
-        index = 0;
-        revealed = false;
-        renderCard();
-        announce("筛选已更新。");
-      });
+      select.addEventListener("change", function () { resetDeckAfterFilter("筛选已更新。"); });
     });
-    refs.flipButton.addEventListener("click", flipCard);
+    refs.revealButton.addEventListener("click", revealAnswer);
+    refs.hideButton.addEventListener("click", hideAnswer);
     refs.previousButton.addEventListener("click", function () { move(-1); });
     refs.nextButton.addEventListener("click", function () { move(1); });
     refs.randomButton.addEventListener("click", chooseRandom);
     refs.knownButton.addEventListener("click", function () { markCurrent("known"); });
     refs.reviewButton.addEventListener("click", function () { markCurrent("review"); });
     refs.resetButton.addEventListener("click", resetProgress);
-    refs.flashcard.addEventListener("click", function () {
-      if (didSwipe) { didSwipe = false; return; }
-      flipCard();
-    });
-    refs.flashcard.addEventListener("keydown", function (event) {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        event.stopPropagation();
-        flipCard();
-      }
-    });
-    refs.flashcard.addEventListener("pointerdown", function (event) {
+
+    refs.studySheet.addEventListener("pointerdown", function (event) {
+      if (event.target.closest("button, select, summary, a")) { pointerStartX = null; return; }
       pointerStartX = event.clientX;
-      didSwipe = false;
     });
-    refs.flashcard.addEventListener("pointerup", function (event) {
+    refs.studySheet.addEventListener("pointerup", function (event) {
       if (pointerStartX === null) return;
       const delta = event.clientX - pointerStartX;
       pointerStartX = null;
-      if (Math.abs(delta) < 46) return;
-      didSwipe = true;
+      if (Math.abs(delta) < 64) return;
       move(delta > 0 ? -1 : 1);
     });
-    refs.flashcard.addEventListener("pointercancel", function () { pointerStartX = null; });
+    refs.studySheet.addEventListener("pointercancel", function () { pointerStartX = null; });
+
     document.addEventListener("keydown", function (event) {
       const active = document.activeElement;
-      const tagName = active && active.tagName;
-      if (tagName === "SELECT" || tagName === "SUMMARY" || tagName === "INPUT" || (tagName === "BUTTON" && (event.key === " " || event.key === "Enter"))) return;
+      if (active && active.closest("select, button, summary, input, textarea, a")) return;
       if (event.key === " " || event.code === "Space") {
         event.preventDefault();
-        flipCard();
+        toggleAnswer();
       } else if (event.key === "ArrowLeft") {
         event.preventDefault();
         move(-1);
@@ -1173,16 +996,16 @@
         markCurrent("review");
       }
     });
+
     window.addEventListener("storage", function (event) {
       if (event.key === storageKey || event.key === legacyStorageKey) {
         readProgress();
         renderCard();
       }
     });
-    document.querySelector(".source-details").addEventListener("click", function (event) { event.stopPropagation(); });
 
     readProgress();
-    updateOptions();
+    updateUnitOptions();
     renderCard();
   </script>
 </body>
