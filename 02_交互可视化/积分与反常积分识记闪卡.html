@@ -5,31 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
   <link rel="icon" href="data:,">
-  <title>积分与反常积分识记闪卡</title>
+  <title>数学二核心识记闪卡</title>
   <style>
     :root {
       --canvas: #edf2f7;
       --surface: #ffffff;
-      --surface-muted: #f8fafc;
+      --surface-muted: #f7fafc;
       --ink: #14213d;
-      --muted: #64748b;
+      --muted: #60748a;
+      --muted-strong: #40566d;
       --line: #d7e0ea;
-      --line-strong: #b8c5d4;
+      --line-strong: #b7c5d4;
       --navy: #12355b;
       --navy-dark: #0c2746;
       --teal: #0f766e;
       --teal-soft: #e5f6f2;
-      --amber: #a16207;
+      --amber: #9a6207;
       --amber-soft: #fff6df;
       --violet: #6941c6;
       --violet-soft: #f1edff;
       --rose: #b42348;
       --rose-soft: #fff0f3;
-      --shadow-lg: 0 22px 55px rgba(20, 33, 61, 0.14), 0 3px 10px rgba(20, 33, 61, 0.08);
+      --shadow-lg: 0 20px 45px rgba(20, 33, 61, 0.13), 0 3px 10px rgba(20, 33, 61, 0.07);
       --shadow-sm: 0 3px 12px rgba(20, 33, 61, 0.08);
-      --radius-lg: 22px;
-      --radius-md: 14px;
-      --radius-sm: 9px;
+      --radius-card: 16px;
+      --radius-panel: 12px;
+      --radius-control: 8px;
       --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
       --serif: "Iowan Old Style", "Noto Serif CJK SC", "Songti SC", STSong, serif;
       --math: "STIX Two Math", "Cambria Math", "Times New Roman", serif;
@@ -42,28 +43,26 @@
       min-height: 100vh;
       margin: 0;
       color: var(--ink);
-      background:
-        linear-gradient(90deg, rgba(18, 53, 91, 0.035) 1px, transparent 1px),
-        linear-gradient(rgba(18, 53, 91, 0.035) 1px, transparent 1px),
-        var(--canvas);
-      background-size: 28px 28px;
+      background: var(--canvas);
       font-family: var(--sans);
       font-size: 16px;
       line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
     }
 
     button, select { font: inherit; }
     button { border: 0; }
     button, select { -webkit-tap-highlight-color: transparent; }
-    button:focus-visible, select:focus-visible, .flashcard:focus-visible {
-      outline: 3px solid rgba(15, 118, 110, 0.45);
+    button:focus-visible, select:focus-visible, summary:focus-visible, .flashcard:focus-visible {
+      outline: 3px solid rgba(15, 118, 110, 0.42);
       outline-offset: 3px;
     }
+    ::selection { color: #fff; background: var(--teal); }
 
     .app {
-      width: min(1180px, calc(100% - 36px));
+      width: min(1200px, calc(100% - 36px));
       margin: 0 auto;
-      padding: 34px 0 54px;
+      padding: 32px 0 54px;
     }
 
     .masthead {
@@ -71,188 +70,158 @@
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 24px;
       align-items: end;
-      padding: 0 2px 28px;
+      padding: 0 2px 26px;
       border-bottom: 1px solid rgba(18, 53, 91, 0.15);
     }
-
-    .eyeline {
-      margin: 0 0 8px;
-      color: var(--teal);
-      font-size: 12px;
-      font-weight: 760;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
     h1, h2, h3, p { margin-top: 0; }
     h1 {
-      margin-bottom: 8px;
+      max-width: 760px;
+      margin-bottom: 9px;
       font-family: var(--serif);
-      font-size: clamp(30px, 4vw, 44px);
+      font-size: 42px;
       font-weight: 650;
-      letter-spacing: -0.035em;
-      line-height: 1.06;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+      text-wrap: balance;
     }
-
     .subtitle {
-      max-width: 700px;
+      max-width: 720px;
       margin-bottom: 0;
       color: var(--muted);
       font-size: 14px;
       line-height: 1.7;
+      text-wrap: pretty;
     }
-
     .scope-stamp {
-      min-width: 204px;
-      padding: 13px 15px;
+      min-width: 210px;
+      padding: 12px 14px;
       color: #173758;
-      background: rgba(255, 255, 255, 0.76);
+      background: rgba(255, 255, 255, 0.82);
       border: 1px solid rgba(18, 53, 91, 0.16);
-      border-left: 4px solid var(--navy);
-      border-radius: var(--radius-sm);
+      border-left: 1px solid var(--navy);
+      border-radius: var(--radius-control);
       box-shadow: var(--shadow-sm);
       font-size: 13px;
-      line-height: 1.5;
+      line-height: 1.55;
     }
-
     .scope-stamp strong { display: block; color: var(--navy-dark); }
 
     .toolbar {
       display: grid;
-      grid-template-columns: minmax(220px, 1fr) auto auto;
-      gap: 12px;
+      grid-template-columns: 1.2fr 1fr 1fr 1fr auto auto;
+      gap: 10px;
       align-items: center;
-      padding: 22px 0;
+      padding: 20px 0;
     }
-
     .filter-field {
       position: relative;
       display: flex;
       align-items: center;
+      min-width: 0;
       min-height: 46px;
-      padding: 0 12px 0 15px;
+      padding: 0 12px;
       background: var(--surface);
       border: 1px solid var(--line);
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius-control);
       box-shadow: var(--shadow-sm);
     }
-
     .filter-field label {
-      margin-right: 10px;
+      flex: 0 0 auto;
+      margin-right: 9px;
       color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: 0.03em;
       white-space: nowrap;
     }
-
     .filter-field select {
       width: 100%;
       min-width: 0;
       appearance: none;
-      padding: 2px 28px 2px 0;
+      padding: 2px 22px 2px 0;
       color: var(--ink);
       background: transparent;
       border: 0;
       cursor: pointer;
-      font-size: 14px;
-      font-weight: 650;
+      font-size: 13px;
+      font-weight: 680;
+      text-overflow: ellipsis;
     }
-
     .select-caret {
       position: absolute;
-      right: 13px;
+      right: 11px;
       width: 15px;
       height: 15px;
       color: var(--muted);
       pointer-events: none;
     }
-
-    .button {
-      min-height: 46px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 0 15px;
-      color: var(--ink);
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-sm);
-      box-shadow: var(--shadow-sm);
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 680;
-      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
-    }
-
-    .button:hover {
-      border-color: var(--line-strong);
-      background: #fcfdff;
-      box-shadow: 0 5px 16px rgba(20, 33, 61, 0.12);
-      transform: translateY(-1px);
-    }
-
-    .button:active { transform: translateY(0); }
-    .button.primary {
-      color: #fff;
-      background: var(--navy);
-      border-color: var(--navy);
-    }
-
-    .button.primary:hover { background: var(--navy-dark); border-color: var(--navy-dark); }
-    .button.known {
-      color: #075c55;
-      background: var(--teal-soft);
-      border-color: #a9ddd5;
-    }
-    .button.review {
-      color: #925d05;
-      background: var(--amber-soft);
-      border-color: #ecd595;
-    }
-    .button.ghost {
-      color: var(--muted);
-      background: transparent;
-      box-shadow: none;
-    }
-
-    .button svg, .select-caret svg {
+    .select-caret svg, .button svg {
       width: 17px;
       height: 17px;
-      flex: 0 0 auto;
       fill: none;
       stroke: currentColor;
       stroke-linecap: round;
       stroke-linejoin: round;
       stroke-width: 1.8;
     }
+    .button {
+      min-height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 13px;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-control);
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 680;
+      white-space: nowrap;
+      transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+    }
+    .button:hover {
+      border-color: var(--line-strong);
+      background: #fcfdff;
+      box-shadow: 0 5px 16px rgba(20, 33, 61, 0.12);
+      transform: translateY(-1px);
+    }
+    .button:active { transform: translateY(0) scale(0.98); }
+    .button.primary {
+      color: #fff;
+      background: var(--navy);
+      border-color: var(--navy);
+    }
+    .button.primary:hover { background: var(--navy-dark); border-color: var(--navy-dark); }
+    .button.known { color: #075c55; background: var(--teal-soft); border-color: #a9ddd5; }
+    .button.review { color: #925d05; background: var(--amber-soft); border-color: #ecd595; }
+    .button.ghost { color: var(--muted); background: transparent; box-shadow: none; }
+    .button[disabled] { color: #9aa8b6; background: #f2f5f8; border-color: #e1e7ed; box-shadow: none; cursor: not-allowed; transform: none; }
 
     .workspace {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 280px;
-      gap: 24px;
+      grid-template-columns: minmax(0, 1fr) 286px;
+      gap: 22px;
       align-items: start;
     }
-
     .flashcard-wrap { min-width: 0; }
     .flashcard {
       position: relative;
-      min-height: 466px;
-      border-radius: var(--radius-lg);
+      min-height: 500px;
+      border-radius: var(--radius-card);
       cursor: pointer;
       perspective: 1300px;
       touch-action: pan-y;
     }
-
     .card-inner {
       position: absolute;
       inset: 0;
       transform-style: preserve-3d;
-      transition: transform 560ms cubic-bezier(0.2, 0.76, 0.2, 1);
+      transition: transform 500ms cubic-bezier(0.2, 0.76, 0.2, 1);
     }
-
     .flashcard.is-revealed .card-inner { transform: rotateY(180deg); }
-
     .card-face {
       position: absolute;
       inset: 0;
@@ -261,56 +230,50 @@
       overflow: hidden;
       background: var(--surface);
       border: 1px solid var(--line);
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius-card);
       backface-visibility: hidden;
       box-shadow: var(--shadow-lg);
     }
-
     .card-face::after {
       position: absolute;
-      right: -64px;
-      bottom: -77px;
-      width: 260px;
-      height: 260px;
+      right: -76px;
+      bottom: -92px;
+      width: 280px;
+      height: 280px;
       content: "";
       border: 1px solid rgba(18, 53, 91, 0.07);
       border-radius: 50%;
       pointer-events: none;
     }
-
-    .card-back {
-      transform: rotateY(180deg);
-      background: #fdfefe;
-    }
-
+    .card-back { transform: rotateY(180deg); background: #fdfefe; }
     .card-topline {
-      min-height: 73px;
+      min-height: 70px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 18px 22px 15px;
+      padding: 16px 22px 14px;
       border-bottom: 1px solid var(--line);
     }
-
     .category-name {
       min-width: 0;
       color: var(--muted);
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 12px;
+      font-weight: 720;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
     }
-
     .scope-badge {
       flex: 0 0 auto;
-      max-width: 54%;
+      max-width: 56%;
       padding: 5px 9px;
       border-radius: 999px;
-      font-size: 11px;
-      font-weight: 720;
+      font-size: 10px;
+      font-weight: 730;
       line-height: 1.35;
       text-align: right;
     }
-
     .scope-core { color: #075c55; background: var(--teal-soft); }
     .scope-pending { color: #6040ad; background: var(--violet-soft); }
     .scope-boundary { color: var(--rose); background: var(--rose-soft); }
@@ -322,111 +285,110 @@
       flex: 1;
       flex-direction: column;
       justify-content: center;
-      padding: clamp(26px, 5vw, 58px);
+      padding: 46px clamp(28px, 5vw, 62px);
     }
-
+    .answer-body {
+      justify-content: flex-start;
+      gap: 17px;
+      overflow-y: auto;
+      scrollbar-color: #b8c5d4 #f1f4f7;
+      scrollbar-width: thin;
+    }
     .prompt-label, .answer-label {
-      margin-bottom: 18px;
+      margin-bottom: 17px;
       color: var(--teal);
-      font-size: 12px;
-      font-weight: 760;
+      font-size: 11px;
+      font-weight: 780;
       letter-spacing: 0.12em;
     }
-
     .card-title {
-      max-width: 720px;
+      max-width: 730px;
       margin-bottom: 16px;
       font-family: var(--serif);
-      font-size: clamp(30px, 4.4vw, 48px);
+      font-size: 44px;
       font-weight: 640;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.025em;
       line-height: 1.14;
+      text-wrap: balance;
     }
-
     .card-hint {
-      max-width: 640px;
+      max-width: 690px;
       margin: 0;
-      color: #4b5d70;
-      font-size: clamp(16px, 1.7vw, 19px);
+      color: var(--muted-strong);
+      font-size: 18px;
       line-height: 1.72;
+      text-wrap: pretty;
     }
-
     .reveal-cue {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       margin-top: 34px;
       color: var(--muted);
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 620;
     }
-
-    .reveal-cue .keycap {
+    .keycap {
       padding: 2px 7px;
       color: #38516d;
       background: #eef3f8;
       border: 1px solid #d5e0ea;
       border-radius: 5px;
       box-shadow: inset 0 -1px 0 rgba(20, 33, 61, 0.08);
-      font-size: 11px;
+      font-size: 10px;
+      font-weight: 680;
     }
-
-    .answer-body { gap: 20px; justify-content: flex-start; overflow-y: auto; }
     .answer-title {
       margin: 0;
       font-family: var(--serif);
-      font-size: clamp(25px, 3.3vw, 36px);
+      font-size: 32px;
       font-weight: 640;
-      letter-spacing: -0.025em;
+      letter-spacing: -0.02em;
       line-height: 1.2;
+      text-wrap: balance;
     }
-
     .formula-block {
-      max-width: 760px;
-      padding: 19px 20px;
+      max-width: 780px;
+      padding: 18px 20px;
       color: var(--navy-dark);
       background: #f4f8fb;
       border: 1px solid #d9e5ef;
-      border-left: 4px solid var(--navy);
-      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-      font-family: var(--math);
-      font-size: clamp(19px, 2.4vw, 25px);
-      line-height: 1.68;
+      border-left: 1px solid var(--navy);
+      border-radius: var(--radius-control);
+      font-size: 22px;
+      line-height: 1.72;
       overflow-wrap: anywhere;
     }
-
+    .formula-line + .formula-line { margin-top: 10px; }
+    .formula-line { overflow-x: auto; scrollbar-width: thin; }
+    .katex-display { margin: 0.1em 0; overflow-x: auto; overflow-y: hidden; }
+    .katex { font-size: 1em; }
     .answer-notes {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      max-width: 760px;
+      gap: 16px;
+      max-width: 780px;
     }
-
     .note-block {
       min-width: 0;
-      padding-top: 12px;
+      padding-top: 11px;
       border-top: 1px solid var(--line);
     }
-
     .note-block strong {
       display: block;
       margin-bottom: 5px;
       color: var(--muted);
-      font-size: 11px;
+      font-size: 10px;
       letter-spacing: 0.06em;
     }
-
     .note-block p {
       margin: 0;
-      color: #3e5369;
-      font-size: 14px;
+      color: var(--muted-strong);
+      font-size: 13px;
       line-height: 1.65;
+      text-wrap: pretty;
     }
-
-    .math { font-family: var(--math); }
-    .math sup, .math sub { font-size: 0.68em; line-height: 0; }
-    .mi { font-style: italic; }
-
+    .inline-math { white-space: nowrap; }
     .card-footer {
       position: relative;
       z-index: 1;
@@ -435,55 +397,50 @@
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      padding: 12px 22px;
+      padding: 11px 22px;
       color: var(--muted);
       border-top: 1px solid var(--line);
-      font-size: 12px;
+      font-size: 11px;
     }
-
     .card-number { font-variant-numeric: tabular-nums; }
-    .card-state { font-weight: 700; }
+    .card-state { font-weight: 720; }
     .card-state.known { color: var(--teal); }
     .card-state.review { color: var(--amber); }
 
     .deck-controls {
       display: grid;
       grid-template-columns: 1fr 1.15fr 1fr;
-      gap: 10px;
-      margin-top: 16px;
+      gap: 9px;
+      margin-top: 14px;
     }
-
     .deck-controls .button { width: 100%; }
-
     .sidepanel {
       display: grid;
-      gap: 14px;
+      gap: 13px;
       position: sticky;
-      top: 20px;
+      top: 18px;
     }
-
     .panel {
-      padding: 20px;
+      padding: 18px;
       background: rgba(255, 255, 255, 0.9);
       border: 1px solid var(--line);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-panel);
       box-shadow: var(--shadow-sm);
     }
-
     .panel h2 {
-      margin-bottom: 8px;
-      font-size: 15px;
+      margin-bottom: 7px;
+      font-size: 14px;
       font-weight: 760;
       letter-spacing: -0.01em;
+      text-wrap: balance;
     }
-
     .panel-copy {
-      margin-bottom: 16px;
+      margin-bottom: 15px;
       color: var(--muted);
-      font-size: 13px;
+      font-size: 12px;
       line-height: 1.65;
+      text-wrap: pretty;
     }
-
     .progress-row {
       display: flex;
       align-items: baseline;
@@ -491,7 +448,6 @@
       gap: 12px;
       margin-bottom: 8px;
     }
-
     .progress-count {
       color: var(--navy-dark);
       font-family: var(--math);
@@ -499,38 +455,35 @@
       font-variant-numeric: tabular-nums;
       line-height: 1;
     }
-
-    .progress-label { color: var(--muted); font-size: 12px; }
+    .progress-label { color: var(--muted); font-size: 11px; }
     .progress-track {
       height: 7px;
       overflow: hidden;
       background: #e8edf3;
       border-radius: 999px;
     }
-
     .progress-fill {
-      width: 0;
+      width: 100%;
       height: 100%;
       background: var(--teal);
       border-radius: inherit;
-      transition: width 240ms ease;
+      transform: scaleX(0);
+      transform-origin: left center;
+      transition: transform 220ms ease;
     }
-
     .state-list {
       display: grid;
-      gap: 9px;
-      margin-top: 17px;
+      gap: 8px;
+      margin-top: 16px;
     }
-
     .state-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       color: var(--muted);
-      font-size: 13px;
+      font-size: 12px;
     }
-
     .state-row strong { color: var(--ink); font-variant-numeric: tabular-nums; }
     .state-dot {
       display: inline-block;
@@ -539,39 +492,14 @@
       margin-right: 7px;
       border-radius: 999px;
     }
-
     .state-dot.known { background: var(--teal); }
     .state-dot.review { background: var(--amber); }
     .state-dot.unmarked { background: #a8b5c3; }
-
-    .mark-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .mark-actions .button { min-height: 42px; padding: 0 10px; font-size: 13px; }
-
-    .shortcut-list {
-      display: grid;
-      gap: 9px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .shortcut-list li {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
+    .mark-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .mark-actions .button { min-height: 42px; padding: 0 8px; font-size: 12px; }
     kbd {
-      min-width: 30px;
-      padding: 3px 6px;
+      min-width: 26px;
+      padding: 2px 5px;
       color: #3b4f67;
       background: #f2f5f8;
       border: 1px solid #d5dee7;
@@ -579,51 +507,65 @@
       border-radius: 5px;
       box-shadow: inset 0 -1px 0 rgba(20, 33, 61, 0.08);
       font-family: var(--sans);
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 680;
       text-align: center;
     }
-
-    .source-details {
-      margin-top: 18px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.65;
-    }
-
-    .source-details summary {
-      color: #4b5d70;
-      cursor: pointer;
-      font-weight: 680;
-    }
-
-    .source-details p { margin: 9px 0 0; }
-    .scope-legend {
+    .shortcut-list, .scope-legend {
       display: grid;
-      gap: 9px;
+      gap: 8px;
       margin: 0;
       padding: 0;
       list-style: none;
     }
-
+    .shortcut-list li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .scope-legend { gap: 9px; }
     .legend-row {
       display: flex;
       align-items: flex-start;
-      gap: 8px;
+      gap: 7px;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 11px;
       line-height: 1.55;
     }
-
     .legend-chip {
       flex: 0 0 auto;
       padding: 3px 6px;
       border-radius: 5px;
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 750;
       line-height: 1.35;
     }
-
+    .source-details {
+      max-width: 780px;
+      margin-top: 1px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.65;
+    }
+    .source-details summary {
+      color: var(--muted-strong);
+      cursor: pointer;
+      font-weight: 680;
+    }
+    .source-details p { margin: 8px 0 0; }
+    .empty-state {
+      display: none;
+      min-height: 100%;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 28px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .empty-state strong { display: block; margin-bottom: 5px; color: var(--ink); }
     .live-region {
       position: fixed;
       width: 1px;
@@ -634,41 +576,46 @@
       clip-path: inset(50%);
     }
 
+    @media (max-width: 1080px) {
+      .toolbar { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .toolbar .filter-field:first-child { grid-column: span 2; }
+    }
     @media (max-width: 860px) {
       .workspace { grid-template-columns: 1fr; }
       .sidepanel { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .sidepanel .panel:last-child { grid-column: 1 / -1; }
     }
-
     @media (max-width: 660px) {
-      body { background-size: 22px 22px; }
-      .app { width: min(100% - 24px, 1180px); padding-top: 20px; }
-      .masthead { grid-template-columns: 1fr; gap: 16px; padding-bottom: 20px; }
+      .app { width: min(100% - 24px, 1200px); padding-top: 20px; }
+      .masthead { grid-template-columns: 1fr; gap: 15px; padding-bottom: 20px; }
+      h1 { font-size: 34px; }
       .scope-stamp { min-width: 0; width: 100%; }
-      .toolbar { grid-template-columns: 1fr 1fr; }
-      .filter-field { grid-column: 1 / -1; }
-      .toolbar .button { padding: 0 12px; }
-      .flashcard { min-height: 480px; }
-      .card-topline { min-height: 70px; padding: 15px 17px 12px; }
-      .scope-badge { max-width: 57%; font-size: 10px; }
-      .card-content { padding: 28px 24px; }
-      .answer-body { padding-bottom: 24px; }
+      .toolbar { grid-template-columns: 1fr 1fr; gap: 8px; padding: 16px 0; }
+      .toolbar .filter-field:first-child { grid-column: 1 / -1; }
+      .toolbar .button { min-width: 0; padding: 0 10px; }
+      .flashcard { min-height: 520px; }
+      .card-topline { min-height: 68px; padding: 14px 17px 12px; }
+      .scope-badge { max-width: 59%; font-size: 9px; }
+      .card-content { padding: 30px 24px; }
+      .card-title { font-size: 35px; }
+      .card-hint { font-size: 16px; line-height: 1.7; }
+      .answer-body { padding-bottom: 23px; }
+      .answer-title { font-size: 27px; }
+      .formula-block { padding: 15px 16px; font-size: 19px; }
       .answer-notes { grid-template-columns: 1fr; gap: 11px; }
       .card-footer { padding: 11px 17px; }
       .deck-controls { grid-template-columns: 1fr 1fr; }
       .deck-controls .button.primary { grid-column: 1 / -1; grid-row: 1; }
       .sidepanel { grid-template-columns: 1fr; }
       .sidepanel .panel:last-child { grid-column: auto; }
-      .panel { padding: 17px; }
+      .panel { padding: 16px; }
     }
-
     @media (max-width: 390px) {
       .toolbar .button span { display: none; }
       .toolbar .button { min-width: 0; }
-      .flashcard { min-height: 500px; }
-      .card-title { font-size: 29px; }
+      .flashcard { min-height: 540px; }
+      .card-title { font-size: 31px; }
     }
-
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         scroll-behavior: auto !important;
@@ -680,93 +627,103 @@
   </style>
 </head>
 <body>
-  <main class="app" aria-label="积分与反常积分识记闪卡">
+  <main class="app" aria-label="数学二核心识记闪卡">
     <header class="masthead">
       <div>
-        <p class="eyeline">Math II · offline flashcards</p>
-        <h1>积分与反常积分识记闪卡</h1>
-        <p class="subtitle">默认遮挡答案。先说出公式、条件和辨析，再翻面核对。学习进度只保存在当前浏览器。</p>
+        <h1>数学二核心识记闪卡</h1>
+        <p class="subtitle">先从记忆中写出公式、条件和辨析，再翻面核对。内容按数学二范围分层，浏览器中的标记仅用于本机复习导航。</p>
       </div>
       <div class="scope-stamp">
         <strong>暂按数学二</strong>
-        待 2027 官方目录与大纲确认
+        2027 官方目录与大纲待确认
       </div>
     </header>
 
-    <section class="toolbar" aria-label="闪卡工具栏">
+    <section class="toolbar" aria-label="闪卡筛选与工具">
       <div class="filter-field">
-        <label for="categoryFilter">分类</label>
-        <select id="categoryFilter" aria-label="按分类筛选卡片">
-          <option value="全部">全部卡片</option>
-          <option value="基础公式">基础公式</option>
-          <option value="方法触发">方法触发</option>
-          <option value="定积分">定积分</option>
-          <option value="变上限积分">变上限积分</option>
-          <option value="反常积分">反常积分</option>
-          <option value="等价无穷小">等价无穷小</option>
-          <option value="范围边界">范围边界</option>
+        <label for="subjectFilter">科目</label>
+        <select id="subjectFilter" aria-label="按科目筛选卡片">
+          <option value="全部">全部科目</option>
+          <option value="高等数学">高等数学</option>
+          <option value="线性代数">线性代数</option>
         </select>
-        <span class="select-caret" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg>
-        </span>
+        <span class="select-caret" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></span>
       </div>
-      <button class="button" id="randomButton" type="button">
+      <div class="filter-field">
+        <label for="unitFilter">模块</label>
+        <select id="unitFilter" aria-label="按模块筛选卡片"></select>
+        <span class="select-caret" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></span>
+      </div>
+      <div class="filter-field">
+        <label for="scopeFilter">范围</label>
+        <select id="scopeFilter" aria-label="按范围筛选卡片">
+          <option value="全部">全部范围</option>
+          <option value="当前已输入">当前已输入</option>
+          <option value="范围内未学">范围内未学</option>
+          <option value="数学一专有/待确认">边界提醒</option>
+        </select>
+        <span class="select-caret" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></span>
+      </div>
+      <div class="filter-field">
+        <label for="statusFilter">状态</label>
+        <select id="statusFilter" aria-label="按复习标记筛选卡片">
+          <option value="全部">全部状态</option>
+          <option value="未标记">未标记</option>
+          <option value="已会">已会</option>
+          <option value="待复习">待复习</option>
+        </select>
+        <span class="select-caret" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></span>
+      </div>
+      <button class="button" id="randomButton" type="button" title="随机抽取当前筛选中的卡片">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3h5v5"></path><path d="m4 20 6-6"></path><path d="m21 16-5 5"></path><path d="m15 15 6 6"></path><path d="M4 4l5 5"></path><path d="M21 3v5h-5"></path></svg>
         <span>随机</span>
       </button>
-      <button class="button ghost" id="resetButton" type="button">
+      <button class="button ghost" id="resetButton" type="button" title="清除本机浏览器中的闪卡标记">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path></svg>
-        <span>清零进度</span>
+        <span>清零</span>
       </button>
     </section>
 
     <section class="workspace" aria-label="闪卡工作区">
       <div class="flashcard-wrap">
-        <article class="flashcard" id="flashcard" tabindex="0" role="button" aria-label="点击翻卡，或按空格显示答案">
+        <article class="flashcard" id="flashcard" tabindex="0" role="button" aria-label="当前遮挡答案。点击或按空格显示答案。">
           <div class="card-inner">
             <section class="card-face card-front" aria-label="题面">
               <div class="card-topline">
                 <span class="category-name" id="frontCategory"></span>
                 <span class="scope-badge" id="frontScope"></span>
               </div>
-              <div class="card-content">
+              <div class="card-content" id="frontContent">
                 <div class="prompt-label">提示</div>
                 <h2 class="card-title" id="frontTitle"></h2>
                 <p class="card-hint" id="frontHint"></p>
-                <div class="reveal-cue">
-                  <span>点击翻面</span><span class="keycap">Space</span>
-                </div>
+                <div class="reveal-cue"><span>点击翻面</span><span class="keycap">Space</span></div>
               </div>
+              <div class="empty-state" id="frontEmpty"><div><strong>当前筛选没有卡片</strong><span>请调整科目、模块、范围或状态。</span></div></div>
               <div class="card-footer">
                 <span class="card-number" id="frontNumber"></span>
                 <span class="card-state" id="frontState"></span>
               </div>
             </section>
-
             <section class="card-face card-back" aria-label="答案">
               <div class="card-topline">
                 <span class="category-name" id="backCategory"></span>
                 <span class="scope-badge" id="backScope"></span>
               </div>
-              <div class="card-content answer-body">
+              <div class="card-content answer-body" id="backContent">
                 <div class="answer-label">答案</div>
                 <h2 class="answer-title" id="backTitle"></h2>
-                <div class="formula-block math" id="formulaBlock"></div>
+                <div class="formula-block" id="formulaBlock"></div>
                 <div class="answer-notes">
-                  <div class="note-block">
-                    <strong>适用条件</strong>
-                    <p id="conditionText"></p>
-                  </div>
-                  <div class="note-block">
-                    <strong>极短辨析</strong>
-                    <p id="distinctionText"></p>
-                  </div>
+                  <div class="note-block"><strong>适用条件</strong><p id="conditionText"></p></div>
+                  <div class="note-block"><strong>极短辨析</strong><p id="distinctionText"></p></div>
                 </div>
                 <details class="source-details">
                   <summary>来源与范围</summary>
                   <p id="sourceText"></p>
                 </details>
               </div>
+              <div class="empty-state" id="backEmpty"><div><strong>当前筛选没有卡片</strong><span>请调整筛选条件。</span></div></div>
               <div class="card-footer">
                 <span class="card-number" id="backNumber"></span>
                 <span class="card-state" id="backState"></span>
@@ -774,63 +731,46 @@
             </section>
           </div>
         </article>
-
         <nav class="deck-controls" aria-label="卡片导航">
-          <button class="button" id="previousButton" type="button">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
-            上一张
-          </button>
-          <button class="button primary" id="flipButton" type="button">
-            翻卡
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h12a4 4 0 1 1 0 8H8"></path><path d="m8 19-4-4 4-4"></path></svg>
-          </button>
-          <button class="button" id="nextButton" type="button">
-            下一张
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
-          </button>
+          <button class="button" id="previousButton" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>上一张</button>
+          <button class="button primary" id="flipButton" type="button">翻卡<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h12a4 4 0 1 1 0 8H8"></path><path d="m8 19-4-4 4-4"></path></svg></button>
+          <button class="button" id="nextButton" type="button">下一张<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button>
         </nav>
       </div>
 
-      <aside class="sidepanel" aria-label="进度与快捷操作">
+      <aside class="sidepanel" aria-label="复习进度与快捷操作">
         <section class="panel">
-          <h2>当前分类进度</h2>
+          <h2>当前筛选进度</h2>
           <p class="panel-copy" id="deckProgressCopy"></p>
-          <div class="progress-row">
-            <span class="progress-count" id="knownProgress">0 / 0</span>
-            <span class="progress-label">已会</span>
-          </div>
-          <div class="progress-track" aria-label="已会进度">
-            <div class="progress-fill" id="progressFill"></div>
-          </div>
+          <div class="progress-row"><span class="progress-count" id="knownProgress">0 / 0</span><span class="progress-label">已会</span></div>
+          <div class="progress-track" role="progressbar" aria-label="已会标记进度" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0"><div class="progress-fill" id="progressFill"></div></div>
           <div class="state-list">
             <div class="state-row"><span><i class="state-dot known"></i>已会</span><strong id="knownCount">0</strong></div>
             <div class="state-row"><span><i class="state-dot review"></i>待复习</span><strong id="reviewCount">0</strong></div>
             <div class="state-row"><span><i class="state-dot unmarked"></i>未标记</span><strong id="unmarkedCount">0</strong></div>
           </div>
         </section>
-
         <section class="panel">
           <h2>标记当前卡</h2>
-          <p class="panel-copy">“已会”与“待复习”互斥，更新后立即写入本机浏览器。</p>
+          <p class="panel-copy">标记只保存在当前浏览器，用于筛选复习，不代表掌握或间隔保持。</p>
           <div class="mark-actions">
             <button class="button known" id="knownButton" type="button">已会 <kbd>K</kbd></button>
             <button class="button review" id="reviewButton" type="button">待复习 <kbd>R</kbd></button>
           </div>
         </section>
-
         <section class="panel">
           <h2>快捷键与范围</h2>
           <ul class="shortcut-list" aria-label="快捷键说明">
             <li><span>显示或遮挡答案</span><kbd>Space</kbd></li>
             <li><span>上一张 / 下一张</span><kbd>← / →</kbd></li>
             <li><span>随机抽取</span><kbd>S</kbd></li>
-            <li><span>标为已会 / 待复习</span><kbd>K / R</kbd></li>
+            <li><span>标记状态</span><kbd>K / R</kbd></li>
           </ul>
-          <hr style="margin:18px 0;border:0;border-top:1px solid var(--line)">
+          <hr style="margin:16px 0;border:0;border-top:1px solid var(--line)">
           <ul class="scope-legend" aria-label="范围说明">
-            <li class="legend-row"><span class="legend-chip scope-core">数学二核心</span><span>按当前状态为已完成教材输入的内容；不表示掌握。</span></li>
-            <li class="legend-row"><span class="legend-chip scope-pending">范围内未学</span><span>数学二可用，但第 9 讲尚未作为当前已学内容。</span></li>
-            <li class="legend-row"><span class="legend-chip scope-boundary">数学一专有/待确认</span><span>只用于边界提醒，不进入当前核心。</span></li>
+            <li class="legend-row"><span class="legend-chip scope-core">当前已输入</span><span>已核验完成教材输入的高数第 1–8 讲内容；不表示掌握。</span></li>
+            <li class="legend-row"><span class="legend-chip scope-pending">范围内未学</span><span>数学二可用，但尚未作为当前已学内容。</span></li>
+            <li class="legend-row"><span class="legend-chip scope-boundary">边界提醒</span><span>仅用于提醒数学一专有或待官方确认内容。</span></li>
           </ul>
         </section>
       </aside>
@@ -838,446 +778,25 @@
     <div class="live-region" id="liveRegion" aria-live="polite"></div>
   </main>
 
+  <script src="katex-0.18.4.min.js"></script>
+  <script src="math2-flashcards-data.js"></script>
   <script>
     "use strict";
 
-    const cards = [
-      {
-        id: "formula-power",
-        category: "基础公式",
-        scope: "数学二范围内但当前尚未学到",
-        title: "幂函数与对数型",
-        hint: "补全不定积分：∫x<sup>α</sup> dx；当 α = −1 时又该怎样写？",
-        answer: "∫x<sup>α</sup> dx = x<sup>α+1</sup> / (α+1) + C，α ≠ −1<br>∫ dx / x = ln|x| + C",
-        condition: "α 为常数；第二式的定义域要避开 x = 0。",
-        distinction: "α = −1 是分母为 0 的例外，不能代回幂函数公式。",
-        source: "《基础 30 讲·高等数学》第 9 讲，实体 231 页 / PDF 236 页。"
-      },
-      {
-        id: "formula-exp",
-        category: "基础公式",
-        scope: "数学二范围内但当前尚未学到",
-        title: "指数函数",
-        hint: "分别写出 ∫e<sup>ax</sup> dx 与 ∫a<sup>x</sup> dx。",
-        answer: "∫e<sup>ax</sup> dx = e<sup>ax</sup> / a + C，a ≠ 0<br>∫a<sup>x</sup> dx = a<sup>x</sup> / ln a + C",
-        condition: "第二式要求 a &gt; 0 且 a ≠ 1。",
-        distinction: "e<sup>ax</sup> 的分母是 a；a<sup>x</sup> 的分母是 ln a。",
-        source: "《基础 30 讲·高等数学》第 9 讲，实体 231 页 / PDF 236 页。"
-      },
-      {
-        id: "formula-sin-cos",
-        category: "基础公式",
-        scope: "数学二范围内但当前尚未学到",
-        title: "正弦与余弦",
-        hint: "不定积分中，谁导出谁？",
-        answer: "∫sin x dx = −cos x + C<br>∫cos x dx = sin x + C",
-        condition: "在所讨论区间内连续即可。",
-        distinction: "对答案再求导：−cos x 的导数才是 sin x。",
-        source: "《基础 30 讲·高等数学》第 9 讲，实体 231 页 / PDF 236 页。"
-      },
-      {
-        id: "formula-tan-cot",
-        category: "基础公式",
-        scope: "数学二范围内但当前尚未学到",
-        title: "正切与余切",
-        hint: "写出 ∫tan x dx 与 ∫cot x dx，并保留绝对值。",
-        answer: "∫tan x dx = −ln|cos x| + C<br>∫cot x dx = ln|sin x| + C",
-        condition: "分别在 cos x ≠ 0、sin x ≠ 0 的区间内成立。",
-        distinction: "log 内要取绝对值；tan 的原函数前面带负号。",
-        source: "《基础 30 讲·高等数学》第 9 讲，实体 231 页 / PDF 236 页。"
-      },
-      {
-        id: "formula-sec-csc",
-        category: "基础公式",
-        scope: "数学二范围内但当前尚未学到",
-        title: "正割与余割",
-        hint: "写出 ∫sec x dx 与 ∫csc x dx。",
-        answer: "∫sec x dx = ln|sec x + tan x| + C<br>∫csc x dx = ln|csc x − cot x| + C",
-        condition: "在相应三角函数有定义的连续区间内使用。",
-        distinction: "两式都不能省略绝对值；第二式是 csc x − cot x。",
-        source: "《基础 30 讲·高等数学》第 9 讲，实体 231 页 / PDF 236 页。"
-      },
-      {
-        id: "formula-arctan-arcsin",
-        category: "基础公式",
-        scope: "数学二范围内但当前尚未学到",
-        title: "反三角型标准积分",
-        hint: "看到 x<sup>2</sup> + a<sup>2</sup> 或 √(a<sup>2</sup> − x<sup>2</sup>)，分别联想什么？",
-        answer: "∫ dx / (x<sup>2</sup> + a<sup>2</sup>) = (1/a) arctan(x/a) + C<br>∫ dx / √(a<sup>2</sup> − x<sup>2</sup>) = arcsin(x/a) + C",
-        condition: "a &gt; 0；根式的被开方数必须有意义。",
-        distinction: "前者对应 arctan，后者对应 arcsin；别把分母结构混用。",
-        source: "《基础 30 讲·高等数学》第 9 讲，实体 231–232 页 / PDF 236–237 页。"
-      },
-      {
-        id: "formula-quadratic",
-        category: "基础公式",
-        scope: "数学二范围内但当前尚未学到",
-        title: "平方差分母",
-        hint: "分别写出分母 x<sup>2</sup> − a<sup>2</sup> 与 a<sup>2</sup> − x<sup>2</sup> 的结果。",
-        answer: "∫ dx / (x<sup>2</sup> − a<sup>2</sup>) = (1 / 2a) ln|(x − a)/(x + a)| + C<br>∫ dx / (a<sup>2</sup> − x<sup>2</sup>) = (1 / 2a) ln|(a + x)/(a − x)| + C",
-        condition: "a &gt; 0，且积分区间不能穿过使分母为 0 的点。",
-        distinction: "分母整体变号，结果的对数比也随之改变；先做因式分解核对。",
-        source: "《基础 30 讲·高等数学》第 9 讲，实体 231–232 页 / PDF 236–237 页。"
-      },
-      {
-        id: "formula-root",
-        category: "基础公式",
-        scope: "数学二范围内但当前尚未学到",
-        title: "根式分母",
-        hint: "写出 ∫ dx / √(x<sup>2</sup> + a<sup>2</sup>)。",
-        answer: "∫ dx / √(x<sup>2</sup> + a<sup>2</sup>) = ln|x + √(x<sup>2</sup> + a<sup>2</sup>)| + C",
-        condition: "a 为常数且 a ≠ 0；表达式应在实数定义域内讨论。",
-        distinction: "根式里是“加 a<sup>2</sup>”时，答案是对数型，不是 arcsin 型。",
-        source: "《基础 30 讲·高等数学》第 9 讲，实体 232 页 / PDF 237 页。"
-      },
-      {
-        id: "formula-trig-square",
-        category: "基础公式",
-        scope: "数学二范围内但当前尚未学到",
-        title: "三角平方降幂",
-        hint: "先把 sin<sup>2</sup>x、cos<sup>2</sup>x 写成二倍角，再积分。",
-        answer: "∫sin<sup>2</sup>x dx = x/2 − sin 2x/4 + C<br>∫cos<sup>2</sup>x dx = x/2 + sin 2x/4 + C",
-        condition: "先用 sin<sup>2</sup>x = (1 − cos 2x)/2，cos<sup>2</sup>x = (1 + cos 2x)/2。",
-        distinction: "直接把 ∫sin<sup>2</sup>x 写成 −cos<sup>2</sup>x 是错误的。",
-        source: "《基础 30 讲·高等数学》第 9 讲，实体 232 页 / PDF 237 页。"
-      },
-      {
-        id: "formula-tan-square",
-        category: "基础公式",
-        scope: "数学二范围内但当前尚未学到",
-        title: "tan<sup>2</sup>x 与 cot<sup>2</sup>x",
-        hint: "把平方改写为 sec<sup>2</sup>x − 1 或 csc<sup>2</sup>x − 1。",
-        answer: "∫tan<sup>2</sup>x dx = tan x − x + C<br>∫cot<sup>2</sup>x dx = −cot x − x + C",
-        condition: "在相应函数连续的区间内积分。",
-        distinction: "tan<sup>2</sup>x = sec<sup>2</sup>x − 1；cot<sup>2</sup>x = csc<sup>2</sup>x − 1。",
-        source: "《基础 30 讲·高等数学》第 9 讲，实体 232 页 / PDF 237 页。"
-      },
-      {
-        id: "formula-exp-trig",
-        category: "基础公式",
-        scope: "数学二范围内但当前尚未学到",
-        title: "e<sup>ax</sup> 与三角函数的乘积",
-        hint: "两次分部后回到原积分时，两个常用闭式是什么？",
-        answer: "∫e<sup>ax</sup>sin bx dx = e<sup>ax</sup>(a sin bx − b cos bx)/(a<sup>2</sup> + b<sup>2</sup>) + C<br>∫e<sup>ax</sup>cos bx dx = e<sup>ax</sup>(a cos bx + b sin bx)/(a<sup>2</sup> + b<sup>2</sup>) + C",
-        condition: "a、b 为常数，a<sup>2</sup> + b<sup>2</sup> ≠ 0。",
-        distinction: "两个分子中，sin 型配“a sin − b cos”，cos 型配“a cos + b sin”。",
-        source: "《基础 30 讲·高等数学》第 9 讲，实体 233 页 / PDF 238 页。"
-      },
-      {
-        id: "method-substitution-trigger",
-        category: "方法触发",
-        scope: "数学二范围内但当前尚未学到",
-        title: "换元法的触发信号",
-        hint: "看见“复合结构 + 内层导数（差一个常数）”时，应该怎样换元？",
-        answer: "若被积式可整理为 f(g(x))·g′(x) dx，令 u = g(x)，则 ∫f(g(x))g′(x) dx = ∫f(u) du。",
-        condition: "换元后要同步替换所有 x 与 dx；在所用区间内变换需合法。",
-        distinction: "只出现 g(x) 不等于能换元；还要有可配出的 g′(x)dx。",
-        source: "《基础 30 讲·高等数学》第 9 讲，实体 234 页 / PDF 239 页。"
-      },
-      {
-        id: "method-substitution-bounds",
-        category: "方法触发",
-        scope: "数学二范围内但当前尚未学到",
-        title: "定积分换元：边界一起换",
-        hint: "令 u = φ(x) 后，定积分的上下限应如何变化？",
-        answer: "∫<sub>a</sub><sup>b</sup> f(φ(x))φ′(x) dx = ∫<sub>φ(a)</sub><sup>φ(b)</sup> f(u) du",
-        condition: "φ 在积分区间上可导，代换后的积分有意义。",
-        distinction: "若已经把上下限换成 u 的边界，最后不再把 u 换回 x。",
-        source: "《基础 30 讲·高等数学》第 9 讲，实体 234 页 / PDF 239 页。"
-      },
-      {
-        id: "method-parts",
-        category: "方法触发",
-        scope: "数学二范围内但当前尚未学到",
-        title: "分部积分",
-        hint: "乘积型被积式何时优先选 u、dv？",
-        answer: "∫u dv = uv − ∫v du",
-        condition: "u、v 可导，相关积分存在。常让求导后更简单的一项作 u，让易积分的一项作 dv。",
-        distinction: "公式中的负号不能丢；多项式、ln x、反三角函数常优先作 u。",
-        source: "《基础 30 讲·高等数学》第 9 讲，实体 236 页 / PDF 241 页。"
-      },
-      {
-        id: "definite-orientation",
-        category: "定积分",
-        scope: "数学二核心",
-        title: "交换上下限",
-        hint: "∫<sub>a</sub><sup>a</sup> f(x)dx 与 ∫<sub>b</sub><sup>a</sup> f(x)dx 分别是什么？",
-        answer: "∫<sub>a</sub><sup>a</sup> f(x)dx = 0<br>∫<sub>b</sub><sup>a</sup> f(x)dx = −∫<sub>a</sub><sup>b</sup> f(x)dx",
-        condition: "f 在相关区间可积。",
-        distinction: "定积分带方向；交换上下限必然变号。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 207 页 / PDF 212 页。"
-      },
-      {
-        id: "definite-additivity",
-        category: "定积分",
-        scope: "数学二核心",
-        title: "区间可加性",
-        hint: "c 在 a 与 b 之间时，如何拆 ∫<sub>a</sub><sup>b</sup> f(x)dx？",
-        answer: "∫<sub>a</sub><sup>b</sup> f(x)dx = ∫<sub>a</sub><sup>c</sup> f(x)dx + ∫<sub>c</sub><sup>b</sup> f(x)dx",
-        condition: "f 在涉及的各段均可积。",
-        distinction: "拆点 c 只是边界，不改变积分方向。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 207 页 / PDF 212 页。"
-      },
-      {
-        id: "definite-linearity",
-        category: "定积分",
-        scope: "数学二核心",
-        title: "线性性质",
-        hint: "常数 α、β 与可积函数 f、g 的定积分怎样展开？",
-        answer: "∫<sub>a</sub><sup>b</sup>[αf(x) + βg(x)]dx = α∫<sub>a</sub><sup>b</sup>f(x)dx + β∫<sub>a</sub><sup>b</sup>g(x)dx",
-        condition: "f、g 在 [a,b] 上可积，α、β 为常数。",
-        distinction: "只有加法与常数倍可直接拆；乘积没有同样规则。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 207 页 / PDF 212 页。"
-      },
-      {
-        id: "definite-comparison",
-        category: "定积分",
-        scope: "数学二核心",
-        title: "保序性与非负性",
-        hint: "若 f(x) ≤ g(x)，定积分之间如何比较？",
-        answer: "若 f(x) ≤ g(x)，则 ∫<sub>a</sub><sup>b</sup>f(x)dx ≤ ∫<sub>a</sub><sup>b</sup>g(x)dx<br>特别地，f(x) ≥ 0 时，∫<sub>a</sub><sup>b</sup>f(x)dx ≥ 0",
-        condition: "f、g 在 [a,b] 上可积。",
-        distinction: "点态不等式才可直接推出积分不等式；反向不能从积分大小推出点态大小。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 207–208 页 / PDF 212–213 页。"
-      },
-      {
-        id: "definite-bounds-mean",
-        category: "定积分",
-        scope: "数学二核心",
-        title: "估值与积分中值定理",
-        hint: "m ≤ f(x) ≤ M 时如何估定积分？连续时又有哪些 ξ？",
-        answer: "m(b − a) ≤ ∫<sub>a</sub><sup>b</sup>f(x)dx ≤ M(b − a)<br>f 连续时，∃ξ∈[a,b]：∫<sub>a</sub><sup>b</sup>f(x)dx = f(ξ)(b − a)",
-        condition: "a &lt; b，且 m、M 为 f 在 [a,b] 上的界；中值结论要求 f 连续。",
-        distinction: "中值定理给的是“存在 ξ”，不能自行指定 ξ 为端点或中点。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 208、212 页 / PDF 213、217 页。"
-      },
-      {
-        id: "definite-newton-leibniz",
-        category: "定积分",
-        scope: "数学二核心",
-        title: "牛顿—莱布尼茨公式",
-        hint: "若 F′(x) = f(x)，怎样计算 ∫<sub>a</sub><sup>b</sup> f(x)dx？",
-        answer: "∫<sub>a</sub><sup>b</sup>f(x)dx = F(b) − F(a)",
-        condition: "F 是 f 的一个原函数；在常见考研使用中按 f 在 [a,b] 连续处理。",
-        distinction: "先找原函数再代“上限减下限”，不是将 f 直接代上下限。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 212 页 / PDF 217 页。"
-      },
-      {
-        id: "definite-absolute",
-        category: "定积分",
-        scope: "数学二核心",
-        title: "绝对值与几何面积",
-        hint: "f 变号时，定积分、面积和绝对值积分的关系是什么？",
-        answer: "|∫<sub>a</sub><sup>b</sup>f(x)dx| ≤ ∫<sub>a</sub><sup>b</sup>|f(x)|dx<br>曲边图形面积用 ∫<sub>a</sub><sup>b</sup>|f(x)|dx",
-        condition: "f 在 [a,b] 上可积。",
-        distinction: "∫f 是有向面积；只有 f 不变号时才等于几何面积。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 210 页 / PDF 215 页。"
-      },
-      {
-        id: "upper-definition",
-        category: "变上限积分",
-        scope: "数学二核心",
-        title: "变上限积分的定义",
-        hint: "F(x) = ∫<sub>a</sub><sup>x</sup>f(t)dt 的“变量”在哪里？",
-        answer: "F(x) = ∫<sub>a</sub><sup>x</sup>f(t)dt<br>其中 t 是积分变量，x 是上限变量。",
-        condition: "f 在从 a 到 x 的相关区间上可积。",
-        distinction: "积分结束后 t 已是哑变量；不要把 t 与 x 混为同一个角色。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 209 页 / PDF 214 页。"
-      },
-      {
-        id: "upper-continuity",
-        category: "变上限积分",
-        scope: "数学二核心",
-        title: "变上限积分的连续性",
-        hint: "f 可积时，F(x) = ∫<sub>a</sub><sup>x</sup>f(t)dt 有什么连续性？",
-        answer: "f 在区间上可积 ⇒ F(x) = ∫<sub>a</sub><sup>x</sup>f(t)dt 在该区间上连续",
-        condition: "按当前区间的定积分存在条件使用。",
-        distinction: "连续的 F 不自动推出 f 处处连续；导数结论另有条件。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 209 页 / PDF 214 页。"
-      },
-      {
-        id: "upper-derivative",
-        category: "变上限积分",
-        scope: "数学二核心",
-        title: "上限为 x 时的求导",
-        hint: "F(x) = ∫<sub>a</sub><sup>x</sup>f(t)dt，何时可写 F′(x) = f(x)？",
-        answer: "F′(x) = f(x)",
-        condition: "f 在 x 处连续；若 f 在整个区间连续，则 F 在整个区间可导。",
-        distinction: "先检查连续性；不能把积分号去掉后忽略上限的变化。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 209–210 页 / PDF 214–215 页。"
-      },
-      {
-        id: "upper-chain",
-        category: "变上限积分",
-        scope: "数学二核心",
-        title: "上限复合函数",
-        hint: "上限由 x 变成 φ(x)，导数多出的因子是什么？",
-        answer: "d/dx [∫<sub>a</sub><sup>φ(x)</sup>f(t)dt] = f(φ(x))·φ′(x)",
-        condition: "f 在 φ(x) 处连续，φ 可导。",
-        distinction: "上限不是 x 时必须链式求导，不能只写 f(φ(x))。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 210 页 / PDF 215 页。"
-      },
-      {
-        id: "upper-two-bounds",
-        category: "变上限积分",
-        scope: "数学二核心",
-        title: "上下限都在变",
-        hint: "如何求 d/dx ∫<sub>ψ(x)</sub><sup>φ(x)</sup> f(t)dt？",
-        answer: "d/dx [∫<sub>ψ(x)</sub><sup>φ(x)</sup>f(t)dt] = f(φ(x))φ′(x) − f(ψ(x))ψ′(x)",
-        condition: "f 在相应点连续，φ、ψ 可导。",
-        distinction: "下限项前是减号，来自交换上下限的方向。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 210 页 / PDF 215 页。"
-      },
-      {
-        id: "upper-parity",
-        category: "变上限积分",
-        scope: "数学二核心",
-        title: "从 0 积到 x 的奇偶性",
-        hint: "H(x) = ∫<sub>0</sub><sup>x</sup>h(t)dt。h 是奇函数或偶函数时，H 分别是什么？",
-        answer: "h 为奇函数 ⇒ H 为偶函数<br>h 为偶函数 ⇒ H 为奇函数",
-        condition: "定义域关于原点对称，且相关定积分存在。",
-        distinction: "不能把被积函数 h 的奇偶性直接照搬给 H；两者恰好互换。",
-        source: "由第 8 讲变上限积分求导性质与换元得到；项目数学答疑规则对此作了同题要求。"
-      },
-      {
-        id: "improper-infinite",
-        category: "反常积分",
-        scope: "数学二核心",
-        title: "无穷区间：定义先取极限",
-        hint: "∫<sub>a</sub><sup>∞</sup>f(x)dx 到底表示什么？",
-        answer: "∫<sub>a</sub><sup>∞</sup>f(x)dx = lim<sub>b→∞</sub>∫<sub>a</sub><sup>b</sup>f(x)dx<br>极限存在且有限，才称收敛。",
-        condition: "先把无穷上限截断为有限 b，再取 b → ∞ 的极限。",
-        distinction: "∞ 不是普通上限数值；不能直接套牛顿—莱布尼茨而跳过极限。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 218 页 / PDF 223 页。"
-      },
-      {
-        id: "improper-whole-line",
-        category: "反常积分",
-        scope: "数学二核心",
-        title: "全实轴积分必须两边各收敛",
-        hint: "∫<sub>−∞</sub><sup>∞</sup>f(x)dx 如何定义？",
-        answer: "∫<sub>−∞</sub><sup>∞</sup>f(x)dx = ∫<sub>−∞</sub><sup>c</sup>f(x)dx + ∫<sub>c</sub><sup>∞</sup>f(x)dx<br>右侧两个积分都收敛才收敛。",
-        condition: "c 为任一有限拆点；两段分别按反常积分定义判断。",
-        distinction: "正负两端的发散不能相互抵消；柯西主值不是这里的收敛定义。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 218 页 / PDF 223 页。"
-      },
-      {
-        id: "improper-singularity",
-        category: "反常积分",
-        scope: "数学二核心",
-        title: "端点或内部瑕点",
-        hint: "f 在端点无界，或在 c∈(a,b) 无界时怎样定义？",
-        answer: "a 为瑕点：∫<sub>a</sub><sup>b</sup>f = lim<sub>t→a+</sub>∫<sub>t</sub><sup>b</sup>f<br>b 为瑕点：∫<sub>a</sub><sup>b</sup>f = lim<sub>t→b−</sub>∫<sub>a</sub><sup>t</sup>f<br>内部瑕点 c：∫<sub>a</sub><sup>c</sup>f + ∫<sub>c</sub><sup>b</sup>f，两个单侧都收敛。",
-        condition: "每个无界端或内部瑕点都要单独取单侧极限。",
-        distinction: "跨过瑕点“一笔带过”没有定义；必须拆区间。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 219 页 / PDF 224 页。"
-      },
-      {
-        id: "improper-direct-comparison",
-        category: "反常积分",
-        scope: "数学二核心",
-        title: "正项比较判别法",
-        hint: "若 0 ≤ f(x) ≤ g(x)，哪些方向能推出收敛或发散？",
-        answer: "g 的反常积分收敛 ⇒ f 的反常积分收敛<br>f 的反常积分发散 ⇒ g 的反常积分发散",
-        condition: "在靠近无穷端或瑕点的某邻域内，f、g 非负且满足比较关系。",
-        distinction: "两个逆向推理都不成立；先记“收敛找大、发散找小”。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 220 页 / PDF 225 页。"
-      },
-      {
-        id: "improper-limit-comparison",
-        category: "反常积分",
-        scope: "数学二核心",
-        title: "极限比较判别法",
-        hint: "正项 f、g 的比值极限为 A 时，何时同敛散？",
-        answer: "lim f(x)/g(x) = A，0 &lt; A &lt; ∞ ⇒ f 与 g 的反常积分同敛散<br>lim f/g = 0 且 ∫g 收敛 ⇒ ∫f 收敛",
-        condition: "f、g 在所考察端点附近为正，并在该邻域内满足相应条件。",
-        distinction: "A = 0 或 ∞ 时不直接套“同敛散”，应使用单向比较结论。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 220 页 / PDF 225 页。"
-      },
-      {
-        id: "improper-p-infinity",
-        category: "反常积分",
-        scope: "数学二核心",
-        title: "p 型：无穷远处",
-        hint: "∫<sub>1</sub><sup>∞</sup> dx / x<sup>p</sup> 什么时候收敛？",
-        answer: "∫<sub>1</sub><sup>∞</sup> dx / x<sup>p</sup><br>p &gt; 1：收敛；p ≤ 1：发散",
-        condition: "p 为实常数，积分下限可换为任意正数。",
-        distinction: "无穷远处要“p 大于 1”才收敛。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 221 页 / PDF 226 页。"
-      },
-      {
-        id: "improper-p-zero",
-        category: "反常积分",
-        scope: "数学二核心",
-        title: "p 型：0 附近",
-        hint: "∫<sub>0</sub><sup>1</sup> dx / x<sup>p</sup> 什么时候收敛？",
-        answer: "∫<sub>0</sub><sup>1</sup> dx / x<sup>p</sup><br>p &lt; 1：收敛；p ≥ 1：发散",
-        condition: "p 为实常数；x = 0 是瑕点，定义需先取单侧极限。",
-        distinction: "与无穷远处的 p 型结论方向相反。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 221 页 / PDF 226 页。"
-      },
-      {
-        id: "improper-log-power",
-        category: "反常积分",
-        scope: "数学二核心",
-        title: "对数幂的比较结论",
-        hint: "x → ∞ 时，ln x 与任意正幂 x<sup>α</sup> 谁长得更快？",
-        answer: "ln x = o(x<sup>α</sup>)，α &gt; 0，x → ∞<br>因此可用幂函数作为反常积分的比较基准。",
-        condition: "α &gt; 0，考察 x → ∞。",
-        distinction: "这是无穷远处的增长比较，不能误当作 x → 0 的等价无穷小。",
-        source: "《基础 30 讲·高等数学》第 8 讲，实体 224 页 / PDF 229 页。"
-      },
-      {
-        id: "equiv-definition",
-        category: "等价无穷小",
-        scope: "数学二核心",
-        title: "等价无穷小的定义",
-        hint: "α(x) 与 β(x) 在 x → x<sub>0</sub> 时何时等价？",
-        answer: "α(x) ∼ β(x) ⇔ lim<sub>x→x<sub>0</sub></sub> α(x) / β(x) = 1",
-        condition: "α、β 在去心邻域内有意义，且作为无穷小时进行比较。",
-        distinction: "等价不等于相等；它说明的是趋于 0 的主导速度相同。",
-        source: "《基础 30 讲·高等数学》第 1 讲，实体 43 页 / PDF 48 页。"
-      },
-      {
-        id: "equiv-list",
-        category: "等价无穷小",
-        scope: "数学二核心",
-        title: "x → 0 的常用等价式",
-        hint: "列出第一批最常用的等价无穷小。",
-        answer: "sin x ∼ tan x ∼ arcsin x ∼ arctan x ∼ ln(1+x) ∼ e<sup>x</sup> − 1 ∼ x<br>1 − cos x ∼ x<sup>2</sup>/2；(1+x)<sup>α</sup> − 1 ∼ αx",
-        condition: "均在 x → 0 时使用；ln(1+x) 还需在定义域内，(1+x)<sup>α</sup>−1∼αx 取 α≠0。",
-        distinction: "代换必须指明趋近点；离开 x → 0，以上链条通常失效。",
-        source: "《基础 30 讲·高等数学》第 1 讲，实体 44 页 / PDF 49 页。"
-      },
-      {
-        id: "equiv-no-addition",
-        category: "等价无穷小",
-        scope: "数学二核心",
-        title: "等价代换不能直接进加减法",
-        hint: "为什么不能把 x − sin x 直接写成 x − x？",
-        answer: "等价无穷小可在乘除、幂指数等适用结构中替换；加减法可能发生主项抵消。<br>x − sin x 需保留高阶项，而不能直接替换为 0。",
-        condition: "先判断是否存在相减抵消；若有，改用恒等变形或泰勒展开。",
-        distinction: "“∼”不是“=”；加减法直接替换会丢掉决定极限的最低非零项。",
-        source: "《基础 30 讲·高等数学》第 1 讲，实体 43–44 页 / PDF 48–49 页。"
-      },
-      {
-        id: "boundary-p-series",
-        category: "范围边界",
-        scope: "数学一专有/待确认",
-        title: "p 型积分与 p 级数不要混",
-        hint: "∫<sub>1</sub><sup>∞</sup>x<sup>−p</sup>dx 与 Σ1/n<sup>p</sup> 的边界分别是什么？",
-        answer: "反常积分 ∫<sub>1</sub><sup>∞</sup>x<sup>−p</sup>dx：当前数学二核心。<br>正项 p 级数 Σ1/n<sup>p</sup>：无穷级数内容，数学一专有/待 2027 官方确认。",
-        condition: "先看符号：∫ 是积分；Σ 是级数。",
-        distinction: "两者都以 p = 1 为临界，但当前学习边界不同，不能把级数内容混入数学二核心。",
-        source: "数学材料索引的当前范围声明；《基础 30 讲》第 16 讲“无穷级数”标注仅数学一、数学三。"
-      }
-    ];
-
-    const storageKey = "math2-integral-flashcards-v1";
-    const flashcard = document.getElementById("flashcard");
-    const categoryFilter = document.getElementById("categoryFilter");
-    const liveRegion = document.getElementById("liveRegion");
+    const cards = Array.isArray(window.MATH2_FLASHCARDS) ? window.MATH2_FLASHCARDS : [];
+    const storageKey = "math2-integral-flashcards-v2";
+    const legacyStorageKey = "math2-integral-flashcards-v1";
     const refs = {
+      flashcard: document.getElementById("flashcard"),
+      subjectFilter: document.getElementById("subjectFilter"),
+      unitFilter: document.getElementById("unitFilter"),
+      scopeFilter: document.getElementById("scopeFilter"),
+      statusFilter: document.getElementById("statusFilter"),
+      liveRegion: document.getElementById("liveRegion"),
+      frontContent: document.getElementById("frontContent"),
+      frontEmpty: document.getElementById("frontEmpty"),
+      backContent: document.getElementById("backContent"),
+      backEmpty: document.getElementById("backEmpty"),
       frontCategory: document.getElementById("frontCategory"),
       frontScope: document.getElementById("frontScope"),
       frontTitle: document.getElementById("frontTitle"),
@@ -1295,10 +814,18 @@
       backState: document.getElementById("backState"),
       knownProgress: document.getElementById("knownProgress"),
       deckProgressCopy: document.getElementById("deckProgressCopy"),
+      progressTrack: document.querySelector(".progress-track"),
       progressFill: document.getElementById("progressFill"),
       knownCount: document.getElementById("knownCount"),
       reviewCount: document.getElementById("reviewCount"),
-      unmarkedCount: document.getElementById("unmarkedCount")
+      unmarkedCount: document.getElementById("unmarkedCount"),
+      previousButton: document.getElementById("previousButton"),
+      nextButton: document.getElementById("nextButton"),
+      flipButton: document.getElementById("flipButton"),
+      randomButton: document.getElementById("randomButton"),
+      resetButton: document.getElementById("resetButton"),
+      knownButton: document.getElementById("knownButton"),
+      reviewButton: document.getElementById("reviewButton")
     };
 
     let progress = { known: [], review: [] };
@@ -1307,39 +834,32 @@
     let pointerStartX = null;
     let didSwipe = false;
 
+    function isCardId(id) {
+      return cards.some(function (card) { return card.id === id; });
+    }
+
     function readProgress() {
       try {
-        const saved = JSON.parse(localStorage.getItem(storageKey));
+        let raw = localStorage.getItem(storageKey);
+        if (!raw) raw = localStorage.getItem(legacyStorageKey);
+        const saved = JSON.parse(raw);
         if (saved && Array.isArray(saved.known) && Array.isArray(saved.review)) {
           progress = {
-            known: Array.from(new Set(saved.known.filter(isKnownCard))),
-            review: Array.from(new Set(saved.review.filter(isKnownCard)))
+            known: Array.from(new Set(saved.known.filter(isCardId))),
+            review: Array.from(new Set(saved.review.filter(isCardId)))
           };
-          progress.review = progress.review.filter(function (id) {
-            return !progress.known.includes(id);
-          });
+          progress.review = progress.review.filter(function (id) { return !progress.known.includes(id); });
         }
       } catch (error) {
         progress = { known: [], review: [] };
       }
     }
 
-    function isKnownCard(id) {
-      return cards.some(function (card) { return card.id === id; });
-    }
-
     function saveProgress() {
-      localStorage.setItem(storageKey, JSON.stringify(progress));
+      try { localStorage.setItem(storageKey, JSON.stringify(progress)); } catch (error) {}
     }
 
-    function getDeck() {
-      const category = categoryFilter.value;
-      return cards.filter(function (card) {
-        return category === "全部" || card.category === category;
-      });
-    }
-
-    function getCardState(id) {
+    function getState(id) {
       if (progress.known.includes(id)) return "known";
       if (progress.review.includes(id)) return "review";
       return "unmarked";
@@ -1352,84 +872,162 @@
     }
 
     function scopeClass(scope) {
-      if (scope === "数学二核心") return "scope-core";
-      if (scope === "数学二范围内但当前尚未学到") return "scope-pending";
+      if (scope === "当前已输入") return "scope-core";
+      if (scope === "范围内未学") return "scope-pending";
       return "scope-boundary";
     }
 
-    function normalizeIndex() {
-      const deck = getDeck();
-      if (!deck.length) {
-        index = 0;
-        return;
-      }
+    function renderInlineText(target, value) {
+      target.replaceChildren();
+      const parts = String(value).split(/(\$[^$]+\$)/g);
+      parts.forEach(function (part) {
+        if (part.startsWith("$") && part.endsWith("$")) {
+          const holder = document.createElement("span");
+          holder.className = "inline-math";
+          try {
+            katex.render(part.slice(1, -1), holder, { output: "mathml", throwOnError: false, strict: "ignore" });
+          } catch (error) {
+            holder.textContent = part;
+          }
+          target.appendChild(holder);
+        } else {
+          target.appendChild(document.createTextNode(part));
+        }
+      });
+    }
+
+    function renderFormula(target, formulas) {
+      target.replaceChildren();
+      formulas.forEach(function (formula) {
+        const line = document.createElement("div");
+        line.className = "formula-line";
+        try {
+          katex.render(formula, line, { displayMode: true, output: "mathml", throwOnError: false, strict: "ignore" });
+        } catch (error) {
+          line.textContent = formula;
+        }
+        target.appendChild(line);
+      });
+    }
+
+    function updateOptions() {
+      const subject = refs.subjectFilter.value;
+      const currentUnit = refs.unitFilter.value;
+      const units = Array.from(new Set(cards
+        .filter(function (card) { return subject === "全部" || card.subject === subject; })
+        .map(function (card) { return card.unit; })));
+      refs.unitFilter.replaceChildren();
+      const allOption = document.createElement("option");
+      allOption.value = "全部";
+      allOption.textContent = "全部模块";
+      refs.unitFilter.appendChild(allOption);
+      units.forEach(function (unit) {
+        const option = document.createElement("option");
+        option.value = unit;
+        option.textContent = unit;
+        refs.unitFilter.appendChild(option);
+      });
+      refs.unitFilter.value = units.includes(currentUnit) ? currentUnit : "全部";
+    }
+
+    function getDeck() {
+      const subject = refs.subjectFilter.value;
+      const unit = refs.unitFilter.value;
+      const scope = refs.scopeFilter.value;
+      const status = refs.statusFilter.value;
+      return cards.filter(function (card) {
+        const matchesSubject = subject === "全部" || card.subject === subject;
+        const matchesUnit = unit === "全部" || card.unit === unit;
+        const matchesScope = scope === "全部" || card.scope === scope;
+        const matchesStatus = status === "全部" || stateText(getState(card.id)) === status;
+        return matchesSubject && matchesUnit && matchesScope && matchesStatus;
+      });
+    }
+
+    function normalizeIndex(deck) {
+      if (!deck.length) { index = 0; return; }
       index = ((index % deck.length) + deck.length) % deck.length;
     }
 
-    function setScopeBadge(element, scope) {
-      element.className = "scope-badge " + scopeClass(scope);
-      element.textContent = scope;
+    function setScope(target, scope) {
+      target.className = "scope-badge " + scopeClass(scope);
+      target.textContent = scope;
     }
 
-    function updateStateLabel(element, state) {
-      element.className = "card-state " + (state === "unmarked" ? "" : state);
-      element.textContent = stateText(state);
+    function setState(target, state) {
+      target.className = "card-state " + (state === "unmarked" ? "" : state);
+      target.textContent = stateText(state);
     }
 
-    function renderCard() {
-      const deck = getDeck();
-      normalizeIndex();
-      const card = deck[index];
-      if (!card) return;
-      const state = getCardState(card.id);
-      const position = String(index + 1) + " / " + String(deck.length);
-
-      refs.frontCategory.textContent = card.category;
-      setScopeBadge(refs.frontScope, card.scope);
-      refs.frontTitle.innerHTML = card.title;
-      refs.frontHint.innerHTML = card.hint;
-      refs.frontNumber.textContent = position;
-      updateStateLabel(refs.frontState, state);
-
-      refs.backCategory.textContent = card.category;
-      setScopeBadge(refs.backScope, card.scope);
-      refs.backTitle.innerHTML = card.title;
-      refs.formulaBlock.innerHTML = card.answer;
-      refs.conditionText.innerHTML = card.condition;
-      refs.distinctionText.innerHTML = card.distinction;
-      refs.sourceText.textContent = card.source;
-      refs.backNumber.textContent = position;
-      updateStateLabel(refs.backState, state);
-
-      flashcard.classList.toggle("is-revealed", revealed);
-      flashcard.setAttribute("aria-label", revealed ? "当前显示答案。点击或按空格遮挡答案。" : "当前遮挡答案。点击或按空格显示答案。");
-      renderProgress();
+    function setEmpty(isEmpty) {
+      refs.frontContent.style.display = isEmpty ? "none" : "";
+      refs.backContent.style.display = isEmpty ? "none" : "";
+      refs.frontEmpty.style.display = isEmpty ? "flex" : "none";
+      refs.backEmpty.style.display = isEmpty ? "flex" : "none";
+      refs.previousButton.disabled = isEmpty;
+      refs.nextButton.disabled = isEmpty;
+      refs.flipButton.disabled = isEmpty;
+      refs.randomButton.disabled = isEmpty;
+      refs.knownButton.disabled = isEmpty;
+      refs.reviewButton.disabled = isEmpty;
     }
 
-    function renderProgress() {
-      const deck = getDeck();
+    function renderProgress(deck) {
       const known = deck.filter(function (card) { return progress.known.includes(card.id); }).length;
       const review = deck.filter(function (card) { return progress.review.includes(card.id); }).length;
       const unmarked = deck.length - known - review;
       const percent = deck.length ? (known / deck.length) * 100 : 0;
       refs.knownProgress.textContent = String(known) + " / " + String(deck.length);
-      refs.deckProgressCopy.textContent = categoryFilter.value === "全部"
-        ? "全套卡片的已会标记。"
-        : "当前筛选分类的已会标记。";
-      refs.progressFill.style.width = String(percent) + "%";
+      refs.deckProgressCopy.textContent = refs.statusFilter.value === "全部"
+        ? "当前筛选范围内的本机标记。"
+        : "当前筛选范围内的“" + refs.statusFilter.value + "”卡片。";
+      refs.progressFill.style.transform = "scaleX(" + String(percent / 100) + ")";
+      refs.progressTrack.setAttribute("aria-valuemax", String(deck.length));
+      refs.progressTrack.setAttribute("aria-valuenow", String(known));
       refs.knownCount.textContent = String(known);
       refs.reviewCount.textContent = String(review);
       refs.unmarkedCount.textContent = String(unmarked);
     }
 
+    function renderCard() {
+      const deck = getDeck();
+      normalizeIndex(deck);
+      setEmpty(!deck.length);
+      renderProgress(deck);
+      if (!deck.length) {
+        refs.flashcard.classList.remove("is-revealed");
+        refs.flashcard.setAttribute("aria-label", "当前筛选没有卡片。");
+        return;
+      }
+      const card = deck[index];
+      const state = getState(card.id);
+      const position = String(index + 1) + " / " + String(deck.length);
+      refs.frontCategory.textContent = card.subject + " · " + card.unit;
+      setScope(refs.frontScope, card.scope);
+      refs.frontTitle.textContent = card.title;
+      renderInlineText(refs.frontHint, card.prompt);
+      refs.frontNumber.textContent = position;
+      setState(refs.frontState, state);
+      refs.backCategory.textContent = card.subject + " · " + card.unit;
+      setScope(refs.backScope, card.scope);
+      refs.backTitle.textContent = card.title;
+      renderFormula(refs.formulaBlock, card.formulas);
+      renderInlineText(refs.conditionText, card.condition);
+      renderInlineText(refs.distinctionText, card.distinction);
+      refs.sourceText.textContent = card.source;
+      refs.backNumber.textContent = position;
+      setState(refs.backState, state);
+      refs.flashcard.classList.toggle("is-revealed", revealed);
+      refs.flashcard.setAttribute("aria-label", revealed ? "当前显示答案。点击或按空格遮挡答案。" : "当前遮挡答案。点击或按空格显示答案。");
+    }
+
     function announce(message) {
-      liveRegion.textContent = "";
-      window.setTimeout(function () {
-        liveRegion.textContent = message;
-      }, 10);
+      refs.liveRegion.textContent = "";
+      window.setTimeout(function () { refs.liveRegion.textContent = message; }, 10);
     }
 
     function flipCard() {
+      if (!getDeck().length) return;
       revealed = !revealed;
       renderCard();
       announce(revealed ? "已显示答案。" : "已遮挡答案。");
@@ -1439,7 +1037,7 @@
       const deck = getDeck();
       if (!deck.length) return;
       index += delta;
-      normalizeIndex();
+      normalizeIndex(deck);
       revealed = false;
       renderCard();
       announce("已切换到第 " + String(index + 1) + " 张。");
@@ -1447,14 +1045,10 @@
 
     function chooseRandom() {
       const deck = getDeck();
-      if (deck.length < 2) {
-        announce("当前筛选只有一张卡。");
-        return;
-      }
+      if (!deck.length) return;
+      if (deck.length < 2) { announce("当前筛选只有一张卡。"); return; }
       let nextIndex = index;
-      while (nextIndex === index) {
-        nextIndex = Math.floor(Math.random() * deck.length);
-      }
+      while (nextIndex === index) nextIndex = Math.floor(Math.random() * deck.length);
       index = nextIndex;
       revealed = false;
       renderCard();
@@ -1477,63 +1071,63 @@
     function resetProgress() {
       if (!window.confirm("清空本浏览器中这套闪卡的已会与待复习标记？")) return;
       progress = { known: [], review: [] };
-      localStorage.removeItem(storageKey);
+      try {
+        localStorage.removeItem(storageKey);
+        localStorage.removeItem(legacyStorageKey);
+      } catch (error) {}
       renderCard();
-      announce("本浏览器的闪卡进度已清零。");
+      announce("本浏览器的闪卡标记已清零。");
     }
 
-    document.getElementById("flipButton").addEventListener("click", flipCard);
-    document.getElementById("previousButton").addEventListener("click", function () { move(-1); });
-    document.getElementById("nextButton").addEventListener("click", function () { move(1); });
-    document.getElementById("randomButton").addEventListener("click", chooseRandom);
-    document.getElementById("knownButton").addEventListener("click", function () { markCurrent("known"); });
-    document.getElementById("reviewButton").addEventListener("click", function () { markCurrent("review"); });
-    document.getElementById("resetButton").addEventListener("click", resetProgress);
-
-    categoryFilter.addEventListener("change", function () {
+    refs.subjectFilter.addEventListener("change", function () {
+      updateOptions();
       index = 0;
       revealed = false;
       renderCard();
-      announce("已切换分类：" + categoryFilter.options[categoryFilter.selectedIndex].text + "。");
+      announce("已切换科目：" + refs.subjectFilter.options[refs.subjectFilter.selectedIndex].text + "。");
     });
-
-    flashcard.addEventListener("click", function () {
-      if (didSwipe) {
-        didSwipe = false;
-        return;
-      }
+    [refs.unitFilter, refs.scopeFilter, refs.statusFilter].forEach(function (select) {
+      select.addEventListener("change", function () {
+        index = 0;
+        revealed = false;
+        renderCard();
+        announce("筛选已更新。");
+      });
+    });
+    refs.flipButton.addEventListener("click", flipCard);
+    refs.previousButton.addEventListener("click", function () { move(-1); });
+    refs.nextButton.addEventListener("click", function () { move(1); });
+    refs.randomButton.addEventListener("click", chooseRandom);
+    refs.knownButton.addEventListener("click", function () { markCurrent("known"); });
+    refs.reviewButton.addEventListener("click", function () { markCurrent("review"); });
+    refs.resetButton.addEventListener("click", resetProgress);
+    refs.flashcard.addEventListener("click", function () {
+      if (didSwipe) { didSwipe = false; return; }
       flipCard();
     });
-    flashcard.addEventListener("keydown", function (event) {
-      if (event.key === "Enter") {
+    refs.flashcard.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
         flipCard();
       }
     });
-
-    flashcard.addEventListener("pointerdown", function (event) {
+    refs.flashcard.addEventListener("pointerdown", function (event) {
       pointerStartX = event.clientX;
       didSwipe = false;
     });
-
-    flashcard.addEventListener("pointerup", function (event) {
+    refs.flashcard.addEventListener("pointerup", function (event) {
       if (pointerStartX === null) return;
       const delta = event.clientX - pointerStartX;
       pointerStartX = null;
       if (Math.abs(delta) < 46) return;
       didSwipe = true;
-      if (delta > 0) move(-1);
-      if (delta < 0) move(1);
+      move(delta > 0 ? -1 : 1);
     });
-
-    flashcard.addEventListener("pointercancel", function () {
-      pointerStartX = null;
-    });
-
+    refs.flashcard.addEventListener("pointercancel", function () { pointerStartX = null; });
     document.addEventListener("keydown", function (event) {
-      const tagName = document.activeElement && document.activeElement.tagName;
-      const nativeActivation = event.key === " " || event.code === "Space" || event.key === "Enter";
-      if (tagName === "SELECT" || tagName === "SUMMARY" || (tagName === "BUTTON" && nativeActivation)) return;
+      const active = document.activeElement;
+      const tagName = active && active.tagName;
+      if (tagName === "SELECT" || tagName === "SUMMARY" || tagName === "INPUT" || (tagName === "BUTTON" && (event.key === " " || event.key === "Enter"))) return;
       if (event.key === " " || event.code === "Space") {
         event.preventDefault();
         flipCard();
@@ -1551,19 +1145,16 @@
         markCurrent("review");
       }
     });
-
     window.addEventListener("storage", function (event) {
-      if (event.key === storageKey) {
+      if (event.key === storageKey || event.key === legacyStorageKey) {
         readProgress();
         renderCard();
       }
     });
-
-    document.querySelector(".source-details").addEventListener("click", function (event) {
-      event.stopPropagation();
-    });
+    document.querySelector(".source-details").addEventListener("click", function (event) { event.stopPropagation(); });
 
     readProgress();
+    updateOptions();
     renderCard();
   </script>
 </body>
