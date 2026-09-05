@@ -1,0 +1,410 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --paper: oklch(0.975 0.006 85);
+  --card: oklch(0.995 0.002 85);
+  --card2: oklch(0.955 0.008 85);
+  --ink: oklch(0.22 0.02 260);
+  --ink-soft: oklch(0.36 0.02 260);
+  --muted: oklch(0.52 0.02 260);
+  --line: oklch(0.9 0.008 85);
+  --line-strong: oklch(0.82 0.01 85);
+  --accent: oklch(0.55 0.19 265);
+  --accent-ink: oklch(0.42 0.17 265);
+  --accent-soft: oklch(0.94 0.04 265);
+  --gold: oklch(0.6 0.14 70);
+  --gold-soft: oklch(0.95 0.05 85);
+  --good: oklch(0.6 0.15 160);
+  --good-soft: oklch(0.95 0.04 160);
+  --bad: oklch(0.58 0.2 25);
+  --bad-soft: oklch(0.95 0.035 25);
+  --ch: oklch(0.55 0.16 230);
+  --ch-soft: oklch(0.94 0.04 230);
+  --font-scale: 1;
+  --math-scale: 1;
+  --shadow-card: 0 1px 2px oklch(0 0 0 / 0.04), 0 8px 24px -12px oklch(0.3 0.03 260 / 0.18);
+  --shadow-pop: 0 12px 40px -10px oklch(0.25 0.03 260 / 0.35);
+  color-scheme: light;
+}
+
+.dark {
+  --paper: oklch(0.17 0.01 260);
+  --card: oklch(0.22 0.012 260);
+  --card2: oklch(0.26 0.012 260);
+  --ink: oklch(0.94 0.008 85);
+  --ink-soft: oklch(0.82 0.01 85);
+  --muted: oklch(0.66 0.015 260);
+  --line: oklch(0.3 0.012 260);
+  --line-strong: oklch(0.38 0.014 260);
+  --accent: oklch(0.74 0.14 265);
+  --accent-ink: oklch(0.82 0.11 265);
+  --accent-soft: oklch(0.3 0.06 265);
+  --gold: oklch(0.8 0.13 80);
+  --gold-soft: oklch(0.32 0.06 80);
+  --good: oklch(0.76 0.14 160);
+  --good-soft: oklch(0.3 0.05 160);
+  --bad: oklch(0.72 0.17 25);
+  --bad-soft: oklch(0.32 0.06 25);
+  --shadow-card: 0 1px 2px oklch(0 0 0 / 0.3), 0 8px 24px -12px oklch(0 0 0 / 0.5);
+  --shadow-pop: 0 12px 40px -10px oklch(0 0 0 / 0.7);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-card2: var(--card2);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-good: var(--good);
+  --color-good-soft: var(--good-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-ch: var(--ch);
+  --color-ch-soft: var(--ch-soft);
+  --shadow-card: var(--shadow-card);
+  --shadow-pop: var(--shadow-pop);
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius-xl2: 1.25rem;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  touch-action: manipulation;
+}
+
+body {
+  @apply bg-paper text-ink antialiased;
+  font-size: calc(16px * var(--font-scale));
+  font-feature-settings: "cv11", "ss01", "tnum";
+  overscroll-behavior-y: none;
+  min-height: 100dvh;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+.safe-b {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.safe-t {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---------- 公式 ---------- */
+.mathtext {
+  overflow-wrap: anywhere;
+}
+.mathtext .katex {
+  font-size: calc(1.08em * var(--math-scale));
+}
+.math-inline {
+  white-space: nowrap;
+}
+.math-inline .katex {
+  white-space: normal;
+}
+.math-display {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 0.35rem 0;
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.75rem;
+  text-align: left;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  background: color-mix(in oklab, var(--card2) 60%, transparent);
+  transition: background 160ms ease;
+  cursor: zoom-in;
+}
+.math-display:hover,
+.math-display:focus-visible {
+  background: var(--card2);
+}
+.math-display .katex-display {
+  margin: 0;
+  text-align: left;
+  width: max-content;
+  min-width: 100%;
+}
+.math-display .katex-display > .katex {
+  text-align: left;
+  white-space: nowrap;
+}
+.math-display .katex {
+  font-size: calc(1.15em * var(--math-scale));
+}
+.katex .kcloze {
+  color: var(--gold);
+}
+.katex .kanswer {
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+.zoom-view .katex {
+  font-size: clamp(1.5rem, 5vw, 2.6rem);
+}
+.zoom-view .katex-display {
+  margin: 0;
+  width: max-content;
+  min-width: 100%;
+  text-align: left;
+}
+
+/* ---------- 挖空 ---------- */
+.cloze-blank {
+  display: inline-block;
+  border-bottom: 2px dashed var(--gold);
+  color: var(--gold);
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.2;
+  margin: 0 0.15em;
+  padding: 0 0.25em;
+  border-radius: 0.2em;
+  background: color-mix(in oklab, var(--gold-soft) 60%, transparent);
+  vertical-align: baseline;
+}
+.cloze-answer {
+  color: var(--accent-ink);
+  font-weight: 600;
+  border-bottom: 2px solid var(--accent);
+  padding: 0 0.1em;
+  border-radius: 0.15em;
+  animation: cloze-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* ---------- 步骤编号 ---------- */
+.step-line {
+  position: relative;
+  padding-left: 2em;
+  margin: 0.35em 0;
+}
+.step-line::before {
+  content: attr(data-step);
+  position: absolute;
+  left: 0;
+  top: 0.15em;
+  width: 1.45em;
+  height: 1.45em;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 0.8em;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+
+/* ---------- 动效 ---------- */
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes cloze-in {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+    background: var(--accent-soft);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes pop {
+  0% {
+    transform: scale(0.9);
+  }
+  60% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes sheet-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.anim-card {
+  animation: card-in 380ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.anim-rise {
+  animation: rise-in 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.anim-pop {
+  animation: pop 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.anim-sheet {
+  animation: sheet-up 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.anim-fade {
+  animation: fade 220ms ease both;
+}
+.delay-1 {
+  animation-delay: 60ms;
+}
+.delay-2 {
+  animation-delay: 120ms;
+}
+.delay-3 {
+  animation-delay: 180ms;
+}
+.delay-4 {
+  animation-delay: 240ms;
+}
+
+.no-motion .anim-card,
+.no-motion .anim-rise,
+.no-motion .anim-pop,
+.no-motion .anim-sheet,
+.no-motion .anim-fade,
+.no-motion .cloze-answer {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .anim-card,
+  .anim-rise,
+  .anim-pop,
+  .anim-sheet,
+  .anim-fade,
+  .cloze-answer {
+    animation: none !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ---------- 控件 ---------- */
+.pressable {
+  transition:
+    transform 140ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease;
+}
+.pressable:active {
+  transform: scale(0.97);
+}
+.no-motion .pressable:active {
+  transform: none;
+}
+
+:focus-visible {
+  outline: 3px solid color-mix(in oklab, var(--accent) 55%, transparent);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line-strong);
+  width: 100%;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--card);
+  border: 2px solid var(--accent);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--card);
+  border: 2px solid var(--accent);
+  cursor: pointer;
+}
+
+.heat-cell {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 3px;
+  background: var(--line);
+}
+.heat-1 {
+  background: color-mix(in oklab, var(--accent) 30%, var(--card2));
+}
+.heat-2 {
+  background: color-mix(in oklab, var(--accent) 55%, var(--card2));
+}
+.heat-3 {
+  background: color-mix(in oklab, var(--accent) 78%, var(--card2));
+}
+.heat-4 {
+  background: var(--accent);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.bg-grid {
+  background-image:
+    radial-gradient(color-mix(in oklab, var(--ink) 7%, transparent) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
