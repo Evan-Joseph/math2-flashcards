@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
-  <title id="title">数学二识记</title>
-  <rect width="512" height="512" rx="112" fill="#e9f0f5"/>
-  <rect x="52" y="52" width="408" height="408" rx="84" fill="#17395d"/>
-  <path d="M151 160h210" fill="none" stroke="#e4f4ee" stroke-linecap="round" stroke-width="18"/>
-  <text x="256" y="358" fill="#fff" font-family="STIX Two Math, Cambria Math, Times New Roman, serif" font-size="244" font-weight="600" text-anchor="middle">∫</text>
-</svg>

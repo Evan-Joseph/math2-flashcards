@@ -1,61 +1,29 @@
-# 交互可视化
+# 数学二识记平台
 
-## 数学二离线识记闪卡
+数学二高等数学与线性代数的本地优先识记应用，面向主动回忆、间隔复习与移动端刷卡。
 
-- 文件：[积分与反常积分识记闪卡.html](积分与反常积分识记闪卡.html)
-- 数据：[math2-flashcards-data.js](math2-flashcards-data.js)
-- 数学渲染：[katex-0.18.4.min.js](katex-0.18.4.min.js)
-- 直接打开 HTML 即可使用；不依赖 CDN、网络字体或构建步骤。
+## 代码与知识库
 
-### 手机与网页部署
+- 应用入口：`index.html`
+- 页面与交互：`src/`
+- 数学知识库：`src/data/`
+- LaTeX / Markdown 渲染：`src/lib/math.tsx`
+- 本地状态与复习排程：`src/lib/store.ts`、`src/lib/session.ts`
 
-- 手机端默认先显示当前卡；筛选按需展开，横屏同样优先保留卡片。
-- 答案里的显示公式可在 90%–140% 之间调整字号，偏好只保存在当前浏览器。公式过长时只在公式行内横向滑动，不会制造整页横向滚动；触控可直接左右滑动，键盘聚焦公式行后可用左右方向键。
-- 从 HTTPS 页面打开后可“添加到主屏幕”；首次加载完成后，页面与公式资源可离线打开。
-- Pages 产物通过 `node build-flashcards-site.mjs` 写入忽略目录 `.flashcards-site/`；发布命令为 `wrangler pages deploy .flashcards-site --project-name math2-flashcards`。
-- 网页端的“顺畅／再练”仅保存在该浏览器和该站点域名的 localStorage 中，不上传答卷、材料或学习记录。
+公式通过 KaTeX 在构建时打包，不依赖 CDN。卡片支持行内与块级 LaTeX、表格、列表、粗体和挖空。
 
-### 当前覆盖
+## 本地运行与发布
 
-当前共 172 张卡片：
+```bash
+cd 02_交互可视化
+npm ci
+npm run dev
+npm run build
+wrangler pages deploy dist --project-name math2-flashcards
+```
 
-- 高等数学 134 张：函数与极限、数列极限、导数与微分、导数应用、中值定理与泰勒、积分计算、定积分与变上限、反常积分、积分应用、积分等式与不等式、积分物理应用、多元函数微分、二重积分、微分方程。
-- 线性代数 38 张：行列式、矩阵、向量组、线性方程组、特征值与相似、二次型。
-- 范围状态：已学 68 张；后续 104 张。
+Cloudflare Pages 生产地址：<https://math2-flashcards.pages.dev/>
 
-“已学”只表示已核验到当前教材停点，不表示作答正确、订正完成或长期掌握。“后续”卡片保留在同一套闪卡中，便于按讲次筛选。
+## 维护
 
-### 公式与 Markdown 数学语法
-
-- 数据文件保留 LaTeX 源文本，不把公式预先转成图片或手工排版。
-- 卡片正文支持 $...$、\(...\) 行内数学语法；$$...$$ 可用于块级数学语法。
-- 答案公式使用结构化 TeX 数组，由本地 KaTeX 0.18.4 渲染为 MathML，浏览器可直接阅读和辅助技术可读取。
-- KaTeX 不可用时保留原始 TeX 文本作为降级显示，不伪装成已渲染结果。
-
-### 本地来源与范围
-
-- 《张宇 2027 基础 30 讲·高等数学分册》各讲页码见[高数页码索引](../01_教材与讲义/02_页码索引/zy-30-gaoshu-2027_章节页码映射.md)。本轮新增并定位了第 11 讲实体页 282–293 / PDF 页 287–298，以及第 12 讲实体页 294–303 / PDF 页 299–308。
-- 当前教材输入停点为高数第 8 讲；第 9–15 讲和线性代数卡片均可按“后续”筛选。
-- 数学二边界按[材料索引](../02_材料索引.md)和[中国教育考试网考试大纲入口](https://yankao.neea.edu.cn/xhtml1/category/1509/6235-1.htm)维护。2027 正式目录与细目发布前，相关范围均保留“暂按数学二，待官方确认”。
-- 无穷级数及其他数学一特有章节没有混入当前卡组；概率论也未纳入本数学二闪卡。
-
-### 交互与数据边界
-
-- 页面已移除双面 3D 翻卡。题面是唯一常驻内容面；答案区初始为 `hidden + inert`，查看答案后在同一阅读流中展开，因此没有正反面重叠渲染的路径。
-- 默认随机模式，“换一张”、右方向键和左滑都会随机选择另一张且不立即重复；切换为顺序模式后，前后导航恢复按卡组顺序运行。只有答案已展开，才可用 `G` 标记“顺畅”或用 `R` 标记“再练”。
-- 本机标记仅用于筛选与导航，不是间隔复习计划，也不生成正确率、掌握结论或复习日志。
-- 标记只写入当前浏览器的 localStorage，不写入 study-ledger，不替代原题作答、官方解析核对、订正或间隔复习证据。
-- 页面不读取教材图片；知识定位以本地可检索教材文本、MinerU 解析和持久页码索引为导航与交叉核验依据。
-
-### GitHub 二次开发基线与开源参考
-
-- 当前静态页面以 [manderwall/aplusstudyapp](https://github.com/manderwall/aplusstudyapp/tree/9b4c9ec8c9512e4bf0fec2d1f47ef2f7b3af479b) 的单一卡片内容树、条件揭示答案、键盘与本地优先交互作为二次开发基线。该项目采用 [MIT License](https://github.com/manderwall/aplusstudyapp/blob/9b4c9ec8c9512e4bf0fec2d1f47ef2f7b3af479b/LICENSE)（Copyright 2026 Amanda Kondrat'yev）。
-- 本页面没有引入其题库、FSRS 排程、同步、加密或 PWA 模块；数学数据、范围状态与本地 KaTeX 继续由本仓库维护。
-- 下列项目仅提供离线优先、LaTeX/KaTeX、键盘操作和主动提取的补充参考，不作为数学事实来源：
-
-- [zsh-eng/spaced2](https://github.com/zsh-eng/spaced2)：local-first 闪卡和离线体验。
-- [davisilva169/quanta-flashcards](https://github.com/davisilva169/quanta-flashcards)：Markdown、LaTeX 与本地数据边界。
-- [alexthillen/better-markdown-anki](https://github.com/alexthillen/better-markdown-anki)：Markdown/KaTeX 和可访问交互提示。
-- [open-spaced-repetition/ts-fsrs](https://github.com/open-spaced-repetition/ts-fsrs)：正式 FSRS 需要根据真实作答后写入评分与复习日志；当前页面只保留会话内导航，未实现或宣称实现 FSRS。
-
-闪卡用于主动回忆：先闭卷写出公式、条件和辨析，再展开答案核对。它不改变本科目的学习状态、题目批阅和结构化学习记录。
+新 Agent 先阅读 `src/data/`、`src/lib/` 和本文件，再根据最新数学二官方大纲、教材与权威解析核验知识变更。GitHub、经验贴和其他开源项目只用于产品、交互和工程方案参考。
