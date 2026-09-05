@@ -9,6 +9,9 @@
 04_学习记录/**/mineru/
 tmp/
 test-results/
+/.next/
+next-env.d.ts
+tsconfig.tsbuildinfo
 /.wrangler/
 02_交互可视化/.flashcards-site/
 02_交互可视化/node_modules/

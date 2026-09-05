@@ -33,6 +33,7 @@ export const l1 = defineChapter('l1', [
   {
     sec: '矩阵行列式', k: 'qa', s: 3,
     q: '与矩阵运算相关的 7 个行列式公式',
+    cond: r`$A,B$ 均为 $n$ 阶方阵；$|A^{-1}|=1/|A|$ 要求 $A$ 可逆；$|A^*|=|A|^{n-1}$ 对任意 $n\ge2$ 的方阵成立（含 $|A|=0$）；$|A|=\prod\lambda_i$ 中 $\lambda_i$ 计重数、含复特征值。`,
     a: r`$$|kA|=k^n|A|,\quad|AB|=|A||B|,\quad|A^T|=|A|,\quad|A^{-1}|=\frac1{|A|}$$
 $$|A^*|=|A|^{n-1},\quad|A^k|=|A|^k,\quad|A|=\prod_{i=1}^n\lambda_i$$
 $|E_m+AB|=|E_n+BA|$（$A$ 为 $m\times n$，$B$ 为 $n\times m$）`,
@@ -92,20 +93,24 @@ export const l2 = defineChapter('l2', [
   },
   {
     sec: '逆矩阵', k: 'cloze', s: 3,
+    cond: r`$A,B$ 为同阶**可逆**方阵，$k\ne0$。`,
     q: r`$(AB)^{-1}=⟦B^{-1}A^{-1}⟧$，$(A^T)^{-1}=⟦(A^{-1})^T⟧$，$(kA)^{-1}=⟦\frac1kA^{-1}⟧$，$|A^{-1}|=⟦|A|^{-1}⟧$；而 $(A+B)^{-1}$ ⟦一般 $\ne A^{-1}+B^{-1}$⟧`,
   },
   {
     sec: '伴随矩阵', k: 'cloze', s: 3,
+    cond: r`$AA^*=A^*A=|A|E$ 对任意 $n$ 阶方阵成立；后三式要求 $A$ **可逆**（$|A|\ne0$）。`,
     q: r`$AA^*=A^*A=⟦|A|E⟧$；$A^{-1}=⟦\dfrac{A^*}{|A|}⟧$；$A^*=⟦|A|A^{-1}⟧$；$(A^*)^{-1}=(A^{-1})^*=⟦\dfrac{A}{|A|}⟧$`,
     hook: r`一切伴随矩阵的问题都回到 $AA^*=|A|E$ 这一个式子。`,
   },
   {
     sec: '伴随矩阵', k: 'cloze', s: 3,
+    cond: r`$A,B$ 为 $n$ 阶方阵且 $n\ge2$（$n=1$ 时约定 $A^*=(1)$，各式不适用）；不要求可逆。`,
     q: r`$|A^*|=⟦|A|^{n-1}⟧$，$(A^*)^*=⟦|A|^{n-2}A⟧$，$(kA)^*=⟦k^{n-1}A^*⟧$，$(AB)^*=⟦B^*A^*⟧$，$(A^T)^*=⟦(A^*)^T⟧$`,
     trap: r`二阶矩阵伴随：**主对角互换，副对角变号**。$(A^*)^*$ 对 $n=2$ 时就是 $A$ 本身。`,
   },
   {
     sec: '伴随矩阵', k: 'cloze', s: 3,
+    cond: r`$A$ 为 $n$ 阶方阵，$n\ge2$。`,
     q: r`$r(A^*)=\begin{cases}⟦n⟧,&r(A)=n\\ ⟦1⟧,&r(A)=n-1\\ ⟦0⟧,&r(A)<n-1\end{cases}$`,
     hook: r`$r(A)=n-1$ 时 $AA^*=O$，故 $A^*$ 的列都是 $Ax=0$ 的解，$r(A^*)\le1$；又存在非零 $n-1$ 阶子式，故 $=1$。`,
   },
@@ -423,6 +428,7 @@ export const l5 = defineChapter('l5', [
   },
   {
     sec: '性质', k: 'qa', s: 3,
+    cond: r`$\alpha\ne\mathbf 0$；$A^{-1}$ 行要求 $A$ 可逆（$\lambda\ne0$）；$A^*$ 行的 $|A|/\lambda$ 形式要求 $\lambda\ne0$，若 $A$ 不可逆需回到 $A^*\alpha=\frac{|A|}{\lambda}\alpha$ 的推导另行讨论。`,
     q: r`设 $A\alpha=\lambda\alpha$，写出 $kA,\ A^k,\ f(A),\ A^{-1},\ A^*,\ A^T,\ P^{-1}AP$ 的特征值与特征向量`,
     a: r`| 矩阵 | 特征值 | 特征向量 |
 |---|---|---|

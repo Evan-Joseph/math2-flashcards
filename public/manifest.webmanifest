@@ -1,11 +1,13 @@
 {
-  "name": "数学二识记 · FSRS 间隔复习",
-  "short_name": "数学二识记",
-  "description": "考研数学二公式、定理与易错点的主动回忆闪卡",
+  "name": "考研数学识记 · 数学一 / 数学二",
+  "short_name": "数学识记",
+  "description": "考研数学公式、定理与易错点的主动回忆与间隔复习，离线可用",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#f8f7f4",
-  "theme_color": "#f8f7f4",
+  "orientation": "any",
+  "background_color": "#f8f7f3",
+  "theme_color": "#f8f7f3",
   "lang": "zh-CN",
   "icons": [
     { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },

@@ -1,0 +1,20 @@
+{
+  "schema_version": 2,
+  "source_id": "zy-30-xiandai-2027",
+  "title": "张宇 2027 考研数学基础 30 讲·线性代数分册",
+  "pdf_file": "【数学一】基础30讲线性代数分册_张宇_2027_ISBN待确认.pdf",
+  "pdf_pages": 210,
+  "sha256": "5c8ff7c4b1e9d0cf028df0ef89988061d5635def48771030a49c97c7f6c8bb69",
+  "bookmark_count": 0,
+  "locator_granularity": "讲次级",
+  "page_model": {"toc_pdf_page":4,"body_rule":"pdf_page = print_page + 4","verification":"高清主文件目录页与全部七个讲次首页定点渲染核验","confidence":"high"},
+  "entries": [
+    {"level":"lecture","title":"第0讲 零基础","pdf_page":5,"pdf_page_end":14,"print_page":1,"verified":true},
+    {"level":"lecture","title":"第1讲 行列式","pdf_page":15,"pdf_page_end":48,"print_page":11,"verified":true},
+    {"level":"lecture","title":"第2讲 矩阵","pdf_page":49,"pdf_page_end":85,"print_page":45,"verified":true},
+    {"level":"lecture","title":"第3讲 向量组","pdf_page":86,"pdf_page_end":117,"print_page":82,"verified":true},
+    {"level":"lecture","title":"第4讲 线性方程组","pdf_page":118,"pdf_page_end":142,"print_page":114,"verified":true},
+    {"level":"lecture","title":"第5讲 相似理论","pdf_page":143,"pdf_page_end":181,"print_page":139,"verified":true},
+    {"level":"lecture","title":"第6讲 二次型","pdf_page":182,"pdf_page_end":210,"print_page":178,"verified":true}
+  ]
+}

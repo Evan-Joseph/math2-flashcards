@@ -1,34 +1,32 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
-import 'katex/dist/katex.min.css';
 import './globals.css';
 import { Shell } from '@/components/Shell';
 
 export const metadata: Metadata = {
-  title: { default: '数学二识记 · FSRS 间隔复习', template: '%s · 数学二识记' },
-  description: '考研数学二公式、定理与易错点的主动回忆闪卡，基于 FSRS 间隔复习算法，手机端优先。',
-  applicationName: '数学二识记',
+  title: { default: '考研数学识记', template: '%s · 考研数学识记' },
+  description: '数学一 / 数学二公式、定理与易错点的主动回忆与间隔复习',
   manifest: '/manifest.webmanifest',
-  appleWebApp: { capable: true, title: '数学二识记', statusBarStyle: 'default' },
   icons: { icon: '/icon.svg', apple: '/apple-icon.png' },
+  appleWebApp: { capable: true, title: '数学识记', statusBarStyle: 'default' },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#f8f7f4',
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
+  themeColor: '#f8f7f3',
 };
 
-const themeScript = `(function(){try{var s=JSON.parse(localStorage.getItem('math2-fsrs-v2')||localStorage.getItem('math2-memo-v1')||'{}');var t=s&&s.settings&&s.settings.theme||'auto';var d=t==='dark'||(t==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');if(s&&s.settings){if(s.settings.fontScale)document.documentElement.style.setProperty('--font-scale',s.settings.fontScale);if(s.settings.mathScale)document.documentElement.style.setProperty('--math-scale',s.settings.mathScale);}}catch(e){}})();`;
+const boot = `(function(){try{var s=JSON.parse(localStorage.getItem('kaoyan-math-v3')||'{}').settings||{};var t=s.theme||'auto';var d=t==='dark'||(t==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');if(s.fontScale)document.documentElement.style.setProperty('--font-scale',s.fontScale);if(s.mathScale)document.documentElement.style.setProperty('--math-scale',s.mathScale);}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: boot }} />
       </head>
-      <body className="font-sans">
+      <body>
         <Shell>{children}</Shell>
       </body>
     </html>

@@ -1,27 +1,27 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
-import { fsrs, createEmptyCard, generatorParameters, State, type Card, type Grade } from 'ts-fsrs';
-import { ALL_CARDS, CHAPTERS, CARD_MAP } from '@/data';
+import { fsrs, createEmptyCard, generatorParameters, State, Rating, type Card, type Grade } from 'ts-fsrs';
+import { ALL_CARDS, CARD_MAP, CHAPTER_MAP, studyableFor, cardInExam, type Exam } from '@/data';
 
 /* ------------------------------------------------------------------ */
 /* 类型                                                                */
 /* ------------------------------------------------------------------ */
 
+export type Order = 'random' | 'sequential';
+
 export interface Settings {
+  exam: Exam;
+  order: Order;
   dailyNew: number;
   retention: number; // 0.8 ~ 0.97
-  chapters: string[];
   theme: 'auto' | 'light' | 'dark';
-  motion: boolean;
-  fontScale: number; // 0.9 ~ 1.3
+  motion: 'auto' | 'on' | 'off';
+  fontScale: number; // 0.9 ~ 1.25
   mathScale: number; // 0.9 ~ 1.3
-  showHookFirst: boolean;
-  simpleGrading: boolean; // 只显示「忘了 / 记得」
-  swipe: boolean;
+  hintFirst: boolean;
   haptics: boolean;
   examDate: string; // YYYY-MM-DD
-  newOrder: 'chapter' | 'importance';
 }
 
 export interface DayLog {
@@ -31,54 +31,46 @@ export interface DayLog {
   new: number;
 }
 
-export interface PendingLog {
-  clientId: string;
-  cardId: string;
-  grade: Grade;
-  elapsedMs: number;
-  state: number;
-  stability: number;
-  difficulty: number;
-  reviewedAt: string;
-}
-
-export interface SyncMeta {
-  code: string | null;
-  lastSyncAt: string | null;
-  lastError: string | null;
+export interface ReviewEntry {
+  id: string;
+  g: Grade;
+  ms: number;
+  at: string;
+  exam: Exam;
+  /** 复习后的稳定性（天） */
+  s: number;
 }
 
 export interface Store {
-  v: 2;
+  v: 3;
   cards: Record<string, Card>;
+  /** key: `${YYYY-MM-DD}|${exam}` */
   logs: Record<string, DayLog>;
-  newToday: { d: string; n: number };
+  history: ReviewEntry[];
+  newToday: { d: string; m1: number; m2: number };
+  cursor: { m1: number; m2: number };
   flags: string[];
   notes: Record<string, string>;
   settings: Settings;
-  onboarded: boolean;
-  pending: PendingLog[];
-  sync: SyncMeta;
   updatedAt: string;
 }
 
-const KEY = 'math2-fsrs-v2';
-const LEGACY_KEY = 'math2-memo-v1';
+const KEY = 'kaoyan-math-v3';
+const LEGACY_KEYS = ['math2-fsrs-v2', 'math2-memo-v1'];
+const HISTORY_LIMIT = 5000;
 
 export const DEFAULT_SETTINGS: Settings = {
+  exam: 'm2',
+  order: 'random',
   dailyNew: 15,
   retention: 0.9,
-  chapters: CHAPTERS.map((c) => c.id),
   theme: 'auto',
-  motion: true,
+  motion: 'auto',
   fontScale: 1,
   mathScale: 1,
-  showHookFirst: true,
-  simpleGrading: false,
-  swipe: true,
+  hintFirst: true,
   haptics: true,
   examDate: '2026-12-19',
-  newOrder: 'chapter',
 };
 
 export function todayKey(d = new Date()) {
@@ -90,55 +82,60 @@ export function todayKey(d = new Date()) {
 
 function fresh(): Store {
   return {
-    v: 2,
+    v: 3,
     cards: {},
     logs: {},
-    newToday: { d: todayKey(), n: 0 },
+    history: [],
+    newToday: { d: todayKey(), m1: 0, m2: 0 },
+    cursor: { m1: 0, m2: 0 },
     flags: [],
     notes: {},
     settings: { ...DEFAULT_SETTINGS },
-    onboarded: false,
-    pending: [],
-    sync: { code: null, lastSyncAt: null, lastError: null },
     updatedAt: new Date(0).toISOString(),
   };
 }
 
-/** 服务端 / 首次水合时使用的稳定快照 */
 const EMPTY: Store = fresh();
 
 function reviveCards(cards: Record<string, Card>): Record<string, Card> {
   const out: Record<string, Card> = {};
   for (const [id, c] of Object.entries(cards)) {
     if (!CARD_MAP[id] || !c) continue;
-    out[id] = {
-      ...c,
-      due: new Date(c.due),
-      last_review: c.last_review ? new Date(c.last_review) : undefined,
-    };
+    out[id] = { ...c, due: new Date(c.due), last_review: c.last_review ? new Date(c.last_review) : undefined };
   }
   return out;
 }
 
-function normalize(parsed: Partial<Store>): Store {
+type LegacyStore = { cards?: Record<string, Card>; logs?: Record<string, DayLog>; flags?: string[]; notes?: Record<string, string>; settings?: Partial<Settings> & { motion?: boolean | string } };
+
+function normalize(parsed: Partial<Store> & LegacyStore): Store {
   const base = fresh();
   const logs: Record<string, DayLog> = {};
   for (const [k, v] of Object.entries(parsed.logs ?? {})) {
     const l = v as Partial<DayLog>;
-    logs[k] = { n: l.n ?? 0, again: l.again ?? 0, ms: l.ms ?? 0, new: l.new ?? 0 };
+    // v2 日志无考试维度：归入数学二
+    const key = k.includes('|') ? k : `${k}|m2`;
+    logs[key] = { n: l.n ?? 0, again: l.again ?? 0, ms: l.ms ?? 0, new: l.new ?? 0 };
   }
+  const s: Partial<Settings> & { motion?: boolean | string } = parsed.settings ?? {};
+  const settings: Settings = {
+    ...base.settings,
+    ...s,
+    motion: typeof s.motion === 'boolean' ? (s.motion ? 'auto' : 'off') : ((s.motion as Settings['motion']) ?? 'auto'),
+    exam: s.exam === 'm1' ? 'm1' : 'm2',
+    order: s.order === 'sequential' ? 'sequential' : 'random',
+  };
+  const nt = parsed.newToday as Partial<Store['newToday']> | undefined;
   return {
     ...base,
-    ...parsed,
-    v: 2,
     cards: reviveCards((parsed.cards ?? {}) as Record<string, Card>),
     logs,
-    settings: { ...base.settings, ...(parsed.settings ?? {}) },
-    newToday: parsed.newToday?.d === todayKey() ? parsed.newToday : { d: todayKey(), n: 0 },
-    pending: Array.isArray(parsed.pending) ? parsed.pending : [],
-    sync: { ...base.sync, ...(parsed.sync ?? {}) },
+    history: Array.isArray(parsed.history) ? parsed.history.slice(-HISTORY_LIMIT) : [],
+    newToday: nt?.d === todayKey() ? { d: nt.d, m1: nt.m1 ?? 0, m2: nt.m2 ?? 0 } : base.newToday,
+    cursor: { m1: parsed.cursor?.m1 ?? 0, m2: parsed.cursor?.m2 ?? 0 },
     flags: Array.isArray(parsed.flags) ? parsed.flags.filter((id) => CARD_MAP[id]) : [],
     notes: parsed.notes ?? {},
+    settings,
     updatedAt: parsed.updatedAt ?? base.updatedAt,
   };
 }
@@ -146,9 +143,10 @@ function normalize(parsed: Partial<Store>): Store {
 function load(): Store {
   if (typeof window === 'undefined') return EMPTY;
   try {
-    const raw = localStorage.getItem(KEY) ?? localStorage.getItem(LEGACY_KEY);
+    let raw = localStorage.getItem(KEY);
+    if (!raw) for (const k of LEGACY_KEYS) if ((raw = localStorage.getItem(k))) break;
     if (!raw) return fresh();
-    return normalize(JSON.parse(raw) as Partial<Store>);
+    return normalize(JSON.parse(raw));
   } catch {
     return fresh();
   }
@@ -160,6 +158,7 @@ function load(): Store {
 
 let state: Store = EMPTY;
 let loaded = false;
+let lastSaveError: string | null = null;
 const listeners = new Set<() => void>();
 let saveTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -176,8 +175,10 @@ function persist() {
   saveTimer = setTimeout(() => {
     try {
       localStorage.setItem(KEY, JSON.stringify(state));
-    } catch {
-      /* quota */
+      lastSaveError = null;
+    } catch (e) {
+      lastSaveError = (e as Error)?.message ?? '存储失败';
+      listeners.forEach((l) => l());
     }
   }, 120);
 }
@@ -187,22 +188,39 @@ function emit() {
   persist();
 }
 
-function set(patch: Partial<Store> | ((s: Store) => Partial<Store>), touch = true) {
+function set(patch: Partial<Store> | ((s: Store) => Partial<Store>)) {
   ensureLoaded();
   const p = typeof patch === 'function' ? patch(state) : patch;
-  state = { ...state, ...p, ...(touch ? { updatedAt: new Date().toISOString() } : {}) };
+  state = { ...state, ...p, updatedAt: new Date().toISOString() };
   emit();
 }
 
 function subscribe(cb: () => void) {
   ensureLoaded();
   listeners.add(cb);
+  if (typeof window !== 'undefined') {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === KEY && e.newValue) {
+        try {
+          state = normalize(JSON.parse(e.newValue));
+          listeners.forEach((l) => l());
+        } catch {
+          /* ignore */
+        }
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => {
+      listeners.delete(cb);
+      window.removeEventListener('storage', onStorage);
+    };
+  }
   return () => {
     listeners.delete(cb);
   };
 }
 
-/** 选择器必须返回稳定引用（原始值或 state 中已有的对象） */
+/** 选择器必须返回稳定引用 */
 export function useStore<T>(selector: (s: Store) => T): T {
   return useSyncExternalStore(
     subscribe,
@@ -214,23 +232,25 @@ export function useStore<T>(selector: (s: Store) => T): T {
   );
 }
 
-/** 整体 state（引用随每次变更更新，适合配合 useMemo 派生统计） */
 export function useStoreState(): Store {
   return useStore((s) => s);
 }
 
-/** 是否已在客户端完成加载（用于避免 SSR 闪烁） */
 export function useHydrated(): boolean {
-  return useSyncExternalStore(
-    subscribe,
-    () => loaded,
-    () => false,
-  );
+  return useSyncExternalStore(subscribe, () => loaded, () => false);
+}
+
+export function useSaveError(): string | null {
+  return useSyncExternalStore(subscribe, () => lastSaveError, () => null);
 }
 
 export function getState() {
   ensureLoaded();
   return state;
+}
+
+export function useExam(): Exam {
+  return useStore((s) => s.settings.exam);
 }
 
 /* ------------------------------------------------------------------ */
@@ -244,20 +264,12 @@ export function daysToExam(now = new Date(), s: Settings = getState().settings):
 
 function scheduler(s: Settings = state.settings) {
   const left = daysToExam(new Date(), s);
-  // 间隔上限：不超过半年，也不超过距考试的天数（至少 7 天，防止考前疯狂堆积）
   const maximum_interval = Math.max(7, Math.min(180, left > 0 ? left : 180));
-  return fsrs(
-    generatorParameters({
-      request_retention: s.retention,
-      maximum_interval,
-      enable_fuzz: true,
-      enable_short_term: true,
-    }),
-  );
+  return fsrs(generatorParameters({ request_retention: s.retention, maximum_interval, enable_fuzz: true }));
 }
 
-export function cardStateOf(id: string): Card | undefined {
-  return getState().cards[id];
+export function cardStateOf(id: string, s: Store = getState()): Card | undefined {
+  return s.cards[id];
 }
 
 export function isLearned(id: string, s: Store = getState()) {
@@ -268,117 +280,78 @@ export function isLearned(id: string, s: Store = getState()) {
 export function retrievability(id: string, now = new Date(), s: Store = getState()): number | null {
   const c = s.cards[id];
   if (!c || c.state === State.New) return null;
-  try {
-    return scheduler(s.settings).get_retrievability(c, now, false);
-  } catch {
-    return null;
-  }
+  const r = scheduler(s.settings).get_retrievability(c, now, false);
+  return typeof r === 'number' ? r : null;
 }
 
 export function previewIntervals(id: string, now = new Date()): Record<Grade, string> {
-  const f = scheduler();
-  const card = getState().cards[id] ?? createEmptyCard(now);
-  const out = {} as Record<Grade, string>;
-  ([1, 2, 3, 4] as Grade[]).forEach((g) => {
-    try {
-      const { card: next } = f.next(card, now, g);
-      out[g] = humanInterval(new Date(next.due).getTime() - now.getTime());
-    } catch {
-      out[g] = '';
-    }
-  });
-  return out;
+  const c = getState().cards[id] ?? createEmptyCard(now);
+  const rec = scheduler().repeat(c, now);
+  const fmt = (g: Grade) => humanInterval(rec[g].card.due.getTime() - now.getTime());
+  return { [Rating.Again]: fmt(Rating.Again), [Rating.Hard]: fmt(Rating.Hard), [Rating.Good]: fmt(Rating.Good), [Rating.Easy]: fmt(Rating.Easy) } as Record<Grade, string>;
 }
 
 export function humanInterval(ms: number): string {
-  const min = Math.round(ms / 60000);
-  if (min < 1) return '<1 分';
-  if (min < 60) return `${min} 分`;
-  const h = Math.round(min / 60);
-  if (h < 24) return `${h} 小时`;
+  const m = Math.round(ms / 60000);
+  if (m < 1) return '<1 分';
+  if (m < 60) return `${m} 分`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h} 时`;
   const d = Math.round(h / 24);
   if (d < 30) return `${d} 天`;
-  const mo = (d / 30).toFixed(1).replace(/\.0$/, '');
-  return `${mo} 月`;
+  const mo = d / 30;
+  return mo < 12 ? `${mo.toFixed(mo < 3 ? 1 : 0)} 月` : `${(d / 365).toFixed(1)} 年`;
 }
 
 export interface RateResult {
   prev: Card | undefined;
   wasNew: boolean;
-  nextDue: Date;
-  requeue: boolean;
-  leech: boolean;
 }
 
-function uid() {
-  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+function bumpLog(logs: Record<string, DayLog>, key: string, d: Partial<DayLog>) {
+  const cur = logs[key] ?? { n: 0, again: 0, ms: 0, new: 0 };
+  return { ...logs, [key]: { n: cur.n + (d.n ?? 0), again: cur.again + (d.again ?? 0), ms: cur.ms + (d.ms ?? 0), new: cur.new + (d.new ?? 0) } };
 }
 
-/** 评分并调度 */
 export function rate(id: string, grade: Grade, elapsedMs = 0, now = new Date()): RateResult {
   ensureLoaded();
-  const f = scheduler();
   const prev = state.cards[id];
   const wasNew = !prev || prev.state === State.New;
-  const card = prev ?? createEmptyCard(now);
-  const { card: next } = f.next(card, now, grade);
-  const day = todayKey(now);
-  const log = state.logs[day] ?? { n: 0, again: 0, ms: 0, new: 0 };
-  const pendingItem: PendingLog = {
-    clientId: uid(),
-    cardId: id,
-    grade,
-    elapsedMs: Math.min(elapsedMs, 10 * 60000),
-    state: next.state,
-    stability: next.stability,
-    difficulty: next.difficulty,
-    reviewedAt: now.toISOString(),
-  };
-  set({
-    cards: { ...state.cards, [id]: next },
-    logs: {
-      ...state.logs,
-      [day]: { n: log.n + 1, again: log.again + (grade === 1 ? 1 : 0), ms: log.ms + Math.min(elapsedMs, 10 * 60000), new: log.new + (wasNew ? 1 : 0) },
-    },
-    newToday: wasNew ? { d: day, n: (state.newToday.d === day ? state.newToday.n : 0) + 1 } : state.newToday.d === day ? state.newToday : { d: day, n: 0 },
-    pending: [...state.pending, pendingItem].slice(-2000),
-  });
-  const nextDue = new Date(next.due);
-  const requeue = (next.state === State.Learning || next.state === State.Relearning) && nextDue.getTime() - now.getTime() < 20 * 60000;
-  return { prev, wasNew, nextDue, requeue, leech: next.lapses >= 4 && grade === 1 };
+  const base = prev ?? createEmptyCard(now);
+  const rec = scheduler().repeat(base, now);
+  const next = rec[grade].card;
+  const exam = state.settings.exam;
+  const key = `${todayKey(now)}|${exam}`;
+  const entry: ReviewEntry = { id, g: grade, ms: Math.min(elapsedMs, 600000), at: now.toISOString(), exam, s: Math.round(next.stability * 10) / 10 };
+  set((s) => ({
+    cards: { ...s.cards, [id]: next },
+    logs: bumpLog(s.logs, key, { n: 1, again: grade === Rating.Again ? 1 : 0, ms: entry.ms, new: wasNew ? 1 : 0 }),
+    history: [...s.history, entry].slice(-HISTORY_LIMIT),
+    newToday: s.newToday.d === todayKey(now) ? { ...s.newToday, [exam]: s.newToday[exam] + (wasNew ? 1 : 0) } : { d: todayKey(now), m1: 0, m2: 0, [exam]: wasNew ? 1 : 0 },
+  }));
+  return { prev, wasNew };
 }
 
-/** 撤销上一次评分 */
 export function undoRate(id: string, prev: Card | undefined, grade: Grade, elapsedMs: number, wasNew: boolean, now = new Date()) {
-  ensureLoaded();
-  const day = todayKey(now);
-  const cards = { ...state.cards };
-  if (prev) cards[id] = prev;
-  else delete cards[id];
-  const log = state.logs[day];
-  const logs = { ...state.logs };
-  if (log) {
-    logs[day] = {
-      n: Math.max(0, log.n - 1),
-      again: Math.max(0, log.again - (grade === 1 ? 1 : 0)),
-      ms: Math.max(0, log.ms - elapsedMs),
-      new: Math.max(0, log.new - (wasNew ? 1 : 0)),
-    };
-    if (logs[day].n === 0) delete logs[day];
-  }
-  // 撤销时去掉最后一条针对该卡的待同步记录
-  const pending = [...state.pending];
-  for (let i = pending.length - 1; i >= 0; i--) {
-    if (pending[i].cardId === id) {
-      pending.splice(i, 1);
-      break;
+  const exam = getState().settings.exam;
+  const key = `${todayKey(now)}|${exam}`;
+  set((s) => {
+    const cards = { ...s.cards };
+    if (prev) cards[id] = prev;
+    else delete cards[id];
+    const history = s.history.slice();
+    for (let i = history.length - 1; i >= 0; i--) {
+      if (history[i].id === id) {
+        history.splice(i, 1);
+        break;
+      }
     }
-  }
-  set({
-    cards,
-    logs,
-    newToday: wasNew && state.newToday.d === day ? { d: day, n: Math.max(0, state.newToday.n - 1) } : state.newToday,
-    pending,
+    return {
+      cards,
+      logs: bumpLog(s.logs, key, { n: -1, again: grade === Rating.Again ? -1 : 0, ms: -Math.min(elapsedMs, 600000), new: wasNew ? -1 : 0 }),
+      history,
+      newToday: { ...s.newToday, [exam]: Math.max(0, s.newToday[exam] - (wasNew ? 1 : 0)) },
+    };
   });
 }
 
@@ -391,30 +364,33 @@ export function forgetCard(id: string) {
 }
 
 /* ------------------------------------------------------------------ */
-/* 查询                                                                */
+/* 查询（全部按当前考试模式过滤）                                       */
 /* ------------------------------------------------------------------ */
 
+function pool(exam: Exam, chapters?: string[]) {
+  const list = studyableFor(exam);
+  return chapters ? list.filter((c) => chapters.includes(c.ch)) : list;
+}
+
 export function dueIds(now = new Date(), chapters?: string[], s: Store = getState()): string[] {
-  const en = new Set(chapters ?? s.settings.chapters);
   const t = now.getTime();
-  return ALL_CARDS.filter((c) => {
-    if (!en.has(c.ch)) return false;
-    const st = s.cards[c.id];
-    return !!st && st.state !== State.New && new Date(st.due).getTime() <= t;
-  })
-    .sort((a, b) => new Date(s.cards[a.id].due).getTime() - new Date(s.cards[b.id].due).getTime())
+  return pool(s.settings.exam, chapters)
+    .filter((c) => {
+      const st = s.cards[c.id];
+      return st && st.state !== State.New && st.due.getTime() <= t;
+    })
+    .sort((a, b) => s.cards[a.id].due.getTime() - s.cards[b.id].due.getTime())
     .map((c) => c.id);
 }
 
 export function newIds(chapters?: string[], s: Store = getState()): string[] {
-  const en = new Set(chapters ?? s.settings.chapters);
-  const list = ALL_CARDS.filter((c) => en.has(c.ch) && !isLearned(c.id, s));
-  if (s.settings.newOrder === 'importance') return list.slice().sort((a, b) => b.s - a.s).map((c) => c.id);
-  return list.map((c) => c.id);
+  return pool(s.settings.exam, chapters)
+    .filter((c) => !s.cards[c.id] || s.cards[c.id].state === State.New)
+    .map((c) => c.id);
 }
 
 export function newRemainingToday(s: Store = getState()) {
-  const used = s.newToday.d === todayKey() ? s.newToday.n : 0;
+  const used = s.newToday.d === todayKey() ? s.newToday[s.settings.exam] : 0;
   return Math.max(0, s.settings.dailyNew - used);
 }
 
@@ -422,117 +398,150 @@ export interface ChapterStat {
   total: number;
   learned: number;
   due: number;
-  mastery: number;
-  avgR: number | null;
-  weak: number;
   mature: number;
+  avgR: number | null;
+  pending: number;
 }
 
 export function chapterStat(ch: string, now = new Date(), s: Store = getState()): ChapterStat {
-  const cards = ALL_CARDS.filter((c) => c.ch === ch);
+  const exam = s.settings.exam;
+  const all = ALL_CARDS.filter((c) => c.ch === ch && cardInExam(c, exam));
+  const cards = all.filter((c) => c.status !== 'pending');
   let learned = 0;
   let due = 0;
-  let rSum = 0;
-  let weak = 0;
   let mature = 0;
+  let rs = 0;
+  let rn = 0;
   const t = now.getTime();
   for (const c of cards) {
     const st = s.cards[c.id];
     if (!st || st.state === State.New) continue;
     learned++;
-    if (new Date(st.due).getTime() <= t) due++;
-    const r = retrievability(c.id, now, s) ?? 0;
-    rSum += r;
-    if (r < 0.7) weak++;
+    if (st.due.getTime() <= t) due++;
     if (st.stability >= 21) mature++;
+    const r = retrievability(c.id, now, s);
+    if (r != null) {
+      rs += r;
+      rn++;
+    }
   }
-  return { total: cards.length, learned, due, mastery: cards.length ? rSum / cards.length : 0, avgR: learned ? rSum / learned : null, weak, mature };
+  return { total: cards.length, learned, due, mature, avgR: rn ? rs / rn : null, pending: all.length - cards.length };
 }
 
 export function overallStat(now = new Date(), s: Store = getState()) {
+  const exam = s.settings.exam;
+  const cards = studyableFor(exam);
   let learned = 0;
-  let rSum = 0;
-  let due = 0;
   let mature = 0;
+  let due = 0;
+  let rs = 0;
+  let rn = 0;
   const t = now.getTime();
-  for (const c of ALL_CARDS) {
+  for (const c of cards) {
     const st = s.cards[c.id];
     if (!st || st.state === State.New) continue;
     learned++;
-    rSum += retrievability(c.id, now, s) ?? 0;
-    if (new Date(st.due).getTime() <= t) due++;
     if (st.stability >= 21) mature++;
+    if (st.due.getTime() <= t) due++;
+    const r = retrievability(c.id, now, s);
+    if (r != null) {
+      rs += r;
+      rn++;
+    }
   }
-  const total = ALL_CARDS.length;
-  const reviews = Object.values(s.logs).reduce((a, l) => a + l.n, 0);
-  const minutes = Math.round(Object.values(s.logs).reduce((a, l) => a + l.ms, 0) / 60000);
-  return { total, learned, due, mature, mastery: total ? rSum / total : 0, avgR: learned ? rSum / learned : null, reviews, minutes, streak: streak(s) };
+  return { total: cards.length, learned, mature, due, avgR: rn ? rs / rn : null };
+}
+
+function examLogs(s: Store, exam: Exam = s.settings.exam): Record<string, DayLog> {
+  const out: Record<string, DayLog> = {};
+  for (const [k, v] of Object.entries(s.logs)) {
+    const [d, e] = k.split('|');
+    if (e === exam) out[d] = v;
+  }
+  return out;
 }
 
 export function streak(s: Store = getState()): number {
+  const logs = examLogs(s);
   let n = 0;
   const d = new Date();
-  if (!s.logs[todayKey(d)]) d.setDate(d.getDate() - 1);
-  for (;;) {
-    const k = todayKey(d);
-    if (s.logs[k]?.n) {
-      n++;
-      d.setDate(d.getDate() - 1);
-    } else break;
+  if (!(logs[todayKey(d)]?.n > 0)) d.setDate(d.getDate() - 1);
+  while (logs[todayKey(d)]?.n > 0) {
+    n++;
+    d.setDate(d.getDate() - 1);
   }
   return n;
 }
 
 export function todayLog(s: Store = getState()): DayLog {
-  return s.logs[todayKey()] ?? { n: 0, again: 0, ms: 0, new: 0 };
+  return s.logs[`${todayKey()}|${s.settings.exam}`] ?? { n: 0, again: 0, ms: 0, new: 0 };
 }
 
-/** 未来 n 天到期预测（第 0 天含逾期） */
 export function forecast(days = 14, now = new Date(), s: Store = getState()): number[] {
-  const out = new Array(days).fill(0) as number[];
+  const out = new Array<number>(days).fill(0);
   const start = new Date(now);
   start.setHours(0, 0, 0, 0);
-  const en = new Set(s.settings.chapters);
-  for (const [id, c] of Object.entries(s.cards)) {
-    if (c.state === State.New || !en.has(CARD_MAP[id]?.ch)) continue;
-    const idx = Math.floor((new Date(c.due).getTime() - start.getTime()) / 86400000);
-    if (idx < 0) out[0]++;
-    else if (idx < days) out[idx]++;
+  for (const c of studyableFor(s.settings.exam)) {
+    const st = s.cards[c.id];
+    if (!st || st.state === State.New) continue;
+    const diff = Math.floor((st.due.getTime() - start.getTime()) / 86400000);
+    const i = Math.max(0, diff);
+    if (i < days) out[i]++;
   }
   return out;
 }
 
 export function heat(days = 119, s: Store = getState()): { d: string; n: number }[] {
+  const logs = examLogs(s);
   const out: { d: string; n: number }[] = [];
   const d = new Date();
-  d.setDate(d.getDate() - (days - 1));
+  d.setDate(d.getDate() - days + 1);
   for (let i = 0; i < days; i++) {
     const k = todayKey(d);
-    out.push({ d: k, n: s.logs[k]?.n ?? 0 });
+    out.push({ d: k, n: logs[k]?.n ?? 0 });
     d.setDate(d.getDate() + 1);
   }
   return out;
 }
 
+export function totalsAllTime(s: Store = getState()) {
+  const logs = examLogs(s);
+  let n = 0;
+  let again = 0;
+  let ms = 0;
+  let days = 0;
+  for (const l of Object.values(logs)) {
+    if (l.n <= 0) continue;
+    n += l.n;
+    again += l.again;
+    ms += l.ms;
+    days++;
+  }
+  return { n, again, ms, days };
+}
+
 export function weakIds(limit = 20, now = new Date(), s: Store = getState()): string[] {
-  const en = new Set(s.settings.chapters);
-  return ALL_CARDS.filter((c) => en.has(c.ch) && isLearned(c.id, s))
-    .map((c) => {
-      const st = s.cards[c.id];
-      const r = retrievability(c.id, now, s) ?? 1;
-      return { id: c.id, score: r - st.lapses * 0.08 - st.difficulty * 0.01 };
-    })
-    .sort((a, b) => a.score - b.score)
+  return studyableFor(s.settings.exam)
+    .map((c) => ({ id: c.id, st: s.cards[c.id] }))
+    .filter((x) => x.st && x.st.state !== State.New && (x.st.lapses > 0 || x.st.difficulty >= 7))
+    .sort((a, b) => b.st.lapses * 2 + b.st.difficulty - (a.st.lapses * 2 + a.st.difficulty))
     .slice(0, limit)
     .map((x) => x.id);
 }
 
 export function leechIds(s: Store = getState()): string[] {
-  return ALL_CARDS.filter((c) => (s.cards[c.id]?.lapses ?? 0) >= 4).map((c) => c.id);
+  return studyableFor(s.settings.exam)
+    .filter((c) => (s.cards[c.id]?.lapses ?? 0) >= 4)
+    .map((c) => c.id);
+}
+
+export function recentHistory(limit = 50, s: Store = getState()): ReviewEntry[] {
+  const exam = s.settings.exam;
+  return s.history.filter((h) => h.exam === exam).slice(-limit).reverse();
 }
 
 /* ------------------------------------------------------------------ */
-/* 其它操作                                                            */
+/* 操作                                                                */
 /* ------------------------------------------------------------------ */
 
 export function toggleFlag(id: string) {
@@ -552,49 +561,26 @@ export function updateSettings(patch: Partial<Settings>) {
   set((s) => ({ settings: { ...s.settings, ...patch } }));
 }
 
-export function setOnboarded() {
-  set({ onboarded: true });
-}
-
-export function setSyncMeta(patch: Partial<SyncMeta>) {
-  set((s) => ({ sync: { ...s.sync, ...patch } }), false);
-}
-
-export function clearPending(ids: string[]) {
-  const drop = new Set(ids);
-  set((s) => ({ pending: s.pending.filter((p) => !drop.has(p.clientId)) }), false);
-}
-
-/** 用服务器返回的合并结果替换本地（保留本地 pending 与 sync 元信息） */
-export function applyMerged(snapshot: Partial<Store>) {
-  ensureLoaded();
-  const merged = normalize({ ...snapshot, pending: state.pending, sync: state.sync });
-  state = { ...merged, settings: { ...merged.settings, theme: state.settings.theme } };
-  emit();
-}
-
-/** 用于上传的快照（不含 pending / sync） */
-export function snapshotForSync(): Record<string, unknown> {
-  ensureLoaded();
-  const { pending: _p, sync: _s, ...rest } = state;
-  void _p;
-  void _s;
-  return rest;
+export function setCursor(exam: Exam, index: number) {
+  set((s) => ({ cursor: { ...s.cursor, [exam]: index } }));
 }
 
 export function exportData(): string {
-  return JSON.stringify(getState(), null, 2);
+  return JSON.stringify({ app: 'kaoyan-math', exportedAt: new Date().toISOString(), ...getState() }, null, 2);
 }
 
-export function importData(json: string): boolean {
+export type ImportResult = { ok: true; cards: number; reviews: number } | { ok: false; error: string };
+
+export function importData(json: string): ImportResult {
   try {
-    const parsed = JSON.parse(json) as Partial<Store> & { v?: number };
-    if (!parsed || typeof parsed.cards !== 'object') return false;
-    state = normalize(parsed);
+    const parsed = JSON.parse(json);
+    if (!parsed || typeof parsed !== 'object' || (!parsed.cards && !parsed.settings && !parsed.logs)) return { ok: false, error: '文件中没有可识别的学习数据' };
+    const next = normalize(parsed);
+    state = next;
     emit();
-    return true;
+    return { ok: true, cards: Object.keys(next.cards).length, reviews: next.history.length };
   } catch {
-    return false;
+    return { ok: false, error: '文件不是有效的 JSON' };
   }
 }
 
@@ -605,8 +591,12 @@ export function resetAll() {
 }
 
 export function resetProgressOnly() {
-  set({ cards: {}, logs: {}, newToday: { d: todayKey(), n: 0 }, pending: [] });
+  set((s) => ({ cards: {}, logs: {}, history: [], newToday: { d: todayKey(), m1: 0, m2: 0 }, cursor: { m1: 0, m2: 0 }, settings: s.settings }));
 }
 
-export { State };
+export function chapterTitle(ch: string) {
+  return CHAPTER_MAP[ch]?.title ?? ch;
+}
+
+export { State, Rating };
 export type { Card, Grade };

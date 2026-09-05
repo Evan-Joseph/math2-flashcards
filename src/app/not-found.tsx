@@ -2,15 +2,11 @@ import Link from 'next/link';
 
 export default function NotFound() {
   return (
-    <div className="mx-auto grid min-h-[60dvh] max-w-md place-items-center px-4 text-center">
-      <div>
-        <div className="text-5xl font-black text-accent">∅</div>
-        <h1 className="mt-3 text-xl font-bold">页面不存在</h1>
-        <p className="mt-1 text-sm text-muted">这个章节或页面没有找到。</p>
-        <Link href="/" className="mt-5 inline-flex h-11 items-center rounded-xl bg-accent px-5 font-medium text-white">
-          返回首页
-        </Link>
-      </div>
+    <div className="card mx-auto mt-10 max-w-md px-6 py-10 text-center">
+      <div className="text-lg font-semibold">页面不存在</div>
+      <Link href="/" className="btn btn-primary mt-5">
+        回到首页
+      </Link>
     </div>
   );
 }

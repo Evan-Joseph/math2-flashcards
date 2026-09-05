@@ -186,6 +186,7 @@ export const h4X = defineExtra('h4', [
   {
     sec: '极值', k: 'steps', s: 3,
     q: '拉格朗日乘数法求条件极值的完整流程',
+    cond: r`$f,\varphi$ 一阶连续偏导，且可疑点处 $\nabla\varphi\ne\mathbf 0$；多约束时要求各约束梯度线性无关。`,
     a: r`1. 构造 $L(x,y,\lambda)=f(x,y)+\lambda\varphi(x,y)$（约束 $\varphi=0$；多个约束加多个乘子）。
 2. 解方程组 $L_x=0,\ L_y=0,\ L_\lambda=\varphi=0$，得到所有可疑点。
 3. 由问题的实际意义或比较各可疑点函数值确定最大/最小值（不做二阶判别）。

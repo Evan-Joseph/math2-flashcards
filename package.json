@@ -1,20 +1,23 @@
 {
-  "name": "nextjs-postgresql-template",
+  "name": "kaoyan-math-flashcards",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check:data": "tsx scripts/check-data.ts",
+    "verify": "npm run lint && npm run typecheck && npm run check:data && npm run check:render && npm run check:schedule && npm run build",
+    "check:render": "tsx scripts/check-render.tsx",
+    "check:schedule": "tsx scripts/check-schedule.ts",
+    "build:static": "STATIC_EXPORT=1 next build"
   },
   "dependencies": {
     "@types/katex": "^0.16.8",
-    "dotenv": "17.3.1",
-    "drizzle-orm": "0.45.2",
-    "katex": "^0.18.5",
+    "katex": "^0.16.22",
+    "motion": "^13.2.0",
     "next": "16.2.6",
-    "pg": "8.20.0",
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "ts-fsrs": "^5.4.2"
@@ -22,14 +25,14 @@
   "devDependencies": {
     "@tailwindcss/postcss": "4.1.17",
     "@types/node": "22.19.15",
-    "@types/pg": "8.18.0",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
-    "drizzle-kit": "0.31.10",
     "eslint": "9.39.4",
     "eslint-config-next": "16.2.6",
     "postcss": "8.5.8",
     "tailwindcss": "4.1.17",
+    "tsx": "^4.23.13",
     "typescript": "5.9.3"
-  }
+  },
+  "version": "3.0.0"
 }

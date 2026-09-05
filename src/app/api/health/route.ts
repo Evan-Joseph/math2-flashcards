@@ -1,13 +1,6 @@
-import { db } from "@/db";
-import { sql } from "drizzle-orm";
+export const dynamic = 'force-static';
 
-export const dynamic = "force-dynamic";
-
+/** 纯静态健康检查：本应用不依赖数据库或任何服务端状态 */
 export async function GET() {
-  try {
-    await db.execute(sql`select 1`);
-    return Response.json({ ok: true });
-  } catch {
-    return Response.json({ ok: false }, { status: 500 });
-  }
+  return Response.json({ ok: true, app: 'kaoyan-math', storage: 'local-only' });
 }
