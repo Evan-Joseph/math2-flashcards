@@ -1,0 +1,150 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --paper: #f7f5f0;
+  --card: #ffffff;
+  --card2: #f1eee7;
+  --ink: #1c1b18;
+  --muted: #6b675e;
+  --line: #e4e0d6;
+  --accent: #4f46e5;
+  --accent-soft: #eef2ff;
+  --gold: #b45309;
+  --gold-soft: #fef3c7;
+  --good: #059669;
+  --bad: #dc2626;
+  --font-scale: 1;
+}
+
+.dark {
+  --paper: #121315;
+  --card: #1b1d21;
+  --card2: #23262b;
+  --ink: #ecebe6;
+  --muted: #9a978f;
+  --line: #2f333a;
+  --accent: #818cf8;
+  --accent-soft: #24263a;
+  --gold: #f59e0b;
+  --gold-soft: #3a2f14;
+  --good: #34d399;
+  --bad: #f87171;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-card2: var(--card2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-good: var(--good);
+  --color-bad: var(--bad);
+  --font-sans: "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
+  --font-serif: "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", Georgia, serif;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-paper text-ink antialiased;
+  font-size: calc(16px * var(--font-scale));
+  overscroll-behavior-y: none;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--gold-soft);
+}
+
+/* ------- KaTeX 微调 ------- */
+.katex {
+  font-size: 1.08em;
+}
+.katex-display {
+  margin: 0.4em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.15em 0;
+}
+.katex-display > .katex {
+  white-space: normal;
+}
+
+/* ------- 挖空 ------- */
+.cloze-blank {
+  display: inline-block;
+  vertical-align: baseline;
+  text-align: center;
+  color: var(--gold);
+  font-weight: 600;
+  border-bottom: 2px dashed color-mix(in srgb, var(--gold) 60%, transparent);
+  background: color-mix(in srgb, var(--gold-soft) 60%, transparent);
+  border-radius: 4px 4px 0 0;
+  padding: 0 0.4em;
+  margin: 0 0.15em;
+  line-height: 1.4;
+}
+.cloze-answer {
+  color: var(--gold);
+  font-weight: 600;
+  background: color-mix(in srgb, var(--gold-soft) 70%, transparent);
+  border-radius: 4px;
+  padding: 0 0.2em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* ------- 滚动条 ------- */
+.scroll-thin::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 999px;
+}
+
+/* ------- 卡片背景纹理 ------- */
+.paper-grid {
+  background-image: radial-gradient(color-mix(in srgb, var(--ink) 7%, transparent) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* ------- 动画降级 ------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 安全区（iOS 底部） */
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+kbd {
+  @apply inline-flex h-5 min-w-5 items-center justify-center rounded border border-line bg-card2 px-1 font-sans text-[11px] text-muted;
+}

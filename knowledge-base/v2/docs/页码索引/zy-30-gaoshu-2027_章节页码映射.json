@@ -1,0 +1,42 @@
+{
+  "schema_version": 2,
+  "source_id": "zy-30-gaoshu-2027",
+  "title": "张宇 2027 考研数学基础 30 讲·高等数学分册",
+  "pdf_file": "【数学一】基础30讲高等数学分册_张宇_2027_9787576358629.pdf",
+  "pdf_pages": 583,
+  "sha256": "04d05159ec9eabcac090663773d05afeddde46ce8d7ab5ff58e4525ed7882ef7",
+  "bookmark_count": 0,
+  "locator_granularity": "讲次级",
+  "page_model": {
+    "toc_pdf_page": 5,
+    "body_rule": "第1讲起，pdf_page = print_page + 5",
+    "verification": "高清主文件目录页视觉复核；第1、2、5、9、14、16、18讲章首定点渲染；页脚印刷页抽样核对",
+    "confidence": "high"
+  },
+  "entries": [
+    {"level":"lecture","title":"第1讲 函数极限与连续","pdf_page":6,"pdf_page_end":80,"print_page":1,"verified":true},
+    {"level":"lecture","title":"第2讲 数列极限","pdf_page":81,"pdf_page_end":103,"print_page":76,"verified":true},
+    {"level":"lecture","title":"第3讲 一元函数微分学的概念","pdf_page":104,"pdf_page_end":123,"print_page":99,"verified":true},
+    {"level":"lecture","title":"第4讲 一元函数微分学的计算","pdf_page":124,"pdf_page_end":143,"print_page":119,"verified":true},
+    {"level":"lecture","title":"第5讲 一元函数微分学的应用（一）——几何应用","pdf_page":144,"pdf_page_end":168,"print_page":139,"verified":true},
+    {"level":"lecture","title":"第6讲 一元函数微分学的应用（二）——中值定理、微分等式与微分不等式","pdf_page":169,"pdf_page_end":190,"print_page":164,"verified":true},
+    {"level":"lecture","title":"第7讲 一元函数微分学的应用（三）——物理应用与经济应用","pdf_page":191,"pdf_page_end":199,"print_page":186,"verified":true},
+    {"level":"lecture","title":"第8讲 一元函数积分学的概念与性质","pdf_page":200,"pdf_page_end":234,"print_page":195,"verified":true},
+    {"level":"lecture","title":"第9讲 一元函数积分学的计算","pdf_page":235,"pdf_page_end":267,"print_page":230,"verified":true},
+    {"level":"lecture","title":"第10讲 一元函数积分学的应用（一）——几何应用","pdf_page":268,"pdf_page_end":286,"print_page":263,"verified":true},
+    {"level":"lecture","title":"第11讲 一元函数积分学的应用（二）——积分等式与积分不等式","pdf_page":287,"pdf_page_end":298,"print_page":282,"verified":true},
+    {"level":"lecture","title":"第12讲 一元函数积分学的应用（三）——物理应用与经济应用","pdf_page":299,"pdf_page_end":308,"print_page":294,"verified":true},
+    {"level":"lecture","title":"第13讲 多元函数微分学","pdf_page":309,"pdf_page_end":342,"print_page":304,"verified":true},
+    {"level":"lecture","title":"第14讲 二重积分","pdf_page":343,"pdf_page_end":381,"print_page":338,"verified":true},
+    {"level":"lecture","title":"第15讲 微分方程","pdf_page":382,"pdf_page_end":413,"print_page":377,"verified":true},
+    {"level":"lecture","title":"第16讲 无穷级数（仅数学一、数学三）","pdf_page":414,"pdf_page_end":468,"print_page":409,"verified":true},
+    {"level":"lecture","title":"第17讲 多元函数积分学的预备知识（仅数学一）","pdf_page":469,"pdf_page_end":492,"print_page":464,"verified":true},
+    {"level":"lecture","title":"第18讲 多元函数积分学（仅数学一）","pdf_page":493,"pdf_page_end":550,"print_page":488,"verified":true},
+    {"level":"appendix","title":"附录1 图像变换","pdf_page":551,"pdf_page_end":553,"print_page":546,"verified":true},
+    {"level":"appendix","title":"附录2 常用平面图形","pdf_page":554,"pdf_page_end":556,"print_page":549,"verified":true},
+    {"level":"appendix","title":"附录3 常用空间图形","pdf_page":557,"pdf_page_end":559,"print_page":552,"verified":true},
+    {"level":"appendix","title":"附录4 重要公式","pdf_page":560,"pdf_page_end":562,"print_page":555,"verified":true},
+    {"level":"appendix","title":"附录5 从指数函数到双曲函数","pdf_page":563,"pdf_page_end":567,"print_page":558,"verified":true},
+    {"level":"appendix","title":"附录6 变形技巧","pdf_page":568,"pdf_page_end":583,"print_page":563,"verified":true}
+  ]
+}

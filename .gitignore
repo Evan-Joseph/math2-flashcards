@@ -16,3 +16,5 @@ tsconfig.tsbuildinfo
 02_交互可视化/.flashcards-site/
 02_交互可视化/node_modules/
 02_交互可视化/dist/
+node_modules/
+dist/

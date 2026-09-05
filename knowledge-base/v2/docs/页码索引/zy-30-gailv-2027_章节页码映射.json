@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "source_id": "zy-30-gailv-2027",
+  "title": "张宇 2027 考研数学基础 30 讲·概率论与数理统计分册",
+  "pdf_file": "【数学一】基础30讲概率论与数理统计分册_张宇_2027_ISBN待确认.pdf",
+  "pdf_pages": 169,
+  "sha256": "997f150f31124b5f800bcb730b7b3763bf6cffff42ec020fc98d0a496af88fa5",
+  "bookmark_count": 0,
+  "locator_granularity": "讲次级",
+  "page_model": {"toc_pdf_page":5,"body_rule":"pdf_page = print_page + 6","verification":"高清主文件目录页与全部六个讲次首页定点渲染核验","confidence":"high"},
+  "entries": [
+    {"level":"lecture","title":"第1讲 随机事件与概率","pdf_page":7,"pdf_page_end":38,"print_page":1,"verified":true},
+    {"level":"lecture","title":"第2讲 一维随机变量及其分布","pdf_page":39,"pdf_page_end":67,"print_page":33,"verified":true},
+    {"level":"lecture","title":"第3讲 多维随机变量及其分布","pdf_page":68,"pdf_page_end":108,"print_page":62,"verified":true},
+    {"level":"lecture","title":"第4讲 随机变量的数字特征","pdf_page":109,"pdf_page_end":130,"print_page":103,"verified":true},
+    {"level":"lecture","title":"第5讲 大数定律与中心极限定理","pdf_page":131,"pdf_page_end":138,"print_page":125,"verified":true},
+    {"level":"lecture","title":"第6讲 数理统计","pdf_page":139,"pdf_page_end":169,"print_page":133,"verified":true}
+  ]
+}

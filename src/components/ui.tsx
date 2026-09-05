@@ -1,257 +1,243 @@
-'use client';
+import { useEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import gsap from 'gsap';
+import { cn } from '../utils/cn';
+import { useStore } from '../lib/store';
 
-import { useEffect, useRef, type ReactNode, type SVGProps } from 'react';
-import { createPortal } from 'react-dom';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { cn } from '@/lib/cn';
-import { renderTex, useZoom, closeZoom } from '@/lib/math';
-import { useStore } from '@/lib/store';
-
-/* ---------------- Icons ---------------- */
-type IconProps = SVGProps<SVGSVGElement> & { size?: number };
-const base = (p: IconProps) => ({
-  width: p.size ?? 20,
-  height: p.size ?? 20,
-  viewBox: '0 0 24 24',
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 1.9,
-  strokeLinecap: 'round' as const,
-  strokeLinejoin: 'round' as const,
-  'aria-hidden': true,
-});
-export const Icon = {
-  Home: (p: IconProps) => (
-    <svg {...base(p)} {...p}>
-      <path d="M3 11.5 12 4l9 7.5" />
-      <path d="M5 10v10h14V10" />
-    </svg>
-  ),
-  Book: (p: IconProps) => (
-    <svg {...base(p)} {...p}>
-      <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21z" />
-      <path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20" />
-    </svg>
-  ),
-  Search: (p: IconProps) => (
-    <svg {...base(p)} {...p}>
-      <circle cx="11" cy="11" r="7" />
-      <path d="m20 20-3.5-3.5" />
-    </svg>
-  ),
-  Chart: (p: IconProps) => (
-    <svg {...base(p)} {...p}>
-      <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
-    </svg>
-  ),
-  Settings: (p: IconProps) => (
-    <svg {...base(p)} {...p}>
-      <circle cx="12" cy="12" r="3" />
-      <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" />
-    </svg>
-  ),
-  Star: (p: IconProps & { filled?: boolean }) => (
-    <svg {...base(p)} {...p} fill={p.filled ? 'currentColor' : 'none'}>
-      <path d="m12 3 2.7 5.6 6.1.8-4.4 4.3 1.1 6.1L12 17l-5.5 2.8 1.1-6.1L3.2 9.4l6.1-.8z" />
-    </svg>
-  ),
-  Back: (p: IconProps) => (
-    <svg {...base(p)} {...p}>
-      <path d="M15 5l-7 7 7 7" />
-    </svg>
-  ),
-  Close: (p: IconProps) => (
-    <svg {...base(p)} {...p}>
-      <path d="M6 6l12 12M18 6 6 18" />
-    </svg>
-  ),
-  Undo: (p: IconProps) => (
-    <svg {...base(p)} {...p}>
-      <path d="M9 14 4 9l5-5" />
-      <path d="M4 9h10a6 6 0 0 1 0 12h-3" />
-    </svg>
-  ),
-  Bulb: (p: IconProps) => (
-    <svg {...base(p)} {...p}>
-      <path d="M9 18h6M10 21h4" />
-      <path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1.1 2.2h5c.1-1 .5-1.7 1.1-2.2A6 6 0 0 0 12 3z" />
-    </svg>
-  ),
-  Shuffle: (p: IconProps) => (
-    <svg {...base(p)} {...p}>
-      <path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
-    </svg>
-  ),
-  List: (p: IconProps) => (
-    <svg {...base(p)} {...p}>
-      <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
-    </svg>
-  ),
-  Play: (p: IconProps) => (
-    <svg {...base(p)} {...p} fill="currentColor" stroke="none">
-      <path d="M7 4.5v15l12-7.5z" />
-    </svg>
-  ),
-  Check: (p: IconProps) => (
-    <svg {...base(p)} {...p}>
-      <path d="m5 12 5 5L20 7" />
-    </svg>
-  ),
-  Info: (p: IconProps) => (
-    <svg {...base(p)} {...p}>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 11v5M12 8h.01" />
-    </svg>
-  ),
-  Chevron: (p: IconProps) => (
-    <svg {...base(p)} {...p}>
-      <path d="m9 6 6 6-6 6" />
-    </svg>
-  ),
-  Flame: (p: IconProps) => (
-    <svg {...base(p)} {...p}>
-      <path d="M12 3s1 3 3.5 5.5S19 13 19 15a7 7 0 0 1-14 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-3 1-6 3-10.5z" />
-    </svg>
-  ),
-  Link: (p: IconProps) => (
-    <svg {...base(p)} {...p}>
-      <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1" />
-      <path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />
-    </svg>
-  ),
-};
-
-/* ---------------- Motion helpers ---------------- */
-export function useMotionOn() {
-  const setting = useStore((s) => s.settings.motion);
-  const reduced = useReducedMotion();
-  if (setting === 'off') return false;
-  if (setting === 'on') return true;
-  return !reduced;
+/* ---------- 动效开关 ---------- */
+export function useMotion() {
+  const motion = useStore((s) => s.settings.motion);
+  const reduce = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  return motion && !reduce;
 }
 
-/* ---------------- Sheet ---------------- */
-export function Sheet({ open, onClose, title, children, wide }: { open: boolean; onClose: () => void; title?: ReactNode; children: ReactNode; wide?: boolean }) {
-  const motionOn = useMotionOn();
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const prev = document.activeElement as HTMLElement | null;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.stopPropagation();
-        onClose();
-      }
-    };
-    document.addEventListener('keydown', onKey, true);
-    document.body.style.overflow = 'hidden';
-    setTimeout(() => ref.current?.focus(), 30);
-    return () => {
-      document.removeEventListener('keydown', onKey, true);
-      document.body.style.overflow = '';
-      prev?.focus?.();
-    };
-  }, [open, onClose]);
-  if (typeof document === 'undefined') return null;
-  return createPortal(
-    <AnimatePresence>
-      {open && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center" role="presentation">
-          <motion.div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: motionOn ? 0.18 : 0 }} onClick={onClose} />
-          <motion.div
-            ref={ref}
-            tabIndex={-1}
-            role="dialog"
-            aria-modal="true"
-            className={cn('relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-paper shadow-pop outline-none sm:max-h-[86dvh] sm:rounded-2xl', wide ? 'sm:max-w-3xl' : 'sm:max-w-xl')}
-            initial={motionOn ? { y: 40, opacity: 0 } : false}
-            animate={{ y: 0, opacity: 1 }}
-            exit={motionOn ? { y: 40, opacity: 0 } : { opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 380, damping: 34 }}
-          >
-            <div className="flex items-center gap-2 border-b border-line px-4 py-3">
-              <div className="min-w-0 flex-1 truncate text-sm font-semibold text-ink-2">{title}</div>
-              <button type="button" className="btn btn-ghost btn-icon" onClick={onClose} aria-label="关闭">
-                <Icon.Close />
-              </button>
-            </div>
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 safe-b">{children}</div>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>,
-    document.body,
-  );
+/* ---------- 按钮 ---------- */
+type Variant = 'primary' | 'ghost' | 'soft' | 'outline' | 'danger';
+export function Button({
+  variant = 'primary',
+  size = 'md',
+  className,
+  ...rest
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: 'sm' | 'md' | 'lg' }) {
+  const base =
+    'inline-flex items-center justify-center gap-1.5 rounded-xl font-medium transition-[transform,background-color,box-shadow] duration-150 active:scale-[0.97] disabled:opacity-40 disabled:pointer-events-none select-none';
+  const sizes = { sm: 'h-8 px-3 text-sm', md: 'h-10 px-4 text-[15px]', lg: 'h-12 px-6 text-base' };
+  const variants: Record<Variant, string> = {
+    primary: 'bg-accent text-white shadow-sm shadow-accent/30 hover:brightness-110',
+    ghost: 'text-muted hover:bg-card2 hover:text-ink',
+    soft: 'bg-accent-soft text-accent hover:brightness-95',
+    outline: 'border border-line bg-card text-ink hover:bg-card2',
+    danger: 'bg-bad/10 text-bad hover:bg-bad/15',
+  };
+  return <button className={cn(base, sizes[size], variants[variant], className)} {...rest} />;
 }
 
-/* ---------------- 公式放大层 ---------------- */
-export function ZoomLayer() {
-  const z = useZoom();
-  useEffect(() => {
-    if (!z) return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && closeZoom();
-    document.addEventListener('keydown', onKey, true);
-    return () => document.removeEventListener('keydown', onKey, true);
-  }, [z]);
-  if (!z || typeof document === 'undefined') return null;
-  const html = renderTex(z.tex, true);
-  return createPortal(
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4" role="dialog" aria-modal="true" aria-label="放大公式" onClick={closeZoom}>
-      <div className="max-h-[90dvh] w-full max-w-4xl overflow-auto rounded-2xl bg-paper p-6 shadow-pop" onClick={(e) => e.stopPropagation()}>
-        <div className="mathtext" style={{ fontSize: '1.6rem' }} dangerouslySetInnerHTML={{ __html: html }} />
-        <div className="mt-4 flex justify-end">
-          <button type="button" className="btn" onClick={closeZoom}>
-            关闭
-          </button>
-        </div>
-      </div>
-    </div>,
-    document.body,
-  );
-}
-
-/* ---------------- 小组件 ---------------- */
-export function Chip({ children, className, style }: { children: ReactNode; className?: string; style?: React.CSSProperties }) {
+/* ---------- 标签 ---------- */
+export function Chip({ children, className, color }: { children: ReactNode; className?: string; color?: string }) {
   return (
-    <span className={cn('chip', className)} style={style}>
+    <span
+      className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium', className)}
+      style={color ? { backgroundColor: `color-mix(in srgb, ${color} 14%, transparent)`, color } : undefined}
+    >
       {children}
     </span>
   );
 }
 
-export function Progress({ value, className, color }: { value: number; className?: string; color?: string }) {
+/* ---------- 星级 ---------- */
+export function Stars({ n, className }: { n: number; className?: string }) {
   return (
-    <div className={cn('progress', className)} role="progressbar" aria-valuenow={Math.round(value * 100)} aria-valuemin={0} aria-valuemax={100}>
-      <i style={{ width: `${Math.min(100, Math.max(0, value * 100))}%`, background: color }} />
+    <span className={cn('inline-flex text-gold', className)} aria-label={`重要度 ${n}`}>
+      {[1, 2, 3].map((i) => (
+        <svg key={i} viewBox="0 0 20 20" className={cn('h-3.5 w-3.5', i > n && 'opacity-20')} fill="currentColor">
+          <path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L10 14.9l-5.3 2.8 1.1-5.9L1.5 7.7l5.9-.8z" />
+        </svg>
+      ))}
+    </span>
+  );
+}
+
+/* ---------- 进度环 ---------- */
+export function Ring({
+  value,
+  size = 64,
+  stroke = 6,
+  color = 'var(--accent)',
+  children,
+  className,
+}: {
+  value: number;
+  size?: number;
+  stroke?: number;
+  color?: string;
+  children?: ReactNode;
+  className?: string;
+}) {
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const ref = useRef<SVGCircleElement>(null);
+  const motion = useMotion();
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const target = c * (1 - Math.min(1, Math.max(0, value)));
+    if (motion) gsap.to(el, { strokeDashoffset: target, duration: 1, ease: 'power3.out' });
+    else el.style.strokeDashoffset = String(target);
+  }, [value, c, motion]);
+  return (
+    <div className={cn('relative inline-flex items-center justify-center', className)} style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--line)" strokeWidth={stroke} fill="none" />
+        <circle
+          ref={ref}
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke={color}
+          strokeWidth={stroke}
+          fill="none"
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={c}
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">{children}</div>
     </div>
   );
 }
 
-export function Empty({ title, desc, action }: { title: string; desc?: string; action?: ReactNode }) {
+/* ---------- 数字滚动 ---------- */
+export function CountUp({ value, className, suffix }: { value: number; className?: string; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const motion = useMotion();
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (!motion) {
+      el.textContent = String(Math.round(value));
+      return;
+    }
+    const obj = { v: Number(el.dataset.v ?? 0) };
+    gsap.to(obj, {
+      v: value,
+      duration: 0.9,
+      ease: 'power2.out',
+      onUpdate: () => {
+        el.textContent = String(Math.round(obj.v));
+      },
+    });
+    el.dataset.v = String(value);
+  }, [value, motion]);
   return (
-    <div className="card flex flex-col items-center gap-2 px-6 py-10 text-center">
+    <span className={className}>
+      <span ref={ref}>0</span>
+      {suffix}
+    </span>
+  );
+}
+
+/* ---------- 进度条 ---------- */
+export function Bar({ value, color = 'var(--accent)', className, height = 6 }: { value: number; color?: string; className?: string; height?: number }) {
+  return (
+    <div className={cn('w-full overflow-hidden rounded-full bg-line/70', className)} style={{ height }}>
+      <div className="h-full rounded-full transition-[width] duration-700 ease-out" style={{ width: `${Math.round(Math.min(1, Math.max(0, value)) * 100)}%`, backgroundColor: color }} />
+    </div>
+  );
+}
+
+/* ---------- 空状态 ---------- */
+export function Empty({ icon, title, desc, action }: { icon: ReactNode; title: string; desc?: string; action?: ReactNode }) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-line px-6 py-12 text-center">
+      <div className="text-4xl">{icon}</div>
       <div className="text-base font-semibold">{title}</div>
-      {desc && <div className="max-w-sm text-sm text-muted">{desc}</div>}
-      {action && <div className="mt-2">{action}</div>}
+      {desc && <div className="max-w-xs text-sm text-muted">{desc}</div>}
+      {action}
     </div>
   );
 }
 
-export function PageTitle({ title, sub, right }: { title: ReactNode; sub?: ReactNode; right?: ReactNode }) {
-  return (
-    <div className="mb-4 flex items-end justify-between gap-3">
-      <div className="min-w-0">
-        <h1 className="text-[1.6rem] font-bold tracking-tight">{title}</h1>
-        {sub && <div className="mt-0.5 text-sm text-muted">{sub}</div>}
-      </div>
-      {right}
-    </div>
-  );
-}
-
-export function fmtMs(ms: number) {
-  const m = Math.round(ms / 60000);
-  if (m < 1) return '<1 分钟';
-  if (m < 60) return `${m} 分钟`;
-  return `${Math.floor(m / 60)} 小时 ${m % 60} 分`;
-}
+/* ---------- 图标 ---------- */
+export const Icon = {
+  Home: (p: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
+      <path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2z" />
+    </svg>
+  ),
+  Book: (p: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
+      <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z" />
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+    </svg>
+  ),
+  List: (p: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
+      <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+    </svg>
+  ),
+  Chart: (p: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
+      <path d="M3 3v18h18" />
+      <path d="M7 14l4-4 4 4 5-6" />
+    </svg>
+  ),
+  Gear: (p: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" />
+    </svg>
+  ),
+  Flag: (p: { className?: string; filled?: boolean }) => (
+    <svg viewBox="0 0 24 24" fill={p.filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
+      <path d="M4 22V4a1 1 0 0 1 1-1h11l-1.5 4L20 11H5" />
+    </svg>
+  ),
+  Back: (p: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  ),
+  Close: (p: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
+      <path d="M18 6L6 18M6 6l12 12" />
+    </svg>
+  ),
+  Undo: (p: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
+      <path d="M9 14L4 9l5-5" />
+      <path d="M4 9h10a6 6 0 0 1 0 12h-3" />
+    </svg>
+  ),
+  Search: (p: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="M20 20l-3.5-3.5" />
+    </svg>
+  ),
+  Play: (p: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={p.className}>
+      <path d="M8 5.5v13a1 1 0 0 0 1.5.86l11-6.5a1 1 0 0 0 0-1.72l-11-6.5A1 1 0 0 0 8 5.5z" />
+    </svg>
+  ),
+  Fire: (p: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={p.className}>
+      <path d="M12 2c.6 3.2 2.5 5 4.5 7 2 2.1 3.5 4.3 3.5 7a8 8 0 1 1-16 0c0-2.4 1-4.4 2.5-6 .3 1.6 1.1 2.8 2.5 3.5C9 9.5 10 6 12 2z" />
+    </svg>
+  ),
+  Bolt: (p: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={p.className}>
+      <path d="M13 2L4 14h7l-1 8 9-12h-7z" />
+    </svg>
+  ),
+  Eye: (p: { className?: string; off?: boolean }) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+      <circle cx="12" cy="12" r="3" />
+      {p.off && <path d="M3 3l18 18" />}
+    </svg>
+  ),
+  Check: (p: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
+      <path d="M5 12l5 5L20 7" />
+    </svg>
+  ),
+};

@@ -1,0 +1,35 @@
+[
+  {
+    "source_id": "zy-30-gaoshu-2027",
+    "file": "【数学一】基础30讲高等数学分册_张宇_2027_9787576358629.pdf",
+    "sha256": "1b17f5628e03dc24bdc870a8f8155b07d9e18cba7d15cbc983cf0b08375c9a37",
+    "pages": 586,
+    "size_MiB": 353.2,
+    "toc": 0,
+    "searchable": false,
+    "isbn": "9787576358629",
+    "body_start": null
+  },
+  {
+    "source_id": "zy-30-xiandai-2027",
+    "file": "【数学一】基础30讲线性代数分册_张宇_2027_ISBN待确认.pdf",
+    "sha256": "b58f57d5d131573da409b289be23e6421110d3c74aa5578651237e4740393283",
+    "pages": 213,
+    "size_MiB": 117.6,
+    "toc": 213,
+    "searchable": false,
+    "isbn": "待确认",
+    "body_start": 1
+  },
+  {
+    "source_id": "zy-30-gailv-2027",
+    "file": "【数学一】基础30讲概率论与数理统计分册_张宇_2027_ISBN待确认.pdf",
+    "sha256": "5cc04f559658af8c17bb46116bd371778a6001cc0b289f843887d20da72034ca",
+    "pages": 173,
+    "size_MiB": 91.0,
+    "toc": 173,
+    "searchable": false,
+    "isbn": "待确认",
+    "body_start": 1
+  }
+]

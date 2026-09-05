@@ -25,21 +25,25 @@ export const h3 = defineChapter('h3', [
   {
     sec: '基本积分表', k: 'cloze', s: 3,
     q: r`$\displaystyle\int\frac{dx}{a^2+x^2}=⟦\frac1a\arctan\frac xa+C⟧$，$\displaystyle\int\frac{dx}{\sqrt{a^2-x^2}}=⟦\arcsin\frac xa+C⟧$，$\displaystyle\int\frac{dx}{x^2-a^2}=⟦\frac{1}{2a}\ln\Big|\frac{x-a}{x+a}\Big|+C⟧$`,
+    cond: r`$a>0$。第二式要求 $|x|<a$（$\arcsin$ 取主值支 $[-\frac\pi2,\frac\pi2]$）；第三式要求 $x\ne\pm a$。`,
     trap: r`第一个别漏 $\frac1a$；第三个是 $\frac{x-a}{x+a}$（分子在前的 $x-a$）。`,
   },
   {
     sec: '基本积分表', k: 'cloze', s: 3,
     q: r`$\displaystyle\int\frac{dx}{\sqrt{x^2\pm a^2}}=⟦\ln\big|x+\sqrt{x^2\pm a^2}\big|+C⟧$`,
+    cond: r`$a>0$；取「$-$」号时要求 $|x|>a$。`,
     hook: r`$x=a\tan t$ 或 $x=a\sec t$ 换元可推得；导数验证：$\big(\ln(x+\sqrt{x^2+a^2})\big)'=\frac{1}{\sqrt{x^2+a^2}}$。`,
   },
   {
     sec: '基本积分表', k: 'cloze', s: 2,
     q: r`$\displaystyle\int\sqrt{a^2-x^2}\,dx=⟦\frac{x}{2}\sqrt{a^2-x^2}+\frac{a^2}{2}\arcsin\frac xa+C⟧$`,
+    cond: r`$a>0$，$|x|\le a$。`,
     hook: r`定积分 $\int_0^a\sqrt{a^2-x^2}dx=\frac{\pi a^2}{4}$ 直接用几何意义。`,
   },
   {
     sec: '基本积分表', k: 'cloze', s: 2,
     q: r`$\displaystyle\int\sqrt{x^2\pm a^2}\,dx=⟦\frac{x}{2}\sqrt{x^2\pm a^2}\pm\frac{a^2}{2}\ln\big|x+\sqrt{x^2\pm a^2}\big|+C⟧$`,
+    cond: r`$a>0$；取「$-$」号时要求 $|x|\ge a$。`,
   },
   {
     sec: '基本积分表', k: 'cloze', s: 2,
@@ -49,6 +53,7 @@ export const h3 = defineChapter('h3', [
   {
     sec: '基本积分表', k: 'cloze', s: 2,
     q: r`$\int\ln x\,dx=⟦x\ln x-x+C⟧$，$\int\arctan x\,dx=⟦x\arctan x-\frac12\ln(1+x^2)+C⟧$，$\int\arcsin x\,dx=⟦x\arcsin x+\sqrt{1-x^2}+C⟧$`,
+    cond: r`$\int\ln x\,dx$ 要求 $x>0$；$\int\arcsin x\,dx$ 要求 $|x|<1$，$\arcsin$ 取主值支。`,
     hook: '反三角、对数函数单独积分：一律分部，u 取它本身。',
   },
   {

@@ -1,38 +1,33 @@
 {
-  "name": "kaoyan-math-flashcards",
+  "name": "react-vite-tailwind",
   "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
-    "check:data": "tsx scripts/check-data.ts",
-    "verify": "npm run lint && npm run typecheck && npm run check:data && npm run check:render && npm run check:schedule && npm run build",
-    "check:render": "tsx scripts/check-render.tsx",
-    "check:schedule": "tsx scripts/check-schedule.ts",
-    "build:static": "STATIC_EXPORT=1 next build"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "@types/katex": "^0.16.8",
-    "katex": "^0.16.22",
-    "motion": "^13.2.0",
-    "next": "16.2.6",
+    "clsx": "2.1.1",
+    "gsap": "^3.15.0",
+    "katex": "^0.18.5",
     "react": "19.2.6",
     "react-dom": "19.2.6",
+    "tailwind-merge": "3.4.0",
     "ts-fsrs": "^5.4.2"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "4.1.17",
-    "@types/node": "22.19.15",
-    "@types/react": "19.2.14",
+    "@tailwindcss/vite": "4.1.17",
+    "@types/node": "22.19.17",
+    "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
-    "eslint": "9.39.4",
-    "eslint-config-next": "16.2.6",
-    "postcss": "8.5.8",
+    "@vitejs/plugin-react": "5.1.1",
     "tailwindcss": "4.1.17",
-    "tsx": "^4.23.13",
-    "typescript": "5.9.3"
-  },
-  "version": "3.0.0"
+    "typescript": "5.9.3",
+    "vite": "7.3.2",
+    "vite-plugin-singlefile": "2.3.0"
+  }
 }
