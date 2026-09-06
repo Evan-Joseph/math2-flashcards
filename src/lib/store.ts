@@ -1,51 +1,85 @@
+'use client';
+
 import { useSyncExternalStore } from 'react';
-import { fsrs, createEmptyCard, generatorParameters, State, type Card, type Grade } from 'ts-fsrs';
-import { ALL_CARDS, CHAPTERS } from '../data';
+import { fsrs, createEmptyCard, generatorParameters, State, Rating, type Card, type Grade } from 'ts-fsrs';
+import { ALL_CARDS, CARD_MAP, CHAPTER_MAP, studyableFor, cardInExam, isStudyable, countKnowledge, KID_CARDS, type Exam, type KCard } from '@/data';
 
 /* ------------------------------------------------------------------ */
 /* 类型                                                                */
 /* ------------------------------------------------------------------ */
 
+export type Order = 'random' | 'sequential';
+
 export interface Settings {
+  exam: Exam;
+  order: Order;
   dailyNew: number;
   retention: number; // 0.8 ~ 0.97
-  chapters: string[]; // 启用的章节
   theme: 'auto' | 'light' | 'dark';
-  motion: boolean;
-  fontScale: number; // 0.9 ~ 1.2
-  showHookFirst: boolean; // 翻面后是否默认展开记忆锚点
+  motion: 'auto' | 'on' | 'off';
+  fontScale: number; // 0.9 ~ 1.25
+  mathScale: number; // 0.9 ~ 1.3
+  hintFirst: boolean;
+  haptics: boolean;
+  examDate: string; // YYYY-MM-DD
+  /** 云端备份同步码（可为空） */
+  syncCode: string;
+  /** 上次成功备份时间 */
+  lastSync: string;
 }
 
 export interface DayLog {
   n: number;
   again: number;
   ms: number;
+  new: number;
+}
+
+export interface ReviewEntry {
+  id: string;
+  g: Grade;
+  ms: number;
+  at: string;
+  exam: Exam;
+  /** 复习后的稳定性（天） */
+  s: number;
 }
 
 export interface Store {
-  v: 1;
+  v: 3;
   cards: Record<string, Card>;
+  /** key: `${YYYY-MM-DD}|${exam}` */
   logs: Record<string, DayLog>;
-  newToday: { d: string; n: number };
+  history: ReviewEntry[];
+  newToday: { d: string; m1: number; m2: number };
+  cursor: { m1: number; m2: number };
   flags: string[];
   notes: Record<string, string>;
   settings: Settings;
-  onboarded: boolean;
+  updatedAt: string;
 }
 
-const KEY = 'math2-memo-v1';
+const KEY = 'kaoyan-math-v3';
+const LEGACY_KEYS = ['math2-fsrs-v2', 'math2-memo-v1'];
+const HISTORY_LIMIT = 5000;
 
 export const DEFAULT_SETTINGS: Settings = {
+  exam: 'm2',
+  order: 'random',
   dailyNew: 15,
   retention: 0.9,
-  chapters: CHAPTERS.map((c) => c.id),
   theme: 'auto',
-  motion: true,
+  motion: 'auto',
   fontScale: 1,
-  showHookFirst: true,
+  mathScale: 1,
+  hintFirst: true,
+  haptics: true,
+  examDate: '2026-12-19',
+  syncCode: '',
+  lastSync: '',
 };
 
-function todayKey(d = new Date()) {
+export function todayKey(d = new Date()) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
@@ -54,29 +88,71 @@ function todayKey(d = new Date()) {
 
 function fresh(): Store {
   return {
-    v: 1,
+    v: 3,
     cards: {},
     logs: {},
-    newToday: { d: todayKey(), n: 0 },
+    history: [],
+    newToday: { d: todayKey(), m1: 0, m2: 0 },
+    cursor: { m1: 0, m2: 0 },
     flags: [],
     notes: {},
     settings: { ...DEFAULT_SETTINGS },
-    onboarded: false,
+    updatedAt: new Date(0).toISOString(),
+  };
+}
+
+const EMPTY: Store = fresh();
+
+function reviveCards(cards: Record<string, Card>): Record<string, Card> {
+  const out: Record<string, Card> = {};
+  for (const [id, c] of Object.entries(cards)) {
+    if (!CARD_MAP[id] || !c) continue;
+    out[id] = { ...c, due: new Date(c.due), last_review: c.last_review ? new Date(c.last_review) : undefined };
+  }
+  return out;
+}
+
+type LegacyStore = { cards?: Record<string, Card>; logs?: Record<string, DayLog>; flags?: string[]; notes?: Record<string, string>; settings?: Partial<Settings> & { motion?: boolean | string } };
+
+function normalize(parsed: Partial<Store> & LegacyStore): Store {
+  const base = fresh();
+  const logs: Record<string, DayLog> = {};
+  for (const [k, v] of Object.entries(parsed.logs ?? {})) {
+    const l = v as Partial<DayLog>;
+    // v2 日志无考试维度：归入数学二
+    const key = k.includes('|') ? k : `${k}|m2`;
+    logs[key] = { n: l.n ?? 0, again: l.again ?? 0, ms: l.ms ?? 0, new: l.new ?? 0 };
+  }
+  const s: Partial<Settings> & { motion?: boolean | string } = parsed.settings ?? {};
+  const settings: Settings = {
+    ...base.settings,
+    ...s,
+    motion: typeof s.motion === 'boolean' ? (s.motion ? 'auto' : 'off') : ((s.motion as Settings['motion']) ?? 'auto'),
+    exam: s.exam === 'm1' ? 'm1' : 'm2',
+    order: s.order === 'sequential' ? 'sequential' : 'random',
+  };
+  const nt = parsed.newToday as Partial<Store['newToday']> | undefined;
+  return {
+    ...base,
+    cards: reviveCards((parsed.cards ?? {}) as Record<string, Card>),
+    logs,
+    history: Array.isArray(parsed.history) ? parsed.history.slice(-HISTORY_LIMIT) : [],
+    newToday: nt?.d === todayKey() ? { d: nt.d, m1: nt.m1 ?? 0, m2: nt.m2 ?? 0 } : base.newToday,
+    cursor: { m1: parsed.cursor?.m1 ?? 0, m2: parsed.cursor?.m2 ?? 0 },
+    flags: Array.isArray(parsed.flags) ? parsed.flags.filter((id) => CARD_MAP[id]) : [],
+    notes: parsed.notes ?? {},
+    settings,
+    updatedAt: parsed.updatedAt ?? base.updatedAt,
   };
 }
 
 function load(): Store {
+  if (typeof window === 'undefined') return EMPTY;
   try {
-    const raw = localStorage.getItem(KEY);
+    let raw = localStorage.getItem(KEY);
+    if (!raw) for (const k of LEGACY_KEYS) if ((raw = localStorage.getItem(k))) break;
     if (!raw) return fresh();
-    const parsed = JSON.parse(raw) as Partial<Store>;
-    const base = fresh();
-    return {
-      ...base,
-      ...parsed,
-      settings: { ...base.settings, ...(parsed.settings ?? {}) },
-      newToday: parsed.newToday?.d === todayKey() ? parsed.newToday : { d: todayKey(), n: 0 },
-    };
+    return normalize(JSON.parse(raw));
   } catch {
     return fresh();
   }
@@ -86,301 +162,468 @@ function load(): Store {
 /* 外部 store                                                          */
 /* ------------------------------------------------------------------ */
 
-let state: Store = load();
+let state: Store = EMPTY;
+let loaded = false;
+let lastSaveError: string | null = null;
 const listeners = new Set<() => void>();
-let saveTimer: number | undefined;
+let saveTimer: ReturnType<typeof setTimeout> | undefined;
+
+function ensureLoaded() {
+  if (!loaded && typeof window !== 'undefined') {
+    state = load();
+    loaded = true;
+  }
+}
+
+function persist() {
+  if (typeof window === 'undefined') return;
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(state));
+      lastSaveError = null;
+    } catch (e) {
+      lastSaveError = (e as Error)?.message ?? '存储失败';
+      listeners.forEach((l) => l());
+    }
+  }, 120);
+}
 
 function emit() {
   listeners.forEach((l) => l());
-  if (saveTimer) window.clearTimeout(saveTimer);
-  saveTimer = window.setTimeout(() => {
-    try {
-      localStorage.setItem(KEY, JSON.stringify(state));
-    } catch {
-      /* ignore quota errors */
-    }
-  }, 150);
+  persist();
 }
 
 function set(patch: Partial<Store> | ((s: Store) => Partial<Store>)) {
+  ensureLoaded();
   const p = typeof patch === 'function' ? patch(state) : patch;
-  state = { ...state, ...p };
+  state = { ...state, ...p, updatedAt: new Date().toISOString() };
   emit();
 }
 
+function subscribe(cb: () => void) {
+  ensureLoaded();
+  listeners.add(cb);
+  if (typeof window !== 'undefined') {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === KEY && e.newValue) {
+        try {
+          state = normalize(JSON.parse(e.newValue));
+          listeners.forEach((l) => l());
+        } catch {
+          /* ignore */
+        }
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => {
+      listeners.delete(cb);
+      window.removeEventListener('storage', onStorage);
+    };
+  }
+  return () => {
+    listeners.delete(cb);
+  };
+}
+
+/** 选择器必须返回稳定引用 */
 export function useStore<T>(selector: (s: Store) => T): T {
   return useSyncExternalStore(
-    (cb) => {
-      listeners.add(cb);
-      return () => listeners.delete(cb);
+    subscribe,
+    () => {
+      ensureLoaded();
+      return selector(state);
     },
-    () => selector(state),
-    () => selector(state),
+    () => selector(EMPTY),
   );
 }
 
+export function useStoreState(): Store {
+  return useStore((s) => s);
+}
+
+export function useHydrated(): boolean {
+  return useSyncExternalStore(subscribe, () => loaded, () => false);
+}
+
+export function useSaveError(): string | null {
+  return useSyncExternalStore(subscribe, () => lastSaveError, () => null);
+}
+
 export function getState() {
+  ensureLoaded();
   return state;
+}
+
+export function useExam(): Exam {
+  return useStore((s) => s.settings.exam);
 }
 
 /* ------------------------------------------------------------------ */
 /* FSRS                                                                */
 /* ------------------------------------------------------------------ */
 
-function scheduler() {
-  return fsrs(
-    generatorParameters({
-      request_retention: state.settings.retention,
-      maximum_interval: 180, // 考研备考周期内，间隔不超过半年
-      enable_fuzz: true,
-      enable_short_term: true,
-    }),
-  );
+export function daysToExam(now = new Date(), s: Settings = getState().settings): number {
+  const exam = new Date(`${s.examDate}T08:30:00`);
+  return Math.ceil((exam.getTime() - now.getTime()) / 86400000);
 }
 
-export function cardStateOf(id: string): Card | undefined {
-  return state.cards[id];
+function scheduler(s: Settings = state.settings) {
+  const left = daysToExam(new Date(), s);
+  const maximum_interval = Math.max(7, Math.min(180, left > 0 ? left : 180));
+  return fsrs(generatorParameters({ request_retention: s.retention, maximum_interval, enable_fuzz: true }));
 }
 
-export function isLearned(id: string) {
-  const c = state.cards[id];
+export function cardStateOf(id: string, s: Store = getState()): Card | undefined {
+  return s.cards[id];
+}
+
+export function isLearned(id: string, s: Store = getState()) {
+  const c = s.cards[id];
   return !!c && c.state !== State.New;
 }
 
-export function retrievability(id: string, now = new Date()): number | null {
-  const c = state.cards[id];
+export function retrievability(id: string, now = new Date(), s: Store = getState()): number | null {
+  const c = s.cards[id];
   if (!c || c.state === State.New) return null;
-  try {
-    return scheduler().get_retrievability(c, now, false);
-  } catch {
-    return null;
-  }
+  const r = scheduler(s.settings).get_retrievability(c, now, false);
+  return typeof r === 'number' ? r : null;
 }
 
 export function previewIntervals(id: string, now = new Date()): Record<Grade, string> {
-  const f = scheduler();
-  const card = state.cards[id] ?? createEmptyCard(now);
-  const out = {} as Record<Grade, string>;
-  ([1, 2, 3, 4] as Grade[]).forEach((g) => {
-    try {
-      const { card: next } = f.next(card, now, g);
-      out[g] = humanInterval(new Date(next.due).getTime() - now.getTime());
-    } catch {
-      out[g] = '';
-    }
-  });
-  return out;
+  const c = getState().cards[id] ?? createEmptyCard(now);
+  const rec = scheduler().repeat(c, now);
+  const fmt = (g: Grade) => humanInterval(rec[g].card.due.getTime() - now.getTime());
+  return { [Rating.Again]: fmt(Rating.Again), [Rating.Hard]: fmt(Rating.Hard), [Rating.Good]: fmt(Rating.Good), [Rating.Easy]: fmt(Rating.Easy) } as Record<Grade, string>;
 }
 
 export function humanInterval(ms: number): string {
-  const min = Math.round(ms / 60000);
-  if (min < 1) return '<1分';
-  if (min < 60) return `${min}分`;
-  const h = Math.round(min / 60);
-  if (h < 24) return `${h}时`;
+  const m = Math.round(ms / 60000);
+  if (m < 1) return '<1 分';
+  if (m < 60) return `${m} 分`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h} 时`;
   const d = Math.round(h / 24);
-  if (d < 30) return `${d}天`;
-  const mo = (d / 30).toFixed(1).replace(/\.0$/, '');
-  return `${mo}月`;
+  if (d < 30) return `${d} 天`;
+  const mo = d / 30;
+  return mo < 12 ? `${mo.toFixed(mo < 3 ? 1 : 0)} 月` : `${(d / 365).toFixed(1)} 年`;
 }
 
 export interface RateResult {
   prev: Card | undefined;
   wasNew: boolean;
-  nextDue: Date;
-  requeue: boolean;
 }
 
-/** 评分并调度 */
+function bumpLog(logs: Record<string, DayLog>, key: string, d: Partial<DayLog>) {
+  const cur = logs[key] ?? { n: 0, again: 0, ms: 0, new: 0 };
+  return { ...logs, [key]: { n: cur.n + (d.n ?? 0), again: cur.again + (d.again ?? 0), ms: cur.ms + (d.ms ?? 0), new: cur.new + (d.new ?? 0) } };
+}
+
 export function rate(id: string, grade: Grade, elapsedMs = 0, now = new Date()): RateResult {
-  const f = scheduler();
+  ensureLoaded();
   const prev = state.cards[id];
   const wasNew = !prev || prev.state === State.New;
-  const card = prev ?? createEmptyCard(now);
-  const { card: next } = f.next(card, now, grade);
-  const day = todayKey(now);
-  const log = state.logs[day] ?? { n: 0, again: 0, ms: 0 };
-  set({
-    cards: { ...state.cards, [id]: next },
-    logs: { ...state.logs, [day]: { n: log.n + 1, again: log.again + (grade === 1 ? 1 : 0), ms: log.ms + elapsedMs } },
-    newToday: wasNew
-      ? { d: day, n: (state.newToday.d === day ? state.newToday.n : 0) + 1 }
-      : state.newToday.d === day
-        ? state.newToday
-        : { d: day, n: 0 },
-  });
-  const nextDue = new Date(next.due);
-  // 处于（重）学习阶段且下次到期在 20 分钟内 → 本次会话内重排
-  const requeue = (next.state === State.Learning || next.state === State.Relearning) && nextDue.getTime() - now.getTime() < 20 * 60000;
-  return { prev, wasNew, nextDue, requeue };
+  const base = prev ?? createEmptyCard(now);
+  const rec = scheduler().repeat(base, now);
+  const next = rec[grade].card;
+  const exam = state.settings.exam;
+  const key = `${todayKey(now)}|${exam}`;
+  const entry: ReviewEntry = { id, g: grade, ms: Math.min(elapsedMs, 600000), at: now.toISOString(), exam, s: Math.round(next.stability * 10) / 10 };
+  set((s) => ({
+    cards: { ...s.cards, [id]: next },
+    logs: bumpLog(s.logs, key, { n: 1, again: grade === Rating.Again ? 1 : 0, ms: entry.ms, new: wasNew ? 1 : 0 }),
+    history: [...s.history, entry].slice(-HISTORY_LIMIT),
+    newToday: s.newToday.d === todayKey(now) ? { ...s.newToday, [exam]: s.newToday[exam] + (wasNew ? 1 : 0) } : { d: todayKey(now), m1: 0, m2: 0, [exam]: wasNew ? 1 : 0 },
+  }));
+  return { prev, wasNew };
 }
 
-/** 撤销上一次评分 */
-export function undoRate(id: string, res: RateResult, grade: Grade, now = new Date()) {
-  const day = todayKey(now);
-  const cards = { ...state.cards };
-  if (res.prev) cards[id] = res.prev;
-  else delete cards[id];
-  const log = state.logs[day];
-  set({
-    cards,
-    logs: log ? { ...state.logs, [day]: { ...log, n: Math.max(0, log.n - 1), again: Math.max(0, log.again - (grade === 1 ? 1 : 0)) } } : state.logs,
-    newToday: res.wasNew && state.newToday.d === day ? { d: day, n: Math.max(0, state.newToday.n - 1) } : state.newToday,
+export function undoRate(id: string, prev: Card | undefined, grade: Grade, elapsedMs: number, wasNew: boolean, now = new Date()) {
+  const exam = getState().settings.exam;
+  const key = `${todayKey(now)}|${exam}`;
+  set((s) => {
+    const cards = { ...s.cards };
+    if (prev) cards[id] = prev;
+    else delete cards[id];
+    const history = s.history.slice();
+    for (let i = history.length - 1; i >= 0; i--) {
+      if (history[i].id === id) {
+        history.splice(i, 1);
+        break;
+      }
+    }
+    return {
+      cards,
+      logs: bumpLog(s.logs, key, { n: -1, again: grade === Rating.Again ? -1 : 0, ms: -Math.min(elapsedMs, 600000), new: wasNew ? -1 : 0 }),
+      history,
+      newToday: { ...s.newToday, [exam]: Math.max(0, s.newToday[exam] - (wasNew ? 1 : 0)) },
+    };
   });
 }
 
 export function forgetCard(id: string) {
-  const cards = { ...state.cards };
-  delete cards[id];
-  set({ cards });
+  set((s) => {
+    const cards = { ...s.cards };
+    delete cards[id];
+    return { cards };
+  });
 }
 
 /* ------------------------------------------------------------------ */
-/* 查询                                                                */
+/* 查询（全部按当前考试模式过滤）                                       */
 /* ------------------------------------------------------------------ */
 
-export function enabledCards() {
-  const en = new Set(state.settings.chapters);
-  return ALL_CARDS.filter((c) => en.has(c.ch));
+function pool(exam: Exam, chapters?: string[]) {
+  const list = studyableFor(exam);
+  return chapters ? list.filter((c) => chapters.includes(c.ch)) : list;
 }
 
-export function dueIds(now = new Date(), chapters?: string[]): string[] {
-  const en = new Set(chapters ?? state.settings.chapters);
+export function dueIds(now = new Date(), chapters?: string[], s: Store = getState()): string[] {
   const t = now.getTime();
-  return ALL_CARDS.filter((c) => {
-    if (!en.has(c.ch)) return false;
-    const s = state.cards[c.id];
-    return !!s && s.state !== State.New && new Date(s.due).getTime() <= t;
-  })
-    .sort((a, b) => new Date(state.cards[a.id].due).getTime() - new Date(state.cards[b.id].due).getTime())
+  return pool(s.settings.exam, chapters)
+    .filter((c) => {
+      const st = s.cards[c.id];
+      return st && st.state !== State.New && st.due.getTime() <= t;
+    })
+    .sort((a, b) => s.cards[a.id].due.getTime() - s.cards[b.id].due.getTime())
     .map((c) => c.id);
 }
 
-export function newIds(chapters?: string[]): string[] {
-  const en = new Set(chapters ?? state.settings.chapters);
-  return ALL_CARDS.filter((c) => en.has(c.ch) && !isLearned(c.id)).map((c) => c.id);
+export function newIds(chapters?: string[], s: Store = getState()): string[] {
+  return pool(s.settings.exam, chapters)
+    .filter((c) => !s.cards[c.id] || s.cards[c.id].state === State.New)
+    .map((c) => c.id);
 }
 
-export function newRemainingToday() {
-  const used = state.newToday.d === todayKey() ? state.newToday.n : 0;
-  return Math.max(0, state.settings.dailyNew - used);
+export function newRemainingToday(s: Store = getState()) {
+  const used = s.newToday.d === todayKey() ? s.newToday[s.settings.exam] : 0;
+  return Math.max(0, s.settings.dailyNew - used);
 }
 
-export interface ChapterStat {
-  total: number;
+/**
+ * 统计口径（卡片 vs 知识点严格区分）：
+ * - cards：可学卡片数；learned / due / mature：按卡片计
+ * - knowledge：唯一知识点数（按 kid 去重）
+ * - kLearned：至少有一张卡片已学过的知识点数
+ * - kMastered：该知识点全部卡片稳定性 ≥ 21 天
+ * - reviews：累计复习次数（来自日志，与卡片数无关）
+ */
+export interface ProgressStat {
+  cards: number;
   learned: number;
   due: number;
-  mastery: number; // 0-1，已学卡片平均可提取率 × 覆盖率
+  mature: number;
+  knowledge: number;
+  kLearned: number;
+  kMastered: number;
   avgR: number | null;
-  weak: number; // R < 0.7 的数量
+  /** 待确认 / 拓展（不进队列） */
+  excluded: number;
 }
 
-export function chapterStat(ch: string, now = new Date()): ChapterStat {
-  const cards = ALL_CARDS.filter((c) => c.ch === ch);
+const MATURE_DAYS = 21;
+
+function progressOf(cards: KCard[], excluded: number, now: Date, s: Store): ProgressStat {
   let learned = 0;
   let due = 0;
-  let rSum = 0;
-  let weak = 0;
+  let mature = 0;
+  let rs = 0;
+  let rn = 0;
   const t = now.getTime();
+  const kidLearned = new Set<string>();
+  const kidAll = new Map<string, { n: number; mature: number }>();
   for (const c of cards) {
-    const s = state.cards[c.id];
-    if (!s || s.state === State.New) continue;
-    learned++;
-    if (new Date(s.due).getTime() <= t) due++;
-    const r = retrievability(c.id, now) ?? 0;
-    rSum += r;
-    if (r < 0.7) weak++;
+    const kid = c.kid!;
+    const agg = kidAll.get(kid) ?? { n: 0, mature: 0 };
+    agg.n++;
+    const st = s.cards[c.id];
+    if (st && st.state !== State.New) {
+      learned++;
+      kidLearned.add(kid);
+      if (st.due.getTime() <= t) due++;
+      if (st.stability >= MATURE_DAYS) {
+        mature++;
+        agg.mature++;
+      }
+      const r = retrievability(c.id, now, s);
+      if (r != null) {
+        rs += r;
+        rn++;
+      }
+    }
+    kidAll.set(kid, agg);
   }
-  const avgR = learned ? rSum / learned : null;
-  return {
-    total: cards.length,
-    learned,
-    due,
-    mastery: cards.length ? rSum / cards.length : 0,
-    avgR,
-    weak,
-  };
+  let kMastered = 0;
+  for (const a of kidAll.values()) if (a.n > 0 && a.mature === a.n) kMastered++;
+  return { cards: cards.length, learned, due, mature, knowledge: kidAll.size, kLearned: kidLearned.size, kMastered, avgR: rn ? rs / rn : null, excluded };
 }
 
-export function overallStat(now = new Date()) {
-  let learned = 0;
-  let rSum = 0;
-  let due = 0;
-  const t = now.getTime();
-  for (const c of ALL_CARDS) {
-    const s = state.cards[c.id];
-    if (!s || s.state === State.New) continue;
-    learned++;
-    rSum += retrievability(c.id, now) ?? 0;
-    if (new Date(s.due).getTime() <= t) due++;
+export function chapterStat(ch: string, now = new Date(), s: Store = getState()): ProgressStat {
+  const exam = s.settings.exam;
+  const all = ALL_CARDS.filter((c) => c.ch === ch && cardInExam(c, exam));
+  const cards = all.filter(isStudyable);
+  return progressOf(cards, all.length - cards.length, now, s);
+}
+
+export function overallStat(now = new Date(), s: Store = getState()): ProgressStat {
+  const exam = s.settings.exam;
+  const all = ALL_CARDS.filter((c) => cardInExam(c, exam));
+  const cards = all.filter(isStudyable);
+  return progressOf(cards, all.length - cards.length, now, s);
+}
+
+/** 某知识点的掌握状态：new / learning / review / mature（取该知识点全部卡片中最弱者） */
+export type Mastery = 'new' | 'learning' | 'review' | 'mature';
+export function knowledgeMastery(kid: string, s: Store = getState()): Mastery {
+  const cards = KID_CARDS[kid] ?? [];
+  let worst: Mastery = 'mature';
+  const rank: Record<Mastery, number> = { new: 0, learning: 1, review: 2, mature: 3 };
+  let any = false;
+  for (const c of cards) {
+    if (!isStudyable(c)) continue;
+    any = true;
+    const st = s.cards[c.id];
+    let m: Mastery;
+    if (!st || st.state === State.New) m = 'new';
+    else if (st.state === State.Learning || st.state === State.Relearning) m = 'learning';
+    else m = st.stability >= MATURE_DAYS ? 'mature' : 'review';
+    if (rank[m] < rank[worst]) worst = m;
   }
-  const total = ALL_CARDS.length;
-  const reviews = Object.values(state.logs).reduce((s, l) => s + l.n, 0);
-  return { total, learned, due, mastery: total ? rSum / total : 0, reviews, streak: streak() };
+  return any ? worst : 'new';
 }
 
-export function streak(): number {
-  let n = 0;
-  const d = new Date();
-  // 今天若还没学，不中断连续（从昨天开始数）
-  if (!state.logs[todayKey(d)]) d.setDate(d.getDate() - 1);
-  for (;;) {
-    const k = todayKey(d);
-    if (state.logs[k]?.n) {
-      n++;
-      d.setDate(d.getDate() - 1);
-    } else break;
-  }
-  return n;
+export function cardMastery(id: string, s: Store = getState()): Mastery {
+  const st = s.cards[id];
+  if (!st || st.state === State.New) return 'new';
+  if (st.state === State.Learning || st.state === State.Relearning) return 'learning';
+  return st.stability >= MATURE_DAYS ? 'mature' : 'review';
 }
 
-export function todayLog(): DayLog {
-  return state.logs[todayKey()] ?? { n: 0, again: 0, ms: 0 };
-}
+export { countKnowledge };
 
-/** 未来 n 天到期预测 */
-export function forecast(days = 7, now = new Date()): number[] {
-  const out = new Array(days).fill(0) as number[];
-  const start = new Date(now);
-  start.setHours(0, 0, 0, 0);
-  for (const c of Object.values(state.cards)) {
-    if (c.state === State.New) continue;
-    const due = new Date(c.due).getTime();
-    const idx = Math.floor((due - start.getTime()) / 86400000);
-    if (idx < 0) out[0]++;
-    else if (idx < days) out[idx]++;
+function examLogs(s: Store, exam: Exam = s.settings.exam): Record<string, DayLog> {
+  const out: Record<string, DayLog> = {};
+  for (const [k, v] of Object.entries(s.logs)) {
+    const [d, e] = k.split('|');
+    if (e === exam) out[d] = v;
   }
   return out;
 }
 
-/** 热力图：最近 n 天每天复习量 */
-export function heat(days = 91): { d: string; n: number }[] {
-  const out: { d: string; n: number }[] = [];
+export function streak(s: Store = getState()): number {
+  const logs = examLogs(s);
+  let n = 0;
   const d = new Date();
-  d.setDate(d.getDate() - (days - 1));
+  if (!(logs[todayKey(d)]?.n > 0)) d.setDate(d.getDate() - 1);
+  while (logs[todayKey(d)]?.n > 0) {
+    n++;
+    d.setDate(d.getDate() - 1);
+  }
+  return n;
+}
+
+export function todayLog(s: Store = getState()): DayLog {
+  return s.logs[`${todayKey()}|${s.settings.exam}`] ?? { n: 0, again: 0, ms: 0, new: 0 };
+}
+
+export function forecast(days = 14, now = new Date(), s: Store = getState()): number[] {
+  const out = new Array<number>(days).fill(0);
+  const start = new Date(now);
+  start.setHours(0, 0, 0, 0);
+  for (const c of studyableFor(s.settings.exam)) {
+    const st = s.cards[c.id];
+    if (!st || st.state === State.New) continue;
+    const diff = Math.floor((st.due.getTime() - start.getTime()) / 86400000);
+    const i = Math.max(0, diff);
+    if (i < days) out[i]++;
+  }
+  return out;
+}
+
+export interface HeatDay {
+  d: string;
+  n: number;
+  again: number;
+  ms: number;
+  /** 是否在首次学习日之前（区分「无数据」与「未学习」） */
+  before: boolean;
+}
+
+/** 首个有效学习日（当前考试模式） */
+export function firstStudyDay(s: Store = getState()): string | null {
+  const logs = examLogs(s);
+  const days = Object.entries(logs)
+    .filter(([, l]) => l.n > 0)
+    .map(([d]) => d)
+    .sort();
+  return days[0] ?? null;
+}
+
+/** 最近 days 天（含今天）的学习热力，按自然日 */
+export function heat(days: number, s: Store = getState()): HeatDay[] {
+  const logs = examLogs(s);
+  const first = firstStudyDay(s);
+  const out: HeatDay[] = [];
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - days + 1);
   for (let i = 0; i < days; i++) {
     const k = todayKey(d);
-    out.push({ d: k, n: state.logs[k]?.n ?? 0 });
+    const l = logs[k];
+    out.push({ d: k, n: l?.n ?? 0, again: l?.again ?? 0, ms: l?.ms ?? 0, before: !first || k < first });
     d.setDate(d.getDate() + 1);
   }
   return out;
 }
 
-/** 薄弱卡：可提取率最低 / 遗忘次数最多 */
-export function weakIds(limit = 20, now = new Date()): string[] {
-  return ALL_CARDS.filter((c) => isLearned(c.id))
-    .map((c) => {
-      const s = state.cards[c.id];
-      const r = retrievability(c.id, now) ?? 1;
-      return { id: c.id, score: r - s.lapses * 0.08 - s.difficulty * 0.01 };
-    })
-    .sort((a, b) => a.score - b.score)
+/** 自适应窗口：有效学习跨度不足时使用较短窗口，避免冷启动大片空白 */
+export function adaptiveHeatDays(s: Store = getState()): number {
+  const first = firstStudyDay(s);
+  if (!first) return 14;
+  const span = Math.floor((Date.now() - new Date(`${first}T00:00:00`).getTime()) / 86400000) + 1;
+  if (span <= 14) return 14;
+  if (span <= 35) return 35;
+  return 91;
+}
+
+export function totalsAllTime(s: Store = getState()) {
+  const logs = examLogs(s);
+  let n = 0;
+  let again = 0;
+  let ms = 0;
+  let days = 0;
+  for (const l of Object.values(logs)) {
+    if (l.n <= 0) continue;
+    n += l.n;
+    again += l.again;
+    ms += l.ms;
+    days++;
+  }
+  return { n, again, ms, days };
+}
+
+export function weakIds(limit = 20, now = new Date(), s: Store = getState()): string[] {
+  return studyableFor(s.settings.exam)
+    .map((c) => ({ id: c.id, st: s.cards[c.id] }))
+    .filter((x) => x.st && x.st.state !== State.New && (x.st.lapses > 0 || x.st.difficulty >= 7))
+    .sort((a, b) => b.st.lapses * 2 + b.st.difficulty - (a.st.lapses * 2 + a.st.difficulty))
     .slice(0, limit)
     .map((x) => x.id);
 }
 
+export function leechIds(s: Store = getState()): string[] {
+  return studyableFor(s.settings.exam)
+    .filter((c) => (s.cards[c.id]?.lapses ?? 0) >= 4)
+    .map((c) => c.id);
+}
+
+export function recentHistory(limit = 50, s: Store = getState()): ReviewEntry[] {
+  const exam = s.settings.exam;
+  return s.history.filter((h) => h.exam === exam).slice(-limit).reverse();
+}
+
 /* ------------------------------------------------------------------ */
-/* 其它操作                                                            */
+/* 操作                                                                */
 /* ------------------------------------------------------------------ */
 
 export function toggleFlag(id: string) {
@@ -400,31 +643,42 @@ export function updateSettings(patch: Partial<Settings>) {
   set((s) => ({ settings: { ...s.settings, ...patch } }));
 }
 
-export function setOnboarded() {
-  set({ onboarded: true });
+export function setCursor(exam: Exam, index: number) {
+  set((s) => ({ cursor: { ...s.cursor, [exam]: index } }));
 }
 
 export function exportData(): string {
-  return JSON.stringify(state, null, 2);
+  return JSON.stringify({ app: 'kaoyan-math', exportedAt: new Date().toISOString(), ...getState() }, null, 2);
 }
 
-export function importData(json: string): boolean {
+export type ImportResult = { ok: true; cards: number; reviews: number } | { ok: false; error: string };
+
+export function importData(json: string): ImportResult {
   try {
-    const parsed = JSON.parse(json) as Store;
-    if (!parsed || parsed.v !== 1 || typeof parsed.cards !== 'object') return false;
-    state = { ...fresh(), ...parsed, settings: { ...DEFAULT_SETTINGS, ...parsed.settings } };
+    const parsed = JSON.parse(json);
+    if (!parsed || typeof parsed !== 'object' || (!parsed.cards && !parsed.settings && !parsed.logs)) return { ok: false, error: '文件中没有可识别的学习数据' };
+    const next = normalize(parsed);
+    state = next;
     emit();
-    return true;
+    return { ok: true, cards: Object.keys(next.cards).length, reviews: next.history.length };
   } catch {
-    return false;
+    return { ok: false, error: '文件不是有效的 JSON' };
   }
 }
 
 export function resetAll() {
   state = fresh();
+  loaded = true;
   emit();
 }
 
 export function resetProgressOnly() {
-  set({ cards: {}, logs: {}, newToday: { d: todayKey(), n: 0 } });
+  set((s) => ({ cards: {}, logs: {}, history: [], newToday: { d: todayKey(), m1: 0, m2: 0 }, cursor: { m1: 0, m2: 0 }, settings: s.settings }));
 }
+
+export function chapterTitle(ch: string) {
+  return CHAPTER_MAP[ch]?.title ?? ch;
+}
+
+export { State, Rating };
+export type { Card, Grade };

@@ -1,243 +1,283 @@
-import { useEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
-import gsap from 'gsap';
-import { cn } from '../utils/cn';
-import { useStore } from '../lib/store';
+'use client';
 
-/* ---------- 动效开关 ---------- */
-export function useMotion() {
-  const motion = useStore((s) => s.settings.motion);
-  const reduce = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  return motion && !reduce;
+import { forwardRef, useEffect, useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import { Dialog as RDialog, Switch as RSwitch, Slider as RSlider, ToggleGroup as RToggle, Tooltip as RTooltip } from 'radix-ui';
+import { Drawer } from 'vaul';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { X } from 'lucide-react';
+import { cn } from '@/lib/cn';
+import { useStore } from '@/lib/store';
+
+/* ------------------------------------------------------------------ */
+/* hooks                                                               */
+/* ------------------------------------------------------------------ */
+
+export function useMediaQuery(q: string, initial = false) {
+  const [m, setM] = useState(initial);
+  useEffect(() => {
+    const mq = window.matchMedia(q);
+    const on = () => setM(mq.matches);
+    on();
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, [q]);
+  return m;
 }
 
-/* ---------- 按钮 ---------- */
-type Variant = 'primary' | 'ghost' | 'soft' | 'outline' | 'danger';
-export function Button({
-  variant = 'primary',
-  size = 'md',
-  className,
-  ...rest
-}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: 'sm' | 'md' | 'lg' }) {
-  const base =
-    'inline-flex items-center justify-center gap-1.5 rounded-xl font-medium transition-[transform,background-color,box-shadow] duration-150 active:scale-[0.97] disabled:opacity-40 disabled:pointer-events-none select-none';
-  const sizes = { sm: 'h-8 px-3 text-sm', md: 'h-10 px-4 text-[15px]', lg: 'h-12 px-6 text-base' };
-  const variants: Record<Variant, string> = {
-    primary: 'bg-accent text-white shadow-sm shadow-accent/30 hover:brightness-110',
-    ghost: 'text-muted hover:bg-card2 hover:text-ink',
-    soft: 'bg-accent-soft text-accent hover:brightness-95',
-    outline: 'border border-line bg-card text-ink hover:bg-card2',
-    danger: 'bg-bad/10 text-bad hover:bg-bad/15',
+export function useMotionOn(): boolean {
+  const pref = useStore((s) => s.settings.motion);
+  const reduce = useMediaQuery('(prefers-reduced-motion: reduce)');
+  if (pref === 'off') return false;
+  if (pref === 'on') return true;
+  return !reduce;
+}
+
+/* ------------------------------------------------------------------ */
+/* Button                                                              */
+/* ------------------------------------------------------------------ */
+
+export const buttonVariants = cva(
+  'inline-flex shrink-0 select-none items-center justify-center gap-1.5 whitespace-nowrap rounded-xl font-medium leading-none transition-[background-color,color,border-color,transform,box-shadow] duration-150 ease-out active:scale-[0.985] disabled:pointer-events-none disabled:opacity-45 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent [&_svg]:shrink-0',
+  {
+    variants: {
+      variant: {
+        primary: 'bg-accent text-accent-ink shadow-[0_1px_0_oklch(0_0_0/0.06)] hover:brightness-105',
+        secondary: 'bg-paper-2 text-ink hover:bg-line',
+        outline: 'border border-line-2 bg-paper text-ink hover:bg-paper-2',
+        ghost: 'text-ink-2 hover:bg-paper-2 hover:text-ink',
+        soft: 'bg-accent-soft text-accent hover:brightness-[0.98]',
+        danger: 'bg-bad-soft text-bad hover:brightness-[0.98]',
+      },
+      size: {
+        sm: 'h-9 px-3 text-[13px] [&_svg]:size-4',
+        md: 'h-11 px-4 text-sm [&_svg]:size-[18px]',
+        lg: 'h-12 px-5 text-[15px] [&_svg]:size-5',
+        icon: 'h-11 w-11 [&_svg]:size-5',
+        'icon-sm': 'h-9 w-9 rounded-lg [&_svg]:size-[18px]',
+      },
+    },
+    defaultVariants: { variant: 'secondary', size: 'md' },
+  },
+);
+
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {}
+
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button({ className, variant, size, type = 'button', ...props }, ref) {
+  return <button ref={ref} type={type} className={cn(buttonVariants({ variant, size }), className)} {...props} />;
+});
+
+/* ------------------------------------------------------------------ */
+/* Badge / Kbd / Progress                                              */
+/* ------------------------------------------------------------------ */
+
+export function Badge({ children, tone = 'neutral', className, style }: { children: ReactNode; tone?: 'neutral' | 'accent' | 'good' | 'warn' | 'bad' | 'outline'; className?: string; style?: React.CSSProperties }) {
+  const tones = {
+    neutral: 'bg-paper-2 text-ink-2',
+    accent: 'bg-accent-soft text-accent',
+    good: 'bg-good-soft text-good',
+    warn: 'bg-warn-soft text-warn',
+    bad: 'bg-bad-soft text-bad',
+    outline: 'border border-line-2 text-ink-2',
   };
-  return <button className={cn(base, sizes[size], variants[variant], className)} {...rest} />;
-}
-
-/* ---------- 标签 ---------- */
-export function Chip({ children, className, color }: { children: ReactNode; className?: string; color?: string }) {
   return (
-    <span
-      className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium', className)}
-      style={color ? { backgroundColor: `color-mix(in srgb, ${color} 14%, transparent)`, color } : undefined}
-    >
+    <span style={style} className={cn('inline-flex h-6 items-center gap-1 rounded-md px-2 text-xs font-medium leading-none whitespace-nowrap', tones[tone], className)}>
       {children}
     </span>
   );
 }
 
-/* ---------- 星级 ---------- */
-export function Stars({ n, className }: { n: number; className?: string }) {
+export function Kbd({ children }: { children: ReactNode }) {
+  return <kbd className="inline-flex h-5 min-w-5 items-center justify-center rounded-md border border-line-2 bg-paper px-1.5 font-mono text-[11px] font-medium text-muted">{children}</kbd>;
+}
+
+export function Progress({ value, className, color }: { value: number; className?: string; color?: string }) {
   return (
-    <span className={cn('inline-flex text-gold', className)} aria-label={`重要度 ${n}`}>
-      {[1, 2, 3].map((i) => (
-        <svg key={i} viewBox="0 0 20 20" className={cn('h-3.5 w-3.5', i > n && 'opacity-20')} fill="currentColor">
-          <path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L10 14.9l-5.3 2.8 1.1-5.9L1.5 7.7l5.9-.8z" />
-        </svg>
+    <div className={cn('bar', className)} role="progressbar" aria-valuenow={Math.round(value * 100)} aria-valuemin={0} aria-valuemax={100}>
+      <i style={{ width: `${Math.min(100, Math.max(0, value * 100))}%`, background: color }} />
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Switch / Slider / Segmented                                         */
+/* ------------------------------------------------------------------ */
+
+export function Switch({ checked, onCheckedChange, id, ariaLabel }: { checked: boolean; onCheckedChange: (v: boolean) => void; id?: string; ariaLabel?: string }) {
+  return (
+    <RSwitch.Root id={id} checked={checked} onCheckedChange={onCheckedChange} aria-label={ariaLabel} className="relative h-7 w-12 shrink-0 rounded-full bg-line-2 transition-colors data-[state=checked]:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+      <RSwitch.Thumb className="block size-6 translate-x-0.5 rounded-full bg-white shadow-[0_1px_3px_oklch(0_0_0/0.25)] transition-transform duration-200 ease-out data-[state=checked]:translate-x-[22px]" />
+    </RSwitch.Root>
+  );
+}
+
+export function Slider({ value, min, max, step, onValueChange, ariaLabel }: { value: number; min: number; max: number; step: number; onValueChange: (v: number) => void; ariaLabel: string }) {
+  return (
+    <RSlider.Root className="relative flex h-11 w-full touch-none select-none items-center" value={[value]} min={min} max={max} step={step} onValueChange={(v) => onValueChange(v[0])}>
+      <RSlider.Track className="relative h-1.5 grow rounded-full bg-line">
+        <RSlider.Range className="absolute h-full rounded-full bg-accent" />
+      </RSlider.Track>
+      <RSlider.Thumb aria-label={ariaLabel} className="block size-6 rounded-full border border-line-2 bg-paper shadow-[0_1px_4px_oklch(0_0_0/0.2)] transition-transform focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-110" />
+    </RSlider.Root>
+  );
+}
+
+export function Segmented<T extends string>({ value, onValueChange, options, ariaLabel, className, size = 'md' }: { value: T; onValueChange: (v: T) => void; options: { value: T; label: ReactNode }[]; ariaLabel: string; className?: string; size?: 'sm' | 'md' }) {
+  return (
+    <RToggle.Root type="single" value={value} onValueChange={(v) => v && onValueChange(v as T)} aria-label={ariaLabel} className={cn('inline-flex rounded-xl bg-paper-2 p-1', className)}>
+      {options.map((o) => (
+        <RToggle.Item key={o.value} value={o.value} className={cn('flex-1 rounded-[9px] px-3 font-medium leading-none text-muted transition-[background-color,color,box-shadow] duration-150 data-[state=on]:bg-paper data-[state=on]:text-ink data-[state=on]:shadow-[0_1px_2px_oklch(0_0_0/0.08)] focus-visible:outline-2 focus-visible:outline-accent whitespace-nowrap', size === 'sm' ? 'h-8 text-[13px]' : 'h-9 text-sm')}>
+          {o.label}
+        </RToggle.Item>
       ))}
-    </span>
+    </RToggle.Root>
   );
 }
 
-/* ---------- 进度环 ---------- */
-export function Ring({
-  value,
-  size = 64,
-  stroke = 6,
-  color = 'var(--accent)',
-  children,
-  className,
-}: {
-  value: number;
-  size?: number;
-  stroke?: number;
-  color?: string;
-  children?: ReactNode;
-  className?: string;
-}) {
-  const r = (size - stroke) / 2;
-  const c = 2 * Math.PI * r;
-  const ref = useRef<SVGCircleElement>(null);
-  const motion = useMotion();
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const target = c * (1 - Math.min(1, Math.max(0, value)));
-    if (motion) gsap.to(el, { strokeDashoffset: target, duration: 1, ease: 'power3.out' });
-    else el.style.strokeDashoffset = String(target);
-  }, [value, c, motion]);
+/* ------------------------------------------------------------------ */
+/* Tooltip                                                             */
+/* ------------------------------------------------------------------ */
+
+export function Tip({ children, label, side = 'top' }: { children: ReactNode; label: string; side?: 'top' | 'bottom' | 'left' | 'right' }) {
   return (
-    <div className={cn('relative inline-flex items-center justify-center', className)} style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--line)" strokeWidth={stroke} fill="none" />
-        <circle
-          ref={ref}
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          stroke={color}
-          strokeWidth={stroke}
-          fill="none"
-          strokeLinecap="round"
-          strokeDasharray={c}
-          strokeDashoffset={c}
-        />
-      </svg>
-      <div className="absolute inset-0 flex items-center justify-center">{children}</div>
+    <RTooltip.Provider delayDuration={400}>
+      <RTooltip.Root>
+        <RTooltip.Trigger asChild>{children}</RTooltip.Trigger>
+        <RTooltip.Portal>
+          <RTooltip.Content side={side} sideOffset={6} className="z-[60] rounded-lg bg-ink px-2.5 py-1.5 text-xs font-medium text-canvas shadow-pop">
+            {label}
+          </RTooltip.Content>
+        </RTooltip.Portal>
+      </RTooltip.Root>
+    </RTooltip.Provider>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Dialog（居中弹窗，用于确认 / 放大公式）                              */
+/* ------------------------------------------------------------------ */
+
+export function Dialog({ open, onOpenChange, title, description, children, size = 'md' }: { open: boolean; onOpenChange: (v: boolean) => void; title: string; description?: string; children?: ReactNode; size?: 'sm' | 'md' | 'lg' }) {
+  const w = { sm: 'max-w-sm', md: 'max-w-md', lg: 'max-w-2xl' }[size];
+  return (
+    <RDialog.Root open={open} onOpenChange={onOpenChange}>
+      <RDialog.Portal>
+        <RDialog.Overlay className="overlay fixed inset-0 z-50 bg-ink/40 backdrop-blur-[2px]" />
+        <RDialog.Content className={cn('dialog fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-line bg-paper p-5 shadow-pop outline-none max-h-[calc(100dvh-2rem)] overflow-y-auto', w)}>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <RDialog.Title className="text-base font-semibold leading-6">{title}</RDialog.Title>
+              {description ? <RDialog.Description className="mt-1 text-sm text-muted">{description}</RDialog.Description> : <RDialog.Description className="sr-only">{title}</RDialog.Description>}
+            </div>
+            <RDialog.Close asChild>
+              <Button variant="ghost" size="icon-sm" aria-label="关闭" className="-mr-1.5 -mt-1.5">
+                <X />
+              </Button>
+            </RDialog.Close>
+          </div>
+          {children}
+        </RDialog.Content>
+      </RDialog.Portal>
+    </RDialog.Root>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Sheet：移动端底部抽屉，桌面端右侧面板                                 */
+/* ------------------------------------------------------------------ */
+
+export function Sheet({ open, onOpenChange, title, children, footer }: { open: boolean; onOpenChange: (v: boolean) => void; title: string; children: ReactNode; footer?: ReactNode }) {
+  const desktop = useMediaQuery('(min-width: 1024px)');
+  if (desktop) {
+    return (
+      <RDialog.Root open={open} onOpenChange={onOpenChange}>
+        <RDialog.Portal>
+          <RDialog.Overlay className="overlay fixed inset-0 z-50 bg-ink/30" />
+          <RDialog.Content className="side-sheet fixed inset-y-0 right-0 z-50 flex w-full max-w-xl flex-col border-l border-line bg-paper shadow-pop outline-none">
+            <div className="flex h-14 shrink-0 items-center justify-between border-b border-line px-5">
+              <RDialog.Title className="truncate text-[15px] font-semibold">{title}</RDialog.Title>
+              <RDialog.Description className="sr-only">{title}</RDialog.Description>
+              <RDialog.Close asChild>
+                <Button variant="ghost" size="icon-sm" aria-label="关闭">
+                  <X />
+                </Button>
+              </RDialog.Close>
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4">{children}</div>
+            {footer ? <div className="shrink-0 border-t border-line px-5 py-3">{footer}</div> : null}
+          </RDialog.Content>
+        </RDialog.Portal>
+      </RDialog.Root>
+    );
+  }
+  return (
+    <Drawer.Root open={open} onOpenChange={onOpenChange} repositionInputs={false}>
+      <Drawer.Portal>
+        <Drawer.Overlay className="fixed inset-0 z-50 bg-ink/40" />
+        <Drawer.Content className="fixed inset-x-0 bottom-0 z-50 flex max-h-[92dvh] flex-col rounded-t-2xl border-t border-line bg-paper outline-none" aria-describedby={undefined}>
+          <div className="mx-auto mt-2.5 h-1.5 w-10 shrink-0 rounded-full bg-line-2" aria-hidden />
+          <div className="flex h-12 shrink-0 items-center justify-between px-4">
+            <Drawer.Title className="truncate text-[15px] font-semibold">{title}</Drawer.Title>
+            <Drawer.Close asChild>
+              <Button variant="ghost" size="icon-sm" aria-label="关闭">
+                <X />
+              </Button>
+            </Drawer.Close>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4">{children}</div>
+          {footer ? <div className="shrink-0 border-t border-line px-4 py-3 safe-b">{footer}</div> : <div className="safe-b" />}
+        </Drawer.Content>
+      </Drawer.Portal>
+    </Drawer.Root>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* 页面骨架                                                            */
+/* ------------------------------------------------------------------ */
+
+export function PageHeader({ title, subtitle, action, back }: { title: ReactNode; subtitle?: ReactNode; action?: ReactNode; back?: ReactNode }) {
+  return (
+    <header className="mb-5 flex items-end justify-between gap-3">
+      <div className="min-w-0">
+        {back}
+        <h1 className="truncate text-[22px] font-semibold leading-8 tracking-[-0.01em] sm:text-2xl">{title}</h1>
+        {subtitle ? <p className="mt-0.5 text-sm text-muted">{subtitle}</p> : null}
+      </div>
+      {action ? <div className="shrink-0">{action}</div> : null}
+    </header>
+  );
+}
+
+export function Section({ title, aside, children, className }: { title?: ReactNode; aside?: ReactNode; children: ReactNode; className?: string }) {
+  return (
+    <section className={cn('mb-6', className)}>
+      {title ? (
+        <div className="mb-2.5 flex items-center justify-between gap-3 px-0.5">
+          <h2 className="text-[13px] font-semibold uppercase tracking-wide text-muted">{title}</h2>
+          {aside}
+        </div>
+      ) : null}
+      {children}
+    </section>
+  );
+}
+
+export function Empty({ title, desc, action }: { title: string; desc?: string; action?: ReactNode }) {
+  return (
+    <div className="card flex flex-col items-center px-6 py-10 text-center">
+      <p className="text-[15px] font-medium">{title}</p>
+      {desc ? <p className="mt-1 max-w-xs text-sm text-muted">{desc}</p> : null}
+      {action ? <div className="mt-4">{action}</div> : null}
     </div>
   );
 }
 
-/* ---------- 数字滚动 ---------- */
-export function CountUp({ value, className, suffix }: { value: number; className?: string; suffix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const motion = useMotion();
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (!motion) {
-      el.textContent = String(Math.round(value));
-      return;
-    }
-    const obj = { v: Number(el.dataset.v ?? 0) };
-    gsap.to(obj, {
-      v: value,
-      duration: 0.9,
-      ease: 'power2.out',
-      onUpdate: () => {
-        el.textContent = String(Math.round(obj.v));
-      },
-    });
-    el.dataset.v = String(value);
-  }, [value, motion]);
+export function Stat({ label, value, sub, className }: { label: string; value: ReactNode; sub?: ReactNode; className?: string }) {
   return (
-    <span className={className}>
-      <span ref={ref}>0</span>
-      {suffix}
-    </span>
-  );
-}
-
-/* ---------- 进度条 ---------- */
-export function Bar({ value, color = 'var(--accent)', className, height = 6 }: { value: number; color?: string; className?: string; height?: number }) {
-  return (
-    <div className={cn('w-full overflow-hidden rounded-full bg-line/70', className)} style={{ height }}>
-      <div className="h-full rounded-full transition-[width] duration-700 ease-out" style={{ width: `${Math.round(Math.min(1, Math.max(0, value)) * 100)}%`, backgroundColor: color }} />
+    <div className={cn('card px-4 py-3.5', className)}>
+      <div className="text-xs font-medium text-muted">{label}</div>
+      <div className="tnum mt-1 text-[22px] font-semibold leading-7 tracking-tight">{value}</div>
+      {sub ? <div className="mt-0.5 text-xs text-muted">{sub}</div> : null}
     </div>
   );
 }
-
-/* ---------- 空状态 ---------- */
-export function Empty({ icon, title, desc, action }: { icon: ReactNode; title: string; desc?: string; action?: ReactNode }) {
-  return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-line px-6 py-12 text-center">
-      <div className="text-4xl">{icon}</div>
-      <div className="text-base font-semibold">{title}</div>
-      {desc && <div className="max-w-xs text-sm text-muted">{desc}</div>}
-      {action}
-    </div>
-  );
-}
-
-/* ---------- 图标 ---------- */
-export const Icon = {
-  Home: (p: { className?: string }) => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
-      <path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2z" />
-    </svg>
-  ),
-  Book: (p: { className?: string }) => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
-      <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z" />
-      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-    </svg>
-  ),
-  List: (p: { className?: string }) => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
-      <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
-    </svg>
-  ),
-  Chart: (p: { className?: string }) => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
-      <path d="M3 3v18h18" />
-      <path d="M7 14l4-4 4 4 5-6" />
-    </svg>
-  ),
-  Gear: (p: { className?: string }) => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
-      <circle cx="12" cy="12" r="3" />
-      <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" />
-    </svg>
-  ),
-  Flag: (p: { className?: string; filled?: boolean }) => (
-    <svg viewBox="0 0 24 24" fill={p.filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
-      <path d="M4 22V4a1 1 0 0 1 1-1h11l-1.5 4L20 11H5" />
-    </svg>
-  ),
-  Back: (p: { className?: string }) => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
-      <path d="M15 18l-6-6 6-6" />
-    </svg>
-  ),
-  Close: (p: { className?: string }) => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
-      <path d="M18 6L6 18M6 6l12 12" />
-    </svg>
-  ),
-  Undo: (p: { className?: string }) => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
-      <path d="M9 14L4 9l5-5" />
-      <path d="M4 9h10a6 6 0 0 1 0 12h-3" />
-    </svg>
-  ),
-  Search: (p: { className?: string }) => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
-      <circle cx="11" cy="11" r="7" />
-      <path d="M20 20l-3.5-3.5" />
-    </svg>
-  ),
-  Play: (p: { className?: string }) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={p.className}>
-      <path d="M8 5.5v13a1 1 0 0 0 1.5.86l11-6.5a1 1 0 0 0 0-1.72l-11-6.5A1 1 0 0 0 8 5.5z" />
-    </svg>
-  ),
-  Fire: (p: { className?: string }) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={p.className}>
-      <path d="M12 2c.6 3.2 2.5 5 4.5 7 2 2.1 3.5 4.3 3.5 7a8 8 0 1 1-16 0c0-2.4 1-4.4 2.5-6 .3 1.6 1.1 2.8 2.5 3.5C9 9.5 10 6 12 2z" />
-    </svg>
-  ),
-  Bolt: (p: { className?: string }) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={p.className}>
-      <path d="M13 2L4 14h7l-1 8 9-12h-7z" />
-    </svg>
-  ),
-  Eye: (p: { className?: string; off?: boolean }) => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
-      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
-      <circle cx="12" cy="12" r="3" />
-      {p.off && <path d="M3 3l18 18" />}
-    </svg>
-  ),
-  Check: (p: { className?: string }) => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" className={p.className}>
-      <path d="M5 12l5 5L20 7" />
-    </svg>
-  ),
-};

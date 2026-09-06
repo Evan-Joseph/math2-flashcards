@@ -1,19 +1,15 @@
-import { memo, useMemo, type ReactNode } from 'react';
+'use client';
+
+import { memo, useMemo, useSyncExternalStore, type ReactNode, type MouseEvent } from 'react';
 import katex from 'katex';
 
 export type ClozeMode = 'hide' | 'show' | 'plain';
 
 const CLOZE_OPEN = '⟦';
 const CLOZE_CLOSE = '⟧';
-const HIGHLIGHT = '#c2410c';
 
-type Token =
-  | { t: 'text'; v: string }
-  | { t: 'math'; v: string; display: boolean }
-  | { t: 'open' }
-  | { t: 'close' };
+type Token = { t: 'text'; v: string } | { t: 'math'; v: string; display: boolean } | { t: 'open' } | { t: 'close' };
 
-/** 词法：把一段行内文本切成 文本 / 公式 / 挖空标记 */
 function tokenize(src: string): Token[] {
   const out: Token[] = [];
   let i = 0;
@@ -58,76 +54,124 @@ function tokenize(src: string): Token[] {
   return out;
 }
 
-function mathWithCloze(tex: string, mode: ClozeMode): string {
-  if (!tex.includes(CLOZE_OPEN)) return tex;
-  const re = /⟦([\s\S]*?)⟧/g;
-  if (mode === 'hide') return tex.replace(re, String.raw`\textcolor{#b45309}{\underline{\;\;\;?\;\;\;}}`);
-  if (mode === 'show') return tex.replace(re, String.raw`\textcolor{${HIGHLIGHT}}{$1}`);
-  return tex.replace(re, '$1');
+interface Ctx {
+  /** 当前挖空序号 */
+  i: number;
+  /** 序号 < reveal 的挖空显示答案（仅 hide 模式） */
+  reveal: number;
 }
 
-function renderTex(tex: string, display: boolean, mode: ClozeMode): string {
+const CLOZE_RE = /⟦([\s\S]*?)⟧/g;
+
+function mathWithCloze(tex: string, mode: ClozeMode, ctx: Ctx): string {
+  if (!tex.includes(CLOZE_OPEN)) return tex;
+  return tex.replace(CLOZE_RE, (_, inner: string) => {
+    const idx = ctx.i++;
+    if (mode === 'plain') return `{${inner}}`;
+    const shown = mode === 'show' || idx < ctx.reveal;
+    if (shown) return String.raw`\htmlClass{kanswer}{${inner}}`;
+    return String.raw`\htmlClass{kcloze}{\htmlData{ci=${idx}}{\underline{\;\;\;?\;\;\;}}}`;
+  });
+}
+
+const cache = new Map<string, string>();
+
+export function renderTex(tex: string, display: boolean): string {
+  const key = `${display ? 'D' : 'I'}${tex}`;
+  const hit = cache.get(key);
+  if (hit) return hit;
+  let html: string;
   try {
-    return katex.renderToString(mathWithCloze(tex, mode), {
+    html = katex.renderToString(tex, {
       displayMode: display,
       throwOnError: false,
       strict: 'ignore',
       trust: true,
       output: 'html',
+      macros: { '\\R': '\\mathbb{R}', '\\N': '\\mathbb{N}', '\\d': '\\mathrm{d}' },
     });
   } catch {
-    return tex;
+    html = `<code>${tex.replace(/</g, '&lt;')}</code>`;
   }
+  if (cache.size > 3000) cache.clear();
+  cache.set(key, html);
+  return html;
 }
 
-/** 文本中的 **加粗** */
+/* ---------------- 公式放大 ---------------- */
+
+let zoomTex: { tex: string; display: boolean } | null = null;
+const zoomListeners = new Set<() => void>();
+export function openZoom(tex: string, display: boolean) {
+  zoomTex = { tex, display };
+  zoomListeners.forEach((l) => l());
+}
+export function closeZoom() {
+  zoomTex = null;
+  zoomListeners.forEach((l) => l());
+}
+export function useZoom() {
+  return useSyncExternalStore(
+    (cb) => {
+      zoomListeners.add(cb);
+      return () => {
+        zoomListeners.delete(cb);
+      };
+    },
+    () => zoomTex,
+    () => null,
+  );
+}
+
+/* ---------------- 文本渲染 ---------------- */
+
 function renderText(text: string, key: string): ReactNode {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g).filter(Boolean);
-  if (parts.length === 1 && !parts[0].startsWith('**')) return text;
+  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g).filter(Boolean);
+  if (parts.length === 1 && !parts[0].startsWith('**') && !parts[0].startsWith('`')) return text;
   return parts.map((p, i) =>
     p.startsWith('**') && p.endsWith('**') ? (
       <strong key={`${key}-${i}`} className="font-semibold text-ink">
         {p.slice(2, -2)}
       </strong>
+    ) : p.startsWith('`') && p.endsWith('`') ? (
+      <code key={`${key}-${i}`} className="rounded-md bg-ink/6 px-1 py-0.5 font-mono text-[0.9em]">
+        {p.slice(1, -1)}
+      </code>
     ) : (
       <span key={`${key}-${i}`}>{p}</span>
     ),
   );
 }
 
-function renderTokens(tokens: Token[], mode: ClozeMode, keyBase: string): ReactNode[] {
+function renderTokens(tokens: Token[], mode: ClozeMode, keyBase: string, ctx: Ctx): ReactNode[] {
   const nodes: ReactNode[] = [];
   let i = 0;
   let k = 0;
   while (i < tokens.length) {
     const tok = tokens[i];
     if (tok.t === 'open') {
-      // 收集到匹配的 close
       const inner: Token[] = [];
       let j = i + 1;
       while (j < tokens.length && tokens[j].t !== 'close') inner.push(tokens[j++]);
-      const children = renderTokens(inner, mode === 'hide' ? 'plain' : mode, `${keyBase}-c${k}`);
-      if (mode === 'hide') {
-        const len = inner.reduce((s, t) => s + ('v' in t ? t.v.length : 0), 0);
-        const w = Math.min(Math.max(len * 0.55, 3), 12);
+      const idx = ctx.i++;
+      const shown = mode === 'show' || (mode === 'hide' && idx < ctx.reveal);
+      const children = renderTokens(inner, 'plain', `${keyBase}-c${k}`, ctx);
+      if (mode === 'plain') {
+        nodes.push(<span key={`${keyBase}-p${k}`}>{children}</span>);
+      } else if (shown) {
         nodes.push(
-          <span
-            key={`${keyBase}-b${k}`}
-            className="cloze-blank"
-            style={{ minWidth: `${w}em` }}
-            aria-label="挖空"
-          >
-            ?
-          </span>,
-        );
-      } else if (mode === 'show') {
-        nodes.push(
-          <span key={`${keyBase}-s${k}`} className="cloze-answer">
+          <span key={`${keyBase}-s${k}`} className="cloze-answer" data-ci={idx}>
             {children}
           </span>,
         );
       } else {
-        nodes.push(<span key={`${keyBase}-p${k}`}>{children}</span>);
+        const len = inner.reduce((s, t) => s + ('v' in t ? t.v.length : 0), 0);
+        const w = Math.min(Math.max(len * 0.5, 2.5), 10);
+        nodes.push(
+          <button type="button" key={`${keyBase}-b${k}`} className="cloze-blank" data-ci={idx} style={{ minWidth: `${w}em` }} aria-label={`第 ${idx + 1} 个空，点按显示`}>
+            ?
+          </button>,
+        );
       }
       k++;
       i = j + 1;
@@ -138,13 +182,22 @@ function renderTokens(tokens: Token[], mode: ClozeMode, keyBase: string): ReactN
       continue;
     }
     if (tok.t === 'math') {
-      nodes.push(
-        <span
-          key={`${keyBase}-m${k++}`}
-          className={tok.display ? 'block overflow-x-auto py-1' : 'inline'}
-          dangerouslySetInnerHTML={{ __html: renderTex(tok.v, tok.display, mode) }}
-        />,
-      );
+      const tex = mathWithCloze(tok.v, mode, ctx);
+      const html = renderTex(tex, tok.display);
+      if (tok.display) {
+        nodes.push(
+          <div key={`${keyBase}-m${k++}`} className="math-display" role="group">
+            <div className="math-display-inner" dangerouslySetInnerHTML={{ __html: html }} />
+            <button type="button" className="math-zoom" onClick={() => openZoom(mathWithCloze(tok.v, mode === 'hide' ? 'plain' : mode, { i: 0, reveal: 0 }), true)} aria-label="放大查看公式">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+              </svg>
+            </button>
+          </div>,
+        );
+      } else {
+        nodes.push(<span key={`${keyBase}-m${k++}`} className="math-inline" dangerouslySetInnerHTML={{ __html: html }} />);
+      }
       i++;
       continue;
     }
@@ -154,7 +207,6 @@ function renderTokens(tokens: Token[], mode: ClozeMode, keyBase: string): ReactN
   return nodes;
 }
 
-/** 按 | 切分表格单元格，但忽略 $…$ 内部的 | */
 function splitCells(row: string): string[] {
   const cells: string[] = [];
   let buf = '';
@@ -171,94 +223,134 @@ function splitCells(row: string): string[] {
   return cells;
 }
 
-function InlineLine({ text, mode, keyBase }: { text: string; mode: ClozeMode; keyBase: string }) {
-  const nodes = useMemo(() => renderTokens(tokenize(text), mode, keyBase), [text, mode, keyBase]);
-  return <>{nodes}</>;
-}
-
 interface Props {
   text: string;
   mode?: ClozeMode;
   className?: string;
+  /** 分步显示：只渲染前 n 行（steps 卡） */
+  maxLines?: number;
+  /** hide 模式下已揭示的挖空数量 */
+  reveal?: number;
+  /** 点按某个挖空 */
+  onBlank?: (index: number) => void;
 }
 
 /**
  * 渲染知识文本：
- * - `$…$` 行内公式，`$$…$$` 块级公式
+ * - `$…$` 行内公式，`$$…$$` 块级公式（可放大）
  * - `⟦…⟧` 挖空（hide 显示空格；show 高亮显示答案；plain 原样）
  * - 以 `|` 开头的连续行渲染为表格
- * - `- ` 开头为项目符号，`1. ` 开头为编号
+ * - `- ` 项目符号，`1. ` 编号，`**粗体**`，`` `代码` ``
  */
-export const MathText = memo(function MathText({ text, mode = 'plain', className }: Props) {
-  const lines = text.split('\n');
-  const blocks: ReactNode[] = [];
-  let i = 0;
-  while (i < lines.length) {
-    const line = lines[i];
-    if (line.trimStart().startsWith('|')) {
-      const rows: string[] = [];
-      while (i < lines.length && lines[i].trimStart().startsWith('|')) rows.push(lines[i++]);
-      const parsed = rows.filter((r) => !/^\s*\|?\s*:?-{2,}/.test(r)).map((r) => splitCells(r.trim().replace(/^\|/, '').replace(/\|$/, '')));
-      const [head, ...body] = parsed;
-      blocks.push(
-        <div key={`tb${i}`} className="my-2 overflow-x-auto">
-          <table className="w-full border-collapse text-[0.95em]">
-            <thead>
-              <tr>
-                {head.map((c, ci) => (
-                  <th key={ci} className="border-b border-line px-2 py-1.5 text-left font-semibold text-muted">
-                    <InlineLine text={c} mode={mode} keyBase={`th${i}-${ci}`} />
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {body.map((row, ri) => (
-                <tr key={ri} className="border-b border-line/60 last:border-0">
-                  {row.map((c, ci) => (
-                    <td key={ci} className="px-2 py-1.5 align-top">
-                      <InlineLine text={c} mode={mode} keyBase={`td${i}-${ri}-${ci}`} />
-                    </td>
+export const MathText = memo(function MathText({ text, mode = 'plain', className, maxLines, reveal = 0, onBlank }: Props) {
+  const blocks = useMemo(() => {
+    const ls = text.split('\n');
+    const lines = maxLines != null ? ls.slice(0, maxLines) : ls;
+    const ctx: Ctx = { i: 0, reveal };
+    const out: ReactNode[] = [];
+    let i = 0;
+    while (i < lines.length) {
+      const line = lines[i];
+      if (line.trimStart().startsWith('|')) {
+        const rows: string[] = [];
+        while (i < lines.length && lines[i].trimStart().startsWith('|')) rows.push(lines[i++]);
+        const parsed = rows.filter((r) => !/^\s*\|?\s*:?-{2,}/.test(r)).map((r) => splitCells(r.trim().replace(/^\|/, '').replace(/\|$/, '')));
+        const [head, ...body] = parsed;
+        out.push(
+          <div key={`tb${i}`} className="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  {head.map((c, ci) => (
+                    <th key={ci}>{renderTokens(tokenize(c), mode, `th${i}-${ci}`, ctx)}</th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {body.map((row, ri) => (
+                  <tr key={ri}>
+                    {row.map((c, ci) => (
+                      <td key={ci}>{renderTokens(tokenize(c), mode, `td${i}-${ri}-${ci}`, ctx)}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>,
+        );
+        continue;
+      }
+      if (line.trim() === '') {
+        out.push(<div key={`sp${i}`} className="h-1.5" />);
+        i++;
+        continue;
+      }
+      const bullet = /^\s*- /.test(line);
+      const numbered = /^\s*(\d+)\.\s/.exec(line);
+      const isDisplayOnly = /^\s*\$\$[\s\S]*\$\$\s*$/.test(line);
+      const content = bullet ? line.replace(/^\s*- /, '') : numbered ? line.replace(/^\s*\d+\.\s/, '') : line;
+      out.push(
+        <div key={`ln${i}`} className={isDisplayOnly ? 'my-1' : bullet ? 'bullet-line' : numbered ? 'step-line' : ''} data-step={numbered ? numbered[1] : undefined}>
+          {renderTokens(tokenize(content), mode, `l${i}`, ctx)}
         </div>,
       );
-      continue;
-    }
-    if (line.trim() === '') {
-      blocks.push(<div key={`sp${i}`} className="h-2" />);
       i++;
-      continue;
     }
-    const bullet = /^\s*- /.test(line);
-    const numbered = /^\s*(\d+)\.\s/.exec(line);
-    const isDisplayOnly = /^\s*\$\$[\s\S]*\$\$\s*$/.test(line);
-    const content = bullet ? line.replace(/^\s*- /, '') : line;
-    blocks.push(
-      <div
-        key={`ln${i}`}
-        className={
-          isDisplayOnly
-            ? 'my-1'
-            : bullet
-              ? 'relative pl-4 before:absolute before:left-1 before:top-[0.7em] before:h-1.5 before:w-1.5 before:rounded-full before:bg-muted/60'
-              : numbered
-                ? 'pl-[1.6em] -indent-[1.6em]'
-                : ''
-        }
-      >
-        <InlineLine text={content} mode={mode} keyBase={`l${i}`} />
-      </div>,
-    );
-    i++;
-  }
-  return <div className={`mathtext leading-relaxed ${className ?? ''}`}>{blocks}</div>;
+    return out;
+  }, [text, mode, maxLines, reveal]);
+
+  const onClick = (e: MouseEvent<HTMLDivElement>) => {
+    if (!onBlank) return;
+    const el = (e.target as HTMLElement).closest('[data-ci]') as HTMLElement | null;
+    if (!el) return;
+    const ci = Number(el.dataset.ci);
+    if (!Number.isNaN(ci)) {
+      e.stopPropagation();
+      onBlank(ci);
+    }
+  };
+
+  return (
+    <div className={`mathtext ${className ?? ''}`} onClick={onBlank ? onClick : undefined}>
+      {blocks}
+    </div>
+  );
 });
 
-/** 是否包含挖空 */
 export function hasCloze(text: string) {
   return text.includes(CLOZE_OPEN);
+}
+
+export function countCloze(text: string) {
+  return (text.match(/⟦/g) ?? []).length;
+}
+
+export function countLines(text: string) {
+  return text.split('\n').filter((l) => l.trim() !== '').length;
+}
+
+/** 纯文本（用于搜索）：去掉挖空符与 Markdown 标记 */
+export function plain(text: string) {
+  return text
+    .replace(/[⟦⟧]/g, '')
+    .replace(/\*\*/g, '')
+    .replace(/\\[a-zA-Z]+/g, ' ')
+    .replace(/[{}$^_]/g, '');
+}
+
+/** 严格渲染（用于数据检查脚本）：任何 KaTeX 错误都会抛出 */
+export function renderTexStrict(tex: string, display: boolean): string {
+  return katex.renderToString(tex.replace(CLOZE_RE, (_, inner: string) => `{${inner}}`), {
+    displayMode: display,
+    throwOnError: true,
+    strict: 'ignore',
+    trust: true,
+    output: 'html',
+    macros: { '\\R': '\\mathbb{R}', '\\N': '\\mathbb{N}', '\\d': '\\mathrm{d}' },
+  });
+}
+
+/** 提取文本中的全部公式片段 */
+export function extractTex(text: string): { tex: string; display: boolean }[] {
+  return tokenize(text).flatMap((t) => (t.t === 'math' ? [{ tex: t.v, display: t.display }] : []));
 }

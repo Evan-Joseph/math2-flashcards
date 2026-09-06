@@ -1,463 +1,530 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
-import type { Grade } from 'ts-fsrs';
-import { CARD_MAP, CHAPTER_MAP, KIND_LABEL, hueVar } from '../data';
-import type { KCard } from '../data/types';
-import { MathText } from '../lib/math';
-import { previewIntervals, rate, undoRate, toggleFlag, setNote, useStore, type RateResult } from '../lib/store';
-import type { SessionPlan } from '../lib/session';
-import { Button, Chip, Icon, Stars, useMotion } from './ui';
-import { cn } from '../utils/cn';
+'use client';
 
-interface HistoryItem {
-  id: string;
-  grade: Grade;
-  res: RateResult;
-  index: number;
-  requeuedAt: number | null;
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { AnimatePresence, motion } from 'motion/react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Info, Lightbulb, Star, Undo2 } from 'lucide-react';
+import { CARD_MAP, chapterColor, type KCard } from '@/data';
+import { MathText, countCloze, countLines } from '@/lib/math';
+import { rate, undoRate, previewIntervals, toggleFlag, useStore, Rating, setCursor, useExam, type Grade, type Card } from '@/lib/store';
+import { requeue, type SessionPlan } from '@/lib/session';
+import { cn, vibrate, fmtMs } from '@/lib/cn';
+import { Button, Kbd, useMotionOn, useMediaQuery, Tip } from './ui';
+import { CardBadges, CardSheet } from './CardSheet';
+
+interface Props {
+  plan: SessionPlan;
+  onExit: () => void;
+}
+/** 单卡交互状态：所有切换都通过 setView 原子更新，保证互斥 */
+interface View {
+  phase: 'front' | 'back';
+  hint: boolean;
+  reveal: number; // 已揭示的挖空 / 步骤数
+  choice: number | null; // judge: 0=✓ 1=✗；mcq: 选项下标
+  seq: number; // 用于动画 key
 }
 
-const GRADES: { g: Grade; label: string; sub: string; key: string; cls: string }[] = [
-  { g: 1, label: '忘了', sub: '完全想不起', key: '1', cls: 'bg-bad/10 text-bad hover:bg-bad/20 border-bad/20' },
-  { g: 2, label: '模糊', sub: '想起一部分', key: '2', cls: 'bg-gold-soft text-gold hover:brightness-95 border-gold/20' },
-  { g: 3, label: '记得', sub: '稍作思考', key: '3', cls: 'bg-accent-soft text-accent hover:brightness-95 border-accent/20' },
-  { g: 4, label: '轻松', sub: '脱口而出', key: '4', cls: 'bg-good/10 text-good hover:bg-good/20 border-good/20' },
+interface Done {
+  id: string;
+  grade: Grade;
+  prev: Card | undefined;
+  wasNew: boolean;
+  ms: number;
+}
+
+const GRADES: { g: Grade; label: string; key: string; cls: string }[] = [
+  { g: Rating.Again, label: '忘了', key: '1', cls: 'text-bad bg-bad-soft hover:brightness-[0.98]' },
+  { g: Rating.Hard, label: '模糊', key: '2', cls: 'text-warn bg-warn-soft hover:brightness-[0.98]' },
+  { g: Rating.Good, label: '记住', key: '3', cls: 'text-good bg-good-soft hover:brightness-[0.98]' },
+  { g: Rating.Easy, label: '轻松', key: '4', cls: 'text-accent bg-accent-soft hover:brightness-[0.98]' },
 ];
 
-export function Study({ plan, onExit }: { plan: SessionPlan; onExit: () => void }) {
-  const [queue, setQueue] = useState<string[]>(plan.ids);
-  const [index, setIndex] = useState(0);
-  const [revealed, setRevealed] = useState(false);
-  const [judge, setJudge] = useState<boolean | null>(null);
-  const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [counts, setCounts] = useState({ 1: 0, 2: 0, 3: 0, 4: 0 } as Record<Grade, number>);
-  const [seen, setSeen] = useState<Set<string>>(new Set());
-  const [showNote, setShowNote] = useState(false);
-  const startedAt = useRef(Date.now());
-  const cardStart = useRef(Date.now());
-  const cardRef = useRef<HTMLDivElement>(null);
-  const answerRef = useRef<HTMLDivElement>(null);
-  const motion = useMotion();
+const FRESH: View = { phase: 'front', hint: false, reveal: 0, choice: null, seq: 0 };
 
+export function Study({ plan, onExit }: Props) {
+  const router = useRouter();
+  const exam = useExam();
+  const haptics = useStore((s) => s.settings.haptics);
+  const order = useStore((s) => s.settings.order);
   const flags = useStore((s) => s.flags);
-  const notes = useStore((s) => s.notes);
-  const showHookFirst = useStore((s) => s.settings.showHookFirst);
+  const motionOn = useMotionOn();
+  const desktop = useMediaQuery('(min-width: 1024px)');
 
-  const id = queue[index];
-  const card: KCard | undefined = id ? CARD_MAP[id] : undefined;
-  const finished = index >= queue.length;
-  const intervals = useMemo(() => (card ? previewIntervals(card.id) : null), [card, revealed]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [queue, setQueue] = useState<string[]>(() => plan.ids.slice(plan.startIndex ?? 0));
+  const [view, setView] = useState<View>(FRESH);
+  const [done, setDone] = useState<Done[]>([]);
+  const [detail, setDetail] = useState<string | null>(null);
+  const startRef = useRef(0);
+  const sessionStart = useRef(0);
+  const lockRef = useRef(false); // 切卡过渡中忽略输入
+  const [elapsed, setElapsed] = useState(0);
+  const total = plan.ids.length - (plan.startIndex ?? 0);
+  const isCram = !!plan.cram;
 
-  /* --- 卡片入场 --- */
-  useGSAP(
-    () => {
-      if (!cardRef.current || finished) return;
-      if (!motion) return;
-      gsap.fromTo(cardRef.current, { x: 36, opacity: 0, rotate: 0.6 }, { x: 0, opacity: 1, rotate: 0, duration: 0.42, ease: 'power3.out' });
-    },
-    { dependencies: [index, finished], scope: cardRef },
-  );
-
-  /* --- 答案揭示 --- */
-  useGSAP(
-    () => {
-      if (!revealed || !answerRef.current || !motion) return;
-      const items = answerRef.current.querySelectorAll('.reveal-item');
-      gsap.fromTo(answerRef.current, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' });
-      gsap.fromTo(items, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.06, ease: 'power2.out', delay: 0.08 });
-      const btns = document.querySelectorAll('.grade-btn');
-      if (btns.length) gsap.fromTo(btns, { opacity: 0, y: 12, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.3, stagger: 0.05, ease: 'back.out(1.6)', delay: 0.12 });
-    },
-    { dependencies: [revealed] },
-  );
-
-  const reveal = useCallback(() => {
-    if (revealed || finished) return;
-    (document.activeElement as HTMLElement | null)?.blur?.();
-    setRevealed(true);
-  }, [revealed, finished]);
-
-  const doJudge = useCallback(
-    (choice: boolean) => {
-      if (revealed) return;
-      setJudge(choice);
-      setRevealed(true);
-    },
-    [revealed],
-  );
-
-  const goNext = useCallback(() => {
-    (document.activeElement as HTMLElement | null)?.blur?.();
-    setRevealed(false);
-    setJudge(null);
-    setShowNote(false);
-    setIndex((i) => i + 1);
-    cardStart.current = Date.now();
-    window.scrollTo({ top: 0 });
+  useEffect(() => {
+    const t = Date.now();
+    sessionStart.current = sessionStart.current || t;
+    startRef.current = startRef.current || t;
   }, []);
+
+  const id = queue[0];
+  const card: KCard | undefined = id ? CARD_MAP[id] : undefined;
+  const blanks = card?.k === 'cloze' ? countCloze(card.q) : 0;
+  const steps = card?.k === 'steps' && card.a ? countLines(card.a) : 0;
+
+  // 顺序通读进度
+  useEffect(() => {
+    if (!card || order !== 'sequential' || plan.mode !== 'all') return;
+    const idx = plan.ids.indexOf(card.id);
+    if (idx >= 0) setCursor(exam, idx);
+  }, [card, order, plan, exam]);
+
+  // 切卡后回到顶部，避免长卡片停留在底部
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [view.seq]);
+
+  const next = useCallback(() => {
+    lockRef.current = true;
+    startRef.current = Date.now();
+    setView((v) => ({ ...FRESH, seq: v.seq + 1 }));
+    window.setTimeout(() => {
+      lockRef.current = false;
+    }, 160);
+  }, []);
+
+  const showAnswer = useCallback(() => {
+    if (!card) return;
+    setView((v) => {
+      if (v.phase === 'back') return v;
+      const reveal = card.k === 'cloze' ? blanks : card.k === 'steps' ? steps : v.reveal;
+      return { ...v, phase: 'back', reveal };
+    });
+  }, [card, blanks, steps]);
+
+  const revealNext = useCallback(() => {
+    if (!card) return;
+    setView((v) => {
+      if (v.phase === 'back') return v;
+      const max = card.k === 'cloze' ? blanks : card.k === 'steps' ? steps : 0;
+      if (max === 0) return { ...v, phase: 'back' };
+      const n = Math.min(max, v.reveal + 1);
+      return { ...v, reveal: n, phase: n >= max ? 'back' : 'front' };
+    });
+  }, [card, blanks, steps]);
+
+  const revealBlank = useCallback(
+    (i: number) => {
+      if (!card || card.k !== 'cloze') return;
+      setView((v) => {
+        if (v.phase === 'back') return v;
+        const n = Math.max(v.reveal + 1, Math.min(blanks, i + 1));
+        return { ...v, reveal: n, phase: n >= blanks ? 'back' : 'front' };
+      });
+    },
+    [card, blanks],
+  );
+
+  const answer = useCallback(
+    (choice: number) => {
+      setView((v) => (v.phase === 'back' ? v : { ...v, choice, phase: 'back' }));
+    },
+    [],
+  );
 
   const grade = useCallback(
     (g: Grade) => {
-      if (!card || !revealed) return;
-      const elapsed = Date.now() - cardStart.current;
-      const res = rate(card.id, g, elapsed);
-      setCounts((c) => ({ ...c, [g]: c[g] + 1 }));
-      setSeen((s) => new Set(s).add(card.id));
-      let requeuedAt: number | null = null;
-      if (res.requeue) {
-        const pos = Math.min(queue.length, index + 1 + (g === 1 ? 3 : 6));
-        requeuedAt = pos;
-        const nq = [...queue];
-        nq.splice(pos, 0, card.id);
-        setQueue(nq);
+      if (!card || view.phase !== 'back' || lockRef.current) return;
+      const ms = Date.now() - startRef.current;
+      if (haptics) vibrate(g === Rating.Again ? [30, 40, 30] : 12);
+      let entry: Done;
+      if (isCram) entry = { id: card.id, grade: g, prev: undefined, wasNew: false, ms };
+      else {
+        const r = rate(card.id, g, ms);
+        entry = { id: card.id, grade: g, prev: r.prev, wasNew: r.wasNew, ms };
       }
-      setHistory((h) => [...h, { id: card.id, grade: g, res, index, requeuedAt }]);
-      // 卡片出场
-      if (motion && cardRef.current) {
-        gsap.to(cardRef.current, {
-          x: -40,
-          opacity: 0,
-          duration: 0.22,
-          ease: 'power2.in',
-          onComplete: goNext,
-        });
-      } else goNext();
+      setDone((d) => [...d, entry]);
+      setElapsed(Date.now() - sessionStart.current);
+      setQueue((q) => {
+        const rest = q.slice(1);
+        if (g === Rating.Again || (g === Rating.Hard && entry.wasNew)) return requeue([card.id, ...rest], card.id, 3);
+        return rest;
+      });
+      next();
     },
-    [card, revealed, index, queue, goNext, motion],
+    [card, view.phase, haptics, isCram, next],
+  );
+
+  const skip = useCallback(
+    (dir: 1 | -1) => {
+      if (!card || lockRef.current) return;
+      if (dir === 1) setQueue((q) => q.slice(1));
+      else {
+        const idx = plan.ids.indexOf(card.id);
+        if (idx <= 0) return;
+        setQueue((q) => [plan.ids[idx - 1], ...q]);
+      }
+      next();
+    },
+    [card, plan.ids, next],
   );
 
   const undo = useCallback(() => {
-    const last = history[history.length - 1];
-    if (!last) return;
-    undoRate(last.id, last.res, last.grade);
-    setCounts((c) => ({ ...c, [last.grade]: Math.max(0, c[last.grade] - 1) }));
-    setQueue((q) => {
-      if (last.requeuedAt !== null && q[last.requeuedAt] === last.id) {
-        const nq = [...q];
-        nq.splice(last.requeuedAt, 1);
-        return nq;
-      }
-      return q;
-    });
-    setHistory((h) => h.slice(0, -1));
-    setIndex(last.index);
-    setRevealed(true);
-    setJudge(null);
-  }, [history]);
+    const last = done[done.length - 1];
+    if (!last || lockRef.current) return;
+    if (!isCram) undoRate(last.id, last.prev, last.grade, last.ms, last.wasNew);
+    setDone((d) => d.slice(0, -1));
+    setQueue((q) => [last.id, ...q.filter((x) => x !== last.id)]);
+    next();
+  }, [done, isCram, next]);
 
-  /* --- 键盘 --- */
+  // 键盘
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if ((e.target as HTMLElement)?.tagName === 'TEXTAREA') return;
+      if (detail || e.metaKey || e.ctrlKey || e.altKey) return;
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
       if (e.key === 'Escape') return onExit();
-      if (finished) return;
+      if (!card) return;
       if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
-        if (!revealed) {
-          if (card?.k === 'judge') return;
-          reveal();
-        } else grade(3);
+        if (view.phase !== 'front') return;
+        if (card.k === 'cloze' || card.k === 'steps') revealNext();
+        else if (card.k !== 'judge' && card.k !== 'mcq') showAnswer();
         return;
       }
-      if (!revealed && card?.k === 'judge') {
-        if (e.key.toLowerCase() === 'y' || e.key === 'ArrowLeft') doJudge(true);
-        if (e.key.toLowerCase() === 'n' || e.key === 'ArrowRight') doJudge(false);
+      if (view.phase === 'front' && card.k === 'judge' && (e.key === 'y' || e.key === 'n')) return answer(e.key === 'y' ? 0 : 1);
+      if (view.phase === 'front' && card.k === 'mcq' && /^[a-dA-D]$/.test(e.key)) {
+        const i = e.key.toLowerCase().charCodeAt(0) - 97;
+        if (card.opts && i < card.opts.length) answer(i);
         return;
       }
-      if (revealed && ['1', '2', '3', '4'].includes(e.key)) grade(Number(e.key) as Grade);
-      if (e.key.toLowerCase() === 'z') undo();
-      if (e.key.toLowerCase() === 'f' && card) toggleFlag(card.id);
+      if (view.phase === 'back' && ['1', '2', '3', '4'].includes(e.key)) return grade(Number(e.key) as Grade);
+      if (e.key === 'h' || e.key === 'H') return setView((v) => ({ ...v, hint: true }));
+      if (e.key === 'f' || e.key === 'F') return toggleFlag(card.id);
+      if (e.key === 'u' || e.key === 'U') return undo();
+      if (e.key === 'i' || e.key === 'I') return setDetail(card.id);
+      if (isCram && e.key === 'ArrowRight') return skip(1);
+      if (isCram && e.key === 'ArrowLeft') return skip(-1);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [revealed, finished, card, reveal, grade, doJudge, undo, onExit]);
+  }, [card, view.phase, detail, grade, undo, showAnswer, revealNext, answer, onExit, isCram, skip]);
 
-  /* ------------------------------------------------------------ */
-  if (finished || !card) {
-    return <Summary plan={plan} counts={counts} seen={seen.size} startedAt={startedAt.current} onExit={onExit} onAgain={() => {
-      const againIds = history.filter((h) => h.grade <= 2).map((h) => h.id);
-      const uniq = [...new Set(againIds)];
-      if (!uniq.length) return onExit();
-      setQueue(uniq);
-      setIndex(0);
-      setHistory([]);
-      setCounts({ 1: 0, 2: 0, 3: 0, 4: 0 });
-      setRevealed(false);
-      startedAt.current = Date.now();
-      cardStart.current = Date.now();
-    }} />;
+  const intervals = useMemo(() => (card && !isCram && view.phase === 'back' ? previewIntervals(card.id) : null), [card, isCram, view.phase]);
+  const denominator = Math.max(total, done.length + queue.length);
+  const progress = denominator > 0 ? done.length / denominator : 0;
+
+  /* ---------------- 结束页 ---------------- */
+  if (!card) {
+    const again = done.filter((d) => d.grade === Rating.Again).length;
+    const unique = new Set(done.map((d) => d.id)).size;
+    const kids = new Set(done.map((d) => CARD_MAP[d.id]?.kid ?? d.id)).size;
+    return (
+      <div className="flex min-h-dvh flex-col px-4 pb-[calc(var(--sab)+1.5rem)] pt-[calc(var(--sat)+1.5rem)]">
+        <div className="m-auto w-full max-w-md">
+          <motion.div initial={motionOn ? { opacity: 0, y: 12 } : false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }} className="card px-6 py-8 text-center">
+            <div className="text-sm font-medium text-muted">{plan.title}</div>
+            <div className="mt-1 text-2xl font-semibold tracking-tight">{done.length === 0 ? '没有可学习的卡片' : isCram ? '自测完成' : '本轮完成'}</div>
+            {done.length > 0 && (
+              <div className="mt-6 grid grid-cols-2 gap-2 text-left sm:grid-cols-4">
+                <Mini label="评分次数" value={String(done.length)} />
+                <Mini label="卡片 / 知识点" value={`${unique} / ${kids}`} />
+                <Mini label="忘了" value={String(again)} tone={again ? 'bad' : undefined} />
+                <Mini label="用时" value={fmtMs(elapsed)} />
+              </div>
+            )}
+            {done.length === 0 && <p className="mt-3 text-sm text-muted">{plan.mode === 'daily' ? '今天的复习与新卡都已完成。可以从章节里主动学习，或调整每日新卡上限。' : '该集合当前没有卡片。'}</p>}
+            {isCram && done.length > 0 && <p className="mt-4 text-xs text-muted">自测不写入复习调度与统计。</p>}
+            <div className="mt-6 flex flex-col gap-2">
+              {!isCram && done.length > 0 && plan.mode !== 'daily' && (
+                <Button variant="primary" size="lg" onClick={() => router.replace('/study?mode=daily')}>
+                  继续今日任务
+                </Button>
+              )}
+              <Button size="lg" onClick={onExit}>
+                返回
+              </Button>
+              <Link href="/" className="text-sm text-muted hover:text-ink">
+                回到首页
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    );
   }
 
-  const chapter = CHAPTER_MAP[card.ch];
-  const color = hueVar(chapter.hue);
-  const total = queue.length;
-  const flagged = flags.includes(card.id);
-  const judgeAnswer = card.k === 'judge' ? card.a?.trimStart().startsWith('✓') : undefined;
+  const c = card;
+  const flagged = flags.includes(c.id);
+  const judgeTruth = c.k === 'judge' ? (c.a?.trimStart().startsWith('✓') ? 0 : 1) : null;
+  const judgeCorrect = c.k === 'judge' && view.choice != null ? judgeTruth === view.choice : null;
+  const mcqCorrect = c.k === 'mcq' && view.choice != null ? view.choice === c.ans : null;
+  const isBack = view.phase === 'back';
+  const canShowHint = !!c.hook && !view.hint && !isBack;
+  const color = chapterColor(c.ch);
 
   return (
     <div className="flex min-h-dvh flex-col">
       {/* 顶栏 */}
-      <header className="sticky top-0 z-20 border-b border-line/70 bg-paper/85 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl items-center gap-2 px-3 py-2">
-          <button onClick={onExit} className="rounded-lg p-2 text-muted hover:bg-card2 hover:text-ink" aria-label="退出">
-            <Icon.Close className="h-5 w-5" />
-          </button>
-          <div className="flex-1">
-            <div className="flex items-center justify-between text-xs text-muted">
-              <span className="truncate">{plan.title}</span>
-              <span className="tabular-nums">
-                {index + 1} / {total}
-              </span>
-            </div>
-            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-line/70">
-              <div className="h-full rounded-full bg-accent transition-[width] duration-500" style={{ width: `${(index / total) * 100}%` }} />
+      <header className="sticky top-0 z-30 bg-canvas/85 backdrop-blur-md">
+        <div className="mx-auto flex max-w-3xl items-center gap-1 px-2 pb-1.5 pt-[max(var(--sat),0.5rem)] sm:px-4">
+          <Button variant="ghost" size="icon" onClick={onExit} aria-label="退出学习">
+            <ArrowLeft />
+          </Button>
+          <div className="min-w-0 flex-1 px-1">
+            <div className="truncate text-sm font-semibold">{plan.title}</div>
+            <div className="tnum text-xs text-muted">
+              {done.length} / {denominator} · 剩 {queue.length}
+              {isCram ? ' · 自测' : ''}
             </div>
           </div>
-          <button onClick={undo} disabled={!history.length} className="rounded-lg p-2 text-muted hover:bg-card2 hover:text-ink disabled:opacity-30" aria-label="撤销" title="撤销 (Z)">
-            <Icon.Undo className="h-5 w-5" />
-          </button>
-          <button
-            onClick={() => toggleFlag(card.id)}
-            className={cn('rounded-lg p-2 hover:bg-card2', flagged ? 'text-gold' : 'text-muted hover:text-ink')}
-            aria-label="标记"
-            title="标记 (F)"
-          >
-            <Icon.Flag className="h-5 w-5" filled={flagged} />
-          </button>
+          <Tip label="撤销上一张 (U)">
+            <Button variant="ghost" size="icon" onClick={undo} disabled={done.length === 0} aria-label="撤销上一张">
+              <Undo2 />
+            </Button>
+          </Tip>
+          <Tip label={flagged ? '取消收藏 (F)' : '收藏 (F)'}>
+            <Button variant="ghost" size="icon" className={cn(flagged && 'text-warn')} onClick={() => toggleFlag(c.id)} aria-pressed={flagged} aria-label="收藏">
+              <Star className={cn(flagged && 'fill-current')} />
+            </Button>
+          </Tip>
+          <Tip label="知识详情 (I)">
+            <Button variant="ghost" size="icon" onClick={() => setDetail(c.id)} aria-label="知识详情">
+              <Info />
+            </Button>
+          </Tip>
+        </div>
+        <div className="mx-auto max-w-3xl px-3 sm:px-4">
+          <div className="bar" style={{ height: 3 }}>
+            <i style={{ width: `${progress * 100}%`, background: color }} />
+          </div>
         </div>
       </header>
 
       {/* 卡片 */}
-      <main className="mx-auto w-full max-w-3xl flex-1 px-3 pb-40 pt-4 sm:px-4">
-        <div ref={cardRef} key={`${card.id}-${index}`} className="rounded-3xl border border-line bg-card shadow-[0_1px_0_rgba(0,0,0,0.02),0_12px_40px_-20px_rgba(0,0,0,0.25)]">
-          {/* 卡头 */}
-          <div className="flex flex-wrap items-center gap-2 border-b border-line/70 px-5 py-3">
-            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
-            <span className="text-sm font-medium" style={{ color }}>
-              {chapter.title}
-            </span>
-            <span className="text-muted">·</span>
-            <span className="text-sm text-muted">{card.sec}</span>
-            <div className="ml-auto flex items-center gap-2">
-              <Chip className="bg-card2 text-muted">{KIND_LABEL[card.k]}</Chip>
-              <Stars n={card.s} />
-            </div>
-          </div>
+      <div className="mx-auto w-full max-w-3xl flex-1 px-3 pb-[calc(6.5rem+var(--sab))] pt-3 sm:px-4 md:pt-5">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.article
+            key={`${c.id}-${view.seq}`}
+            initial={motionOn ? { opacity: 0, y: 10 } : false}
+            animate={{ opacity: 1, y: 0 }}
+            exit={motionOn ? { opacity: 0, y: -6, transition: { duration: 0.12, ease: 'easeIn' } } : { opacity: 0, transition: { duration: 0 } }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            className="card overflow-hidden"
+          >
+            <div className="h-1" style={{ background: color }} aria-hidden />
+            <div className="px-4 pb-4 pt-4 sm:px-6 sm:pt-5">
+              <div className="mb-3 flex items-start justify-between gap-2">
+                <CardBadges card={c} compact />
+                <span className="shrink-0 text-xs text-muted">{c.sec}</span>
+              </div>
 
-          {/* 题面 */}
-          <div className="px-5 pt-5 pb-4 sm:px-7">
-            {card.k === 'cloze' && !revealed && <p className="mb-2 text-xs font-medium tracking-wide text-gold">在心里填出空格处的内容</p>}
-            {card.k === 'judge' && !revealed && <p className="mb-2 text-xs font-medium tracking-wide text-gold">判断下列说法是否正确</p>}
-            {card.k === 'steps' && !revealed && <p className="mb-2 text-xs font-medium tracking-wide text-gold">先在心里复述完整步骤</p>}
-            {card.k === 'qa' && !revealed && <p className="mb-2 text-xs font-medium tracking-wide text-gold">先在心里作答，再核对</p>}
-            <div className="text-[1.08rem] sm:text-[1.15rem]">
-              <MathText text={card.q} mode={card.k === 'cloze' ? (revealed ? 'show' : 'hide') : 'plain'} />
-            </div>
-          </div>
+              {/* 正面 */}
+              <div className="text-[18px] leading-relaxed sm:text-[19px]">
+                {c.k === 'cloze' ? (
+                  <MathText text={c.q} mode={isBack ? 'show' : 'hide'} reveal={view.reveal} onBlank={isBack ? undefined : revealBlank} />
+                ) : (
+                  <MathText text={c.q} mode="plain" />
+                )}
+              </div>
 
-          {/* 判断题选择 */}
-          {card.k === 'judge' && !revealed && (
-            <div className="grid grid-cols-2 gap-3 px-5 pb-6 sm:px-7">
-              <button onClick={() => doJudge(true)} className="flex h-16 items-center justify-center gap-2 rounded-2xl border border-good/30 bg-good/10 text-lg font-semibold text-good transition active:scale-[0.98]">
-                ✓ 正确 <kbd>Y</kbd>
-              </button>
-              <button onClick={() => doJudge(false)} className="flex h-16 items-center justify-center gap-2 rounded-2xl border border-bad/30 bg-bad/10 text-lg font-semibold text-bad transition active:scale-[0.98]">
-                ✗ 错误 <kbd>N</kbd>
-              </button>
-            </div>
-          )}
-
-          {/* 答案 */}
-          {revealed && (
-            <div ref={answerRef} className="border-t border-dashed border-line px-5 pb-6 pt-5 sm:px-7">
-              {card.k === 'judge' && (
-                <div
-                  className={cn(
-                    'reveal-item mb-4 flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium',
-                    judge === null ? 'bg-card2 text-muted' : judge === judgeAnswer ? 'bg-good/10 text-good' : 'bg-bad/10 text-bad',
-                  )}
-                >
-                  <span className="text-xl">{judge === null ? '·' : judge === judgeAnswer ? '🎯' : '💥'}</span>
-                  <span>
-                    {judge === null ? '未作选择。' : judge === judgeAnswer ? '判断正确！' : '判断错了。'} 该说法{judgeAnswer ? '正确' : '错误'}。
-                  </span>
+              {c.k === 'judge' && (
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  {(['正确', '错误'] as const).map((label, i) => {
+                    const chosen = view.choice === i;
+                    const truthy = isBack && judgeTruth === i;
+                    return (
+                      <Button key={label} size="lg" variant="outline" disabled={isBack} onClick={() => answer(i)} aria-pressed={chosen} className={cn('h-12 justify-center text-[15px] disabled:opacity-100', truthy && 'border-good bg-good-soft text-good', isBack && chosen && !truthy && 'border-bad bg-bad-soft text-bad')}>
+                        {label}
+                        <span className="ml-1 text-xs opacity-60">{i === 0 ? 'Y' : 'N'}</span>
+                      </Button>
+                    );
+                  })}
                 </div>
               )}
-              {card.k === 'steps' && card.a ? (
-                <ol className="space-y-2.5">
-                  {card.a.split('\n').filter(Boolean).map((line, i) => {
-                    const m = /^\s*(\d+)\.\s*/.exec(line);
-                    const body = m ? line.slice(m[0].length) : line;
+
+              {c.k === 'mcq' && c.opts && (
+                <ol className="mt-4 space-y-2">
+                  {c.opts.map((o, i) => {
+                    const chosen = view.choice === i;
+                    const truthy = isBack && i === c.ans;
                     return (
-                      <li key={i} className="reveal-item flex gap-3">
-                        {m ? (
-                          <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-bold text-accent">{m[1]}</span>
-                        ) : (
-                          <span className="w-6 shrink-0" />
-                        )}
-                        <div className="flex-1 text-[1.02rem]">
-                          <MathText text={body} />
-                        </div>
+                      <li key={i}>
+                        <button type="button" disabled={isBack} onClick={() => answer(i)} aria-pressed={chosen} className={cn('flex w-full items-start gap-3 rounded-xl border px-3.5 py-3 text-left transition-colors', isBack ? 'cursor-default' : 'hover:bg-paper-2', truthy ? 'border-good bg-good-soft/60' : isBack && chosen ? 'border-bad bg-bad-soft/60' : 'border-line-2')}>
+                          <span className={cn('mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md text-xs font-semibold', truthy ? 'bg-good text-white' : isBack && chosen ? 'bg-bad text-white' : 'bg-paper-2 text-muted')}>{String.fromCharCode(65 + i)}</span>
+                          <span className="min-w-0 flex-1">
+                            <MathText text={o} />
+                          </span>
+                        </button>
                       </li>
                     );
                   })}
                 </ol>
-              ) : card.a ? (
-                <div className="reveal-item text-[1.02rem] sm:text-[1.08rem]">
-                  <MathText text={card.k === 'judge' ? card.a.replace(/^\s*[✓✗]\s*/, '') : card.a} />
-                </div>
-              ) : null}
-
-              {(card.hook || card.trap) && (
-                <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                  {card.hook && <Aside kind="hook" text={card.hook} open={showHookFirst} />}
-                  {card.trap && <Aside kind="trap" text={card.trap} open={showHookFirst} />}
-                </div>
               )}
 
-              {/* 笔记 */}
-              <div className="reveal-item mt-4">
-                {showNote || notes[card.id] ? (
-                  <textarea
-                    defaultValue={notes[card.id] ?? ''}
-                    onBlur={(e) => setNote(card.id, e.target.value)}
-                    placeholder="写下你自己的理解、口诀或易错提醒…"
-                    rows={2}
-                    className="w-full resize-y rounded-xl border border-line bg-card2/60 px-3 py-2 text-sm outline-none placeholder:text-muted/60 focus:border-accent"
-                  />
-                ) : (
-                  <button onClick={() => setShowNote(true)} className="text-xs text-muted underline-offset-2 hover:text-ink hover:underline">
-                    + 添加我的笔记
-                  </button>
+              {/* 提示 */}
+              <AnimatePresence initial={false}>
+                {view.hint && c.hook && !isBack && (
+                  <motion.div key="hint" initial={motionOn ? { opacity: 0, height: 0 } : false} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
+                    <div className="mt-4 rounded-xl border border-warn/25 bg-warn-soft/50 px-3.5 py-3 text-[15px]">
+                      <div className="mb-1 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-warn">
+                        <Lightbulb className="size-3.5" /> 提示
+                      </div>
+                      <MathText text={c.hook} />
+                    </div>
+                  </motion.div>
                 )}
-              </div>
+              </AnimatePresence>
+
+              {/* 步骤：逐步揭示 */}
+              {c.k === 'steps' && c.a && view.reveal > 0 && !isBack && (
+                <div className="mt-4 border-t border-line pt-4 text-[16px]">
+                  <MathText text={c.a} maxLines={view.reveal} />
+                  <div className="mt-2 text-xs text-muted">
+                    已显示 {view.reveal} / {steps} 步
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-        <p className="mt-4 hidden text-center text-xs text-muted sm:block">
-          {revealed ? (
-            <>
-              按 <kbd>1</kbd>–<kbd>4</kbd> 评分 · <kbd>空格</kbd> 记得 · <kbd>Z</kbd> 撤销 · <kbd>F</kbd> 标记 · <kbd>Esc</kbd> 退出
-            </>
-          ) : card.k === 'judge' ? (
-            <>
-              <kbd>Y</kbd> 正确 · <kbd>N</kbd> 错误 · <kbd>Esc</kbd> 退出
-            </>
-          ) : (
-            <>
-              按 <kbd>空格</kbd> 显示答案 · <kbd>Esc</kbd> 退出
-            </>
-          )}
-        </p>
-      </main>
+            {/* 背面（仅 back 阶段渲染，互斥） */}
+            <AnimatePresence initial={false}>
+              {isBack && (
+                <motion.div key="back" initial={motionOn ? { opacity: 0 } : false} animate={{ opacity: 1 }} transition={{ duration: 0.18 }} className="border-t border-line bg-paper-2/40 px-4 py-4 sm:px-6">
+                  {judgeCorrect != null && (
+                    <div className={cn('mb-3 inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-sm font-medium', judgeCorrect ? 'bg-good-soft text-good' : 'bg-bad-soft text-bad')}>{judgeCorrect ? '判断正确' : '判断错误'}</div>
+                  )}
+                  {mcqCorrect != null && (
+                    <div className={cn('mb-3 inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-sm font-medium', mcqCorrect ? 'bg-good-soft text-good' : 'bg-bad-soft text-bad')}>
+                      {mcqCorrect ? '选择正确' : `选择错误 · 正确答案 ${String.fromCharCode(65 + (c.ans ?? 0))}`}
+                    </div>
+                  )}
+                  {c.a && c.k !== 'cloze' && (
+                    <div className="text-[16px] sm:text-[17px]">
+                      <MathText text={c.k === 'judge' ? c.a.replace(/^\s*[✓✗]\s*/, '') : c.a} />
+                    </div>
+                  )}
+                  {c.a && c.k === 'cloze' && (
+                    <div className="text-[16px]">
+                      <MathText text={c.a} />
+                    </div>
+                  )}
+                  {c.cond && (
+                    <Note label="适用条件" tone="accent">
+                      <MathText text={c.cond} />
+                    </Note>
+                  )}
+                  {c.hook && (
+                    <Note label="记忆锚点">
+                      <MathText text={c.hook} />
+                    </Note>
+                  )}
+                  {c.trap && (
+                    <Note label="易错 · 反例" tone="bad">
+                      <MathText text={c.trap} />
+                    </Note>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.article>
+        </AnimatePresence>
 
-      {/* 底部操作 */}
-      <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-line/70 bg-paper/90 backdrop-blur">
-        <div className="mx-auto max-w-3xl px-3 pt-3 pb-safe sm:px-4">
-          {!revealed ? (
-            card.k === 'judge' ? (
-              <div className="flex h-14 items-center justify-center text-sm text-muted">先选择「正确」或「错误」</div>
-            ) : (
-              <Button size="lg" className="h-14 w-full text-base" onClick={reveal}>
-                显示答案
-                <span className="ml-1 hidden text-white/70 sm:inline">（空格）</span>
-              </Button>
-            )
+        {desktop && (
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 px-1 text-xs text-muted">
+            <span className="inline-flex items-center gap-1"><Kbd>空格</Kbd> 显示 / 下一空</span>
+            <span className="inline-flex items-center gap-1"><Kbd>1</Kbd>–<Kbd>4</Kbd> 评分</span>
+            <span className="inline-flex items-center gap-1"><Kbd>H</Kbd> 提示</span>
+            <span className="inline-flex items-center gap-1"><Kbd>F</Kbd> 收藏</span>
+            <span className="inline-flex items-center gap-1"><Kbd>U</Kbd> 撤销</span>
+            <span className="inline-flex items-center gap-1"><Kbd>I</Kbd> 详情</span>
+            <span className="inline-flex items-center gap-1"><Kbd>Esc</Kbd> 退出</span>
+          </div>
+        )}
+      </div>
+
+      {/* 底部操作栏（固定） */}
+      <div className="action-bar">
+        <div className="mx-auto max-w-3xl">
+          {!isBack ? (
+            <div className="flex items-center gap-2">
+              {isCram && (
+                <Button size="lg" variant="ghost" className="w-12 px-0" onClick={() => skip(-1)} aria-label="上一张" disabled={plan.ids.indexOf(c.id) <= 0}>
+                  <ChevronLeft />
+                </Button>
+              )}
+              {canShowHint && (
+                <Button size="lg" variant="outline" onClick={() => setView((v) => ({ ...v, hint: true }))} className="shrink-0">
+                  <Lightbulb />
+                  提示
+                </Button>
+              )}
+              {c.k === 'judge' || c.k === 'mcq' ? (
+                <div className="flex h-12 flex-1 items-center justify-center text-sm text-muted">先作答再看解析</div>
+              ) : c.k === 'cloze' ? (
+                <>
+                  <Button size="lg" variant="outline" className="flex-1" onClick={revealNext}>
+                    下一空 <span className="tnum text-xs opacity-60">{view.reveal}/{blanks}</span>
+                  </Button>
+                  <Button size="lg" variant="primary" className="flex-1" onClick={showAnswer}>
+                    全部显示
+                  </Button>
+                </>
+              ) : c.k === 'steps' ? (
+                <>
+                  <Button size="lg" variant="outline" className="flex-1" onClick={revealNext}>
+                    下一步 <span className="tnum text-xs opacity-60">{view.reveal}/{steps}</span>
+                  </Button>
+                  <Button size="lg" variant="primary" className="flex-1" onClick={showAnswer}>
+                    全部显示
+                  </Button>
+                </>
+              ) : (
+                <Button size="lg" variant="primary" className="flex-1" onClick={showAnswer}>
+                  显示答案
+                </Button>
+              )}
+              {isCram && (
+                <Button size="lg" variant="ghost" className="w-12 px-0" onClick={() => skip(1)} aria-label="下一张">
+                  <ChevronRight />
+                </Button>
+              )}
+            </div>
           ) : (
             <div className="grid grid-cols-4 gap-2">
               {GRADES.map((g) => (
-                <button
-                  key={g.g}
-                  onClick={() => grade(g.g)}
-                  className={cn('grade-btn flex h-16 flex-col items-center justify-center rounded-2xl border transition active:scale-[0.97]', g.cls)}
-                >
-                  <span className="text-[15px] font-semibold leading-tight">{g.label}</span>
-                  <span className="mt-0.5 text-[11px] opacity-80 tabular-nums">{intervals?.[g.g] ?? ''}</span>
+                <button key={g.g} type="button" onClick={() => grade(g.g)} className={cn('flex h-[3.25rem] flex-col items-center justify-center rounded-xl text-[15px] font-semibold leading-none transition-[transform,filter] active:scale-[0.97]', g.cls)} aria-label={`${g.label}（${g.key}）`}>
+                  {g.label}
+                  <span className="tnum mt-1 text-[11px] font-medium opacity-70">{intervals ? intervals[g.g] : isCram ? '自测' : ''}</span>
                 </button>
               ))}
             </div>
           )}
         </div>
-      </footer>
+      </div>
+
+      <CardSheet id={detail} onClose={() => setDetail(null)} onOpenCard={(cid) => setDetail(cid)} />
     </div>
   );
 }
 
-/* ---------- 记忆锚点 / 易错点 ---------- */
-function Aside({ kind, text, open: initOpen }: { kind: 'hook' | 'trap'; text: string; open: boolean }) {
-  const [open, setOpen] = useState(initOpen);
-  const isHook = kind === 'hook';
+function Note({ label, tone, children }: { label: string; tone?: 'bad' | 'accent'; children: React.ReactNode }) {
   return (
-    <div className={cn('reveal-item rounded-2xl border p-3.5', isHook ? 'border-accent/20 bg-accent-soft/60' : 'border-gold/25 bg-gold-soft/50')}>
-      <button onClick={() => setOpen((o) => !o)} className="flex w-full items-center gap-2 text-left text-xs font-semibold tracking-wide">
-        <span className={cn(isHook ? 'text-accent' : 'text-gold')}>{isHook ? '🧠 记忆锚点' : '⚠️ 易错点'}</span>
-        <span className="ml-auto text-muted">{open ? '收起' : '展开'}</span>
-      </button>
-      {open && (
-        <div className="mt-2 text-[0.95rem] leading-relaxed text-ink/90">
-          <MathText text={text} />
-        </div>
-      )}
+    <div className={cn('mt-3 rounded-xl border px-3.5 py-3 text-[15px]', tone === 'bad' ? 'border-bad/20 bg-bad-soft/40' : tone === 'accent' ? 'border-accent/20 bg-accent-soft/40' : 'border-line bg-paper')}>
+      <div className={cn('mb-1 text-[11px] font-semibold uppercase tracking-wide', tone === 'bad' ? 'text-bad' : tone === 'accent' ? 'text-accent' : 'text-muted')}>{label}</div>
+      {children}
     </div>
   );
 }
 
-/* ---------- 结束总结 ---------- */
-function Summary({ plan, counts, seen, startedAt, onExit, onAgain }: { plan: SessionPlan; counts: Record<Grade, number>; seen: number; startedAt: number; onExit: () => void; onAgain: () => void }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const motion = useMotion();
-  const total = counts[1] + counts[2] + counts[3] + counts[4];
-  const acc = total ? Math.round(((counts[3] + counts[4]) / total) * 100) : 0;
-  const mins = Math.max(1, Math.round((Date.now() - startedAt) / 60000));
-  const hard = counts[1] + counts[2];
-  useGSAP(
-    () => {
-      if (!motion || !ref.current) return;
-      gsap.fromTo('.sum-item', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'power3.out' });
-    },
-    { scope: ref },
-  );
-  const msg = total === 0 ? '这一轮没有可复习的卡片。' : acc >= 85 ? '状态很好，记忆非常稳固。' : acc >= 60 ? '不错，模糊的地方系统会更快安排复习。' : '没关系，遗忘是学习的一部分——这些卡片很快会再次出现。';
+function Mini({ label, value, tone }: { label: string; value: string; tone?: 'bad' }) {
   return (
-    <div ref={ref} className="mx-auto flex min-h-dvh max-w-xl flex-col items-center justify-center px-6 py-12 text-center">
-      <div className="sum-item text-5xl">{total === 0 ? '📭' : acc >= 85 ? '🏆' : acc >= 60 ? '👍' : '🌱'}</div>
-      <h2 className="sum-item mt-4 text-2xl font-bold">{plan.title} · 完成</h2>
-      <p className="sum-item mt-2 text-muted">{msg}</p>
-      <div className="sum-item mt-8 grid w-full grid-cols-3 gap-3">
-        <Stat label="复习次数" value={total} />
-        <Stat label="记住率" value={`${acc}%`} />
-        <Stat label="用时" value={`${mins} 分`} />
-      </div>
-      <div className="sum-item mt-4 grid w-full grid-cols-4 gap-2 text-xs">
-        {GRADES.map((g) => (
-          <div key={g.g} className={cn('rounded-xl border py-2', g.cls)}>
-            <div className="text-lg font-bold tabular-nums">{counts[g.g]}</div>
-            <div>{g.label}</div>
-          </div>
-        ))}
-      </div>
-      <p className="sum-item mt-3 text-xs text-muted">覆盖 {seen} 张不同卡片</p>
-      <div className="sum-item mt-8 flex w-full flex-col gap-2 sm:flex-row">
-        {hard > 0 && (
-          <Button variant="soft" size="lg" className="flex-1" onClick={onAgain}>
-            再过一遍「忘了 / 模糊」的 {hard} 张
-          </Button>
-        )}
-        <Button size="lg" className="flex-1" onClick={onExit}>
-          返回
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="rounded-2xl border border-line bg-card p-3">
-      <div className="text-2xl font-bold tabular-nums">{value}</div>
-      <div className="mt-0.5 text-xs text-muted">{label}</div>
+    <div className="rounded-xl border border-line px-3 py-2">
+      <div className="text-[11px] text-muted">{label}</div>
+      <div className={cn('tnum mt-0.5 text-lg font-semibold', tone === 'bad' && 'text-bad')}>{value}</div>
     </div>
   );
 }
